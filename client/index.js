@@ -56,16 +56,9 @@ var flagBox = [
 // childs first, then the parents
 // where initially evaluated: eval(require('script!./rolling.js'));	but doesn't seem to be necessary
 
-include('stick-defects.js');
-include('pack-defects.js');
-include('sleeve-defects.js');
-
-include("rolling.js");
-include('wrapping.js');
-include('cutting.js');
-include('storage.js');
-include('defects-tabs.js');
-include('data-tabs.js');			// parent
+include('physdata.js');	
+include('penalty.js');	
+include('data.js');			// parent
 
 include('history.js');
 
@@ -105,15 +98,15 @@ var uiTabs = [
 	])
 ]
 
-// the complete handmade component
-var handmade = {
+// the complete pline component
+var pline = {
 	view: function () {
 		return [loginBox, flagBox,	uiTabs,	tabContents];
 	}
 }
 
 $(document).ready(function() {
-	m.mount(document.body, handmade );
+	m.mount(document.body, pline );
 
 	$.getJSON('server/get_server.php', function (data) {
 		if (data != "127.0.0.1")	// dont show login on development server
@@ -144,24 +137,22 @@ $(document).ready(function() {
 		})	
 		$("#loginpop").popdown();
 	})	
-	
-	create_gauges();
 
 	if ($.jStorage.get("lang") == null)
 		$.jStorage.set("lang", 0);
-	if ($.jStorage.get("handmade_maintab") == null)
-		$.jStorage.set("handmade_maintab", 0);
-	if ($.jStorage.get("handmade_datatab") == null)
-		$.jStorage.set("handmade_datatab", 0);
-	if ($.jStorage.get("handmade_defectsstab") == null)
-		$.jStorage.set("handmade_defectsstab", 0);
-	if ($.jStorage.get("handmade_settingstab") == null)
-		$.jStorage.set("handmade_settingstab", 0);
+	if ($.jStorage.get("pline_maintab") == null)
+		$.jStorage.set("pline_maintab", 0);
+	if ($.jStorage.get("pline_datatab") == null)
+		$.jStorage.set("pline_datatab", 0);
+	if ($.jStorage.get("pline_defectsstab") == null)
+		$.jStorage.set("pline_defectsstab", 0);
+	if ($.jStorage.get("pline_settingstab") == null)
+		$.jStorage.set("pline_settingstab", 0);
 
 	fill_labels();
 
 	// default tab when page is first loaded
-	var initialtab = $.jStorage.get("handmade_maintab");
+	var initialtab = $.jStorage.get("pline_maintab");
 		
 	$( "#tabs" ).tabs({
 		active: initialtab,
@@ -170,19 +161,19 @@ $(document).ready(function() {
 			switch (keus) {
 				case "data_tab":			
 					show_datatab();
-					$.jStorage.set("handmade_maintab", 0);
+					$.jStorage.set("pline_maintab", 0);
 					break;
 				case "history_tab": 	
 					show_history(); 												// update the history
-					$.jStorage.set("handmade_maintab", 1);
+					$.jStorage.set("pline_maintab", 1);
 					break;
 				case "evaluate_tab": 
 					show_evaluation();		
-					$.jStorage.set("handmade_maintab", 2);
+					$.jStorage.set("pline_maintab", 2);
 					break;
 				case "settings_tab": 	
 					show_specs();
-					$.jStorage.set("handmade_maintab", 3);
+					$.jStorage.set("pline_maintab", 3);
 					break;
 			}
 		},
@@ -196,17 +187,6 @@ $(document).ready(function() {
 	});
 
 	$('.datum').Zebra_DatePicker();		// set all .datum inputs to datepicker
-	
-	/*
-	// set the events for start/end date
-	var start_date = $('#evaluate [name=start]').data('Zebra_DatePicker');
-	var end_date = $('#evaluate [name=end]').data('Zebra_DatePicker');
-	start_date.update({
-	  onSelect: function () { alert() }
-	});
-	end_date.update({
-	  onSelect: function () { alert() }
-	});
-	*/
+	console.log("ready");
 });
 

@@ -1,7 +1,7 @@
 {
-  "name": "handmade",
+  "name": "pline",
   "version": "0.0.0",
-  "description": "handmade program gwc",
+  "description": "primary line program gwc",
   "main": "./client/index.js",
   "dependencies": {
     "webpack": "^1.13.3"

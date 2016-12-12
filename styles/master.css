@@ -9,10 +9,10 @@ html,body {
 }
 
 .pagecontainer {
-	height: 2000px;
-	background-image: url("../assets/bg.png");
-	background-repeat: no-repeat;	
-	background-size :65%;
+	height: 2000px !important;
+	background-image: url("../assets/bg.png") !important;
+	background-repeat: no-repeat !important;	
+	background-size :65% !important;
 }
 
 .number {	width: 5em;	}
@@ -163,7 +163,7 @@ select {
 }
 
 .subtabs1 { 
-    background: transparent; 
+    background: transparent !important; 
     border: none; 
 } 
 .subtabs1 .ui-widget-header { 

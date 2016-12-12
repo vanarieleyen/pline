@@ -13,7 +13,7 @@ module.exports = {
     proxy: [
         {
             path: '/server/*',
-            target: "http://localhost:80/handmade/"			// the url of the server that handles the php requests
+            target: "http://localhost:80/pline/"			// the url of the server that handles the php requests
         }
     ]
 	},

@@ -145,7 +145,8 @@ function fill_labels() {
 	setButton(".exportsum", 160);
 	setButton(".undo", 495);
 	setButton(".edit", 593);
-
+	show('.SPECSNR', 393);
+	show('.PHYSDATA',  509);
 	show('.IMPORT', 493);
 	show('.FIELD', 116);
 	show('.MEASUREMENTS', 125);
@@ -264,6 +265,10 @@ function fill_labels() {
 	show('.IRESULT', 607);
 	show('.DISPOSAL', 608);
 	show('.HANDLINGNR', 609);
+	show('.REGAIN_1', 610);
+	show('.REGAIN_2', 611);
+	show('.CUT_STRIPS', 637);
+	show('.CUT_WIDTH', 638);
 	show('.INPUTMOIST', 612);
 	show('.OUTPUTMOIST', 613);
 	show('.OUTPUTTEMP', 614);
@@ -283,6 +288,9 @@ function fill_labels() {
 	show('.BLEND_RECYCLED_OK', 628);
 	show('.BLEND_RECYCLED_NR', 629);
 	show('.BLEND_STORAGE', 630);
+	show('.LONG_STEMS', 634);
+	show('.SHORT_STEMS', 635);
+	show('.FILLING_POWER', 636);
 	show('.MOIST_CONTENT', 631);
 	show('.MAT_INPUT', 632);
 	show('.ADDITIONAL_INSPECTIONS', 633);
