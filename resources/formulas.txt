@@ -1,0 +1,129 @@
+A1 = AD4 = Amount length out of lower limit - 长度偏小次数
+A2 = AE4 = Amount length out of upper limit - 长度偏大次数
+A3 = AF4 = Amount length within limit - 长度合格次数
+A4 = AG4 = Amount circumference out of lower limit - 圆周偏小次数
+A5 = AH4 = Amount circumference out of upper limit - 圆周偏大次数
+A6 = AI4 = Amount circumference within limit - 圆周合格次数
+A7 = AJ4 = Amount weight out of lower limit - 质量偏小次数
+A8 = AK4 = Amount weight out of upper limit - 质量偏大次数
+A9 = AL4 = Amount weight within limit - 质量合格次数
+A10 = AM4 = Amount PD out of lower limit - 吸阻偏小次数
+A11 = AN4 = Amount PD out of upper limit - 吸阻偏大次数
+A12 = AO4 = Amount PD within limit - 吸阻合格次数
+A13 = Z4 = surfout - 表面（支）(surface - nr out of specs)
+A14 = AB4 = blendacc - 配方 精度%(Blend accuracy %)
+A15 = AC4 = pdacc - 吸阻合格率%(pd accuracy %)
+A16 = AA4 = tightness - 松紧度（支）tightness - nr out of spec
+A17 = AP6 = batch score (see formula below)
+
+	B1:B10 = length (translates to B1:B10 where B1=length1, B2=length2 etc.)
+	S1 = spec:rol_l_min
+	S2 = spec:rol_l_max	
+	C1:C10 = circ (translates to C1:C10 where C1=circ1, C2=circ2 etc.)
+	S3 = spec:rol_c_min
+	S4 = spec:rol_c_max	
+	D1:D10 = weight (translates to D1:D10 where D1=weight1, D2=weight2 etc.)
+	S5 = spec:rol_w_min
+	S6 = spec:rol_w_max	
+	E1:E10 = pd (translates to E1:E10 where E1=pd1, E2=pd2 etc.)
+	S7 = spec:rol_p_min
+	S8 = spec:rol_p_max	
+	F1:F8 = moisture (translates to F1:F8 where F1=m1, F2=m2 etc.)
+	S9 = spec:moist_s_min
+	S10 = spec:moist_s_max
+
+A18 = AW4 = color - 茄衣颜色（color of wrapper）
+A19 = AX4 = headend - 头尾（head and end）
+A20 = AY4 = wrapok - 转数（number of turns - wrapped ok）
+A21 = AZ4 = incision - 切口（incision）
+A22 = BA4 = empty - 空头（empty head） 
+A23 = BB4 = tightness - 松紧度（tightness）
+A24 = BC4 = veins - 脉纹（vein lines）
+A25 = BD4 = crease - 折痕（crease
+A26 = BE4 = spot - 病斑（spots）
+A27 = BF4 = blot - 污痕（blot）
+A28 = BG4 = seam - 缝口（seam）
+A29 = BH4 = hole - 洞眼（hole）
+A30 = BI4 = break - 破皮（breakage）
+A31 = BJ4 = splice - 拼接（splice）
+A32 = BK4 = batch score (see below)
+
+A33 = F4 = headend - 头尾(head and end)
+A34 = G4 = incision - 切口(incision)
+A35 = H4 = empty - 空头(empty head)
+A36 = I4 = crease - 折痕(crease/folds)
+A37 = J4 = blot - 污痕(blot)
+A38 = K4 = seam - 缝口(seam)
+A39 = L4 = break - 破皮(breakage)
+A40 = M4 = score (see below)
+
+A41 = L6 = dopant - 杂物（支）(dopant)
+A42 = M6 = headend - 头尾（支）(head and end)
+A43 = N6 = empty - 空头（支）(empty head)
+A44 = O6 = seam - 缝口（支）(seam)
+A45 = P6 = hole - 洞眼（支）(hole)
+A46 = Q6 = break - 破皮（支）(breakage)
+A47 = K6 = deworm - 有无生霉/虫蛀)(mildew/worms damage)
+A48 = V6 = Amount moisture out of lower limit - 水分偏小次数
+A49 = W6 = Amount moisture out of upper limit - 水分偏大次数
+A50 = X6 = Amount moisture within limit - 水分合格次数
+A51 = Y6 = Amount moisture ±0.5% spec- 水标±0.5%次数
+A52 = Z6 = score (see below)
+
+----------------------------------------------------------------------------------------------------------------------
+rolling process
+
+A1: =COUNTIF(B1:B10,"<"&S1)
+A2: =COUNTIF(B1:B10,">"&S2)
+A3: =COUNTIF(B1:B10,">="&S1) - COUNTIF(B1:B10,">"&S2)
+A4: =COUNTIF(C1:C10,"<"&S3)
+A5: =COUNTIF(C1:C10,">"&S4)
+A6: =COUNTIF(C1:C10,">="&S3) - COUNTIF(C1:C10,">"&S4)
+A7: =COUNTIF(D1:D10,"<"&S5)
+A8: =COUNTIF(D1:D10,">"&S6)
+A9: =COUNTIF(D1:D10,">="&S5) - COUNTIF(D1:D10,">"&S6)
+A10: =COUNTIF(E1:E10,"<"&S7)
+A11: =COUNTIF(E1:E10,">"&S8)
+A12: =COUNTIF(E1:E10,">="&S7) - COUNTIF(E1:E10,">"&S8)
+
+AP4 = 批次 得分(batch score): 
+=100-(A1+A2)*0.5-(A4+A5)*0.4-(A7+A8)*0.3-A13*0.4-A16*0.5-(A10+A11)*1+(IF(A14="","",IF(A14<S11,-4,IF(A14>=((S11+S12)/2),IF(A14<S12,-1,0),-2))))+(IF(A15="","",IF(A15<S13,-5,IF(A15>=((S14-13)/2),IF(A15<S14,-2,0),-4))))
+
+AQ4 = 批次    质量  判定(quality determination of batch):
+=IF(OR(A17<85,(A1+A2)>6,(A4+A5)>6,(A7+A8)>6,A13>S16,(A1+A2+A4+A5+A7+A8+A13)>13,A16>S15,A14<(S11-10),A15<(S13-10)),"不合格","合格")
+
+----------------------------------------------------------------------------------------------------------------------		
+wrapping process
+BK4 = 批次 得分(batch score) :
+=100-A18*0.2-A19*0.5-A20*0.2-A21*0.5-A22*1-A23*0.5-A24*0.2-A25*0.2-A26*0.2-A27*0.5-A28*0.5-A29*1-A30*1-A31*0.5
+
+BL4 = 批次    质量  判定(quality determination of batch):
+=IF(OR(A32<96,(A18+A20+A24+A25+A26)>8,(A19+A21+A23+A27+A28+A31)>6,(A18+A19+A20+A21+A22+A23+A24+A25+A26+A27+A28+A29+A30+A31)>9),"不合格","合格")
+
+----------------------------------------------------------------------------------------------------------------------
+machine cutting
+M4 = 批次 得分(batch score):
+=100-A33*0.5-A34*0.5-A35*1-A36*0.2-A37*0.5-A38*0.5-A39*1
+
+N4 = 批次    质量  判定(quality determination of batch):
+=IF(OR(A40<90),"不合格","合格")
+
+----------------------------------------------------------------------------------------------------------------------
+storage
+
+A49: =COUNTIF(F1:F8,"<"&S9)
+A48: =COUNTIF(F1:F8,">"&S10)
+A51: =COUNTIF(F1:F8,">="&S9) - COUNTIF(F1:F8,">"S10)
+A52: =COUNTIF(F1:F8,">="&(S9-0.5))-COUNTIF(F1:F8,">="&S9)+COUNTIF(F1:F8,">"&S10)-COUNTIF(F1:F8,">"&(S10+0.5))
+
+Z4 = 批次得分(Batch Score):
+=100-A41*0.2-A42*0.5-A43*1-A44*0.5-A45*1-A46*1-(A49+A48)*0.5+IF(A47>0,-60,0)
+
+AA4 = 批次质量判定(Batch quality determination):
+=IF(OR(A52<85,A50<4,AND(A50=4,A51<3)),"不合格","合格")
+
+----------------------------------------------------------------------------------------------------------------------
+defects
+
+
+

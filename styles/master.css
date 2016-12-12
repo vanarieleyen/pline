@@ -1,0 +1,184 @@
+/* custom styles used throughout the program */
+
+html,body {
+	height:100%;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+}
+
+.pagecontainer {
+	height: 2000px;
+	background-image: url("../assets/bg.png");
+	background-repeat: no-repeat;	
+	background-size :65%;
+}
+
+.number {	width: 5em;	}
+
+.flagbox {
+	position: absolute;
+	width: 90px;
+	height: 27px;
+	top: 6px;
+	right: 1em;
+	display: -webkit-flex;
+	-webkit-flex-direction: row;
+	-webkit-justify-content: space-between;
+	z-index: 1000;
+}
+
+.scale {
+	font-size: 120%;	
+}
+
+.formula {
+	width: 33em;
+}
+
+table {
+	border-collapse: collapse;	
+}
+
+.header {	/* header for dynatables */
+	background-color: #fece2f;
+	height: 1.2em;
+}
+.row_selected {	/* selected row in a dynatable */
+	background-color: #fad19b;
+}
+
+.protect {	/* readonly fields coloring */
+	background-color:rgba(0,0,255,0.05) !important;
+	border: 0px;
+	text-align: left;
+}
+
+/* colors to indicate the measured value */
+.red {
+	color: red;
+}
+.orange {
+	color: orange;
+}
+.green {
+	color: green;
+}
+.redBackground {
+	background-color: red !important;
+}
+.orangeBackground {
+	background-color: orange !important;
+}
+.greenBackground {
+	background-color: green !important;
+}
+/* fieldsets with rounded corners and transparent backgrounds */
+fieldset {
+	display:table-cell;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;	
+	border-radius:8px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	margin: 3px;
+	background-color: rgba(0,0,0,0.1);
+}
+
+/* legend used for fieldsets */
+legend {
+	border:0px solid grey;
+	border-left-width: 10px;
+	border-right-width: 10px;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;	
+	border-radius:10px;
+	background-color: grey;
+	padding-left: 1em;
+	padding-right: 1em;
+	padding-bottom: 1px;
+	font-size: 90%;
+	color: white;
+}
+
+/* display the buttons evenly spaced in a row */
+.buttonrow {
+	display:-webkit-flex;
+	-webkit-flex-direction:row;
+	-webkit-justify-content:space-around;
+}
+
+/* buttons - rounded, transparent glass-like */
+input[type=button] {
+	background-color: rgba(0,0,0,0.1) !important;
+	border-radius:15px;
+	border-width: 0px;
+	text-decoration: none;
+	cursor: pointer;
+	outline: none;
+	box-shadow:	inset 0px 15px rgba(255,255,255,0.1), 
+					inset 0px 0px 15px rgba(0,0,0,1);    
+}
+input[type=button]:hover:enabled {
+    background-color: rgba(255,255,255,0.3) !important;
+}
+
+.minichart {
+	height:120px; 
+	width:500px;
+}
+
+/* larger checkboxes */
+input[type='checkbox'] {
+	width: 20px;
+	height: 20px;
+}
+
+/* display elements evenly in a row/column */
+.flex-row {
+	display:-webkit-flex;
+	-webkit-flex-direction:row;
+	-webkit-justify-content:space-between;
+	width: 100%;
+}
+.flex-col {
+	display:-webkit-flex;
+	-webkit-flex-direction:column;
+	-webkit-justify-content:space-between;
+	width: 100%;
+}
+
+/* transparent selectboxes */
+select {
+	border: 0px;
+	background-color: rgba(0,0,0,0.2);
+	border-radius:4px;
+}
+
+/* place the datepicker icon at the right place */
+.Zebra_DatePicker_Icon {
+	right: 1px !important;
+	top: 4px !important;	
+}
+
+.subtabs1 { 
+    background: transparent; 
+    border: none; 
+} 
+.subtabs1 .ui-widget-header { 
+    background: transparent; 
+    border: none; 
+    border-bottom: 1px solid #c0c0c0; 
+    -moz-border-radius: 0px; 
+    -webkit-border-radius: 0px; 
+    border-radius: 0px; 
+} 
+.subtabs1 .ui-tabs-nav .ui-state-default { 
+    background: transparent; 
+	 margin-top: -6px;
+} 
+.subtabs1 .ui-tabs-nav .ui-state-active a { 
+    text-decoration: underline;
+    background: white;
+}
