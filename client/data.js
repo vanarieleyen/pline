@@ -76,8 +76,30 @@ var data_content = {
 	controller: function (element, isInitialized) {		// only events and initialisation
 		if (isInitialized) 
 			return;
-		
-		$( "#tabs3" ).tabs();
+				
+		// default tab when page is first loaded
+		var initialtab = $.jStorage.get("pline_datatab");
+
+		$( "#tabs3" ).tabs({
+			active: initialtab,
+			activate: function( event, ui ) {
+				keus = ui.newPanel[0].id;
+				switch (keus) {
+					case "physdata_tab":			
+						$.jStorage.set("pline_datatab", 0);
+						break;
+					case "penalty_tab": 	
+						$.jStorage.set("pline_datatab", 1);
+						break;
+				}
+			},
+			create: function( event, ui ) {
+				switch (initialtab) {
+					//case 0: show_physdata(); break;
+					//case 1: show_penalty(); break;
+				}
+			}
+		});
 		
 	},		
 	view: function () {

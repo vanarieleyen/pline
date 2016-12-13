@@ -279,6 +279,10 @@ function fill_labels() {
 	show('.MATERIAL', 619);
 	show('.MOIST_HEAT', 620);
 	show('.AIR_DRYING', 621);
+	show('.MATREQUIREMENTS', 639);
+	show('.BATCHNOTMIXED', 641);
+	show('.EXPREQUIREMENTS', 643);
+	show('.CUTREQUIREMENTS', 642);
 	show('.FLAVORING', 622);
 	show('.FLAVORING_ACCURACY', 623);
 	show('.BLEND_CUT', 624);
@@ -1122,46 +1126,17 @@ function show_data(table) {
 }
 		
 function show_history() {
-	var defectstab = ($.jStorage.get("handmade_defectsstab") == null) ? "stickDefects" : $.jStorage.get("handmade_defectsstab");
-	var lasttab = ($.jStorage.get("handmade_lasttab") == null) ? "rolling_sub_tab" : $.jStorage.get("handmade_lasttab");
-	var source = sprintf("server/list_history.php?lang=%s&tab=%s&defects=%s", $.jStorage.get("lang"),	lasttab, defectstab);
-	
-	$("#history #lijst thead").empty();
-	$("#history #lijst thead").append('<th style="display:none">ID</th>');
-	$("#history #lijst thead").append('<th><label class="DATE"></label></th>'); 
-	$("#history #lijst thead").append('<th><label class="PRODUCT"></label></th>');
-
-	switch (lasttab) {
-		case "rolling_sub_tab":
-		case "wrapping_sub_tab":
-		case "cutting_sub_tab":
-			$("#history #lijst thead").append('<th><label class="SAMPLINGPOINT"></label></th>');
-			$("#history #lijst thead").append('<th><label class="BATCH_SCORE"></label></th>');
-			$("#history #lijst thead").append('<th><label class="BATCH_QUALITY"></label></th>');
-			$("#history #lijst thead").append('<th><label class="INSPECTOR"></label></th>');
-			break;
-		case "storage_sub_tab":
-			$("#history #lijst thead").append('<th><label class="IN_CHARGE"></label></th>');
-			$("#history #lijst thead").append('<th><label class="BATCH_SCORE"></label></th>');
-			$("#history #lijst thead").append('<th><label class="BATCH_QUALITY_OK"></label></th>');
-			$("#history #lijst thead").append('<th><label class="INSPECTOR"></label></th>');
-			break;
-		case "defects_sub_tab":
-			$("#history #lijst thead").append('<th><label class="SAMPLING_FREQ"></label></th>');
-			$("#history #lijst thead").append('<th><label class="DETERMINATION"></label></th>');
-			$("#history #lijst thead").append('<th><label class="SCORE"></label></th>');
-			$("#history #lijst thead").append('<th><label class="INSPECTOR"></label></th>');
-			break;
-	}
-
 	fill_labels();
+	var options = $.jStorage.get("pline.historylist");
 	
-	$.getJSON(source,	function(data) {
+	$.getJSON("server/list_history.php", options, function(data) {
+		$.jStorage.set("pline.historylist", options);
 		$('#history #lijst tbody').empty();
 		$.each(data.records, function (key, regel) {
 			$('#history #lijst tbody').append(regel);
-		});		
-	})		
+		});
+	})
+	
 }
 
 // fill the users list

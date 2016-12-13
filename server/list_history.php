@@ -1,7 +1,5 @@
 <?php
 
-// http://localhost/handmade/server/get_history.php?lang=1&tab=rolling_sub_tab
-
 require_once 'Classes/pdo.php';
 
 $database = new Database();
@@ -15,59 +13,59 @@ $database->execute();
 
 extract($_GET);
 
-// set table and field names with corresponding label
-switch ($tab) {
-	case "rolling_sub_tab":
-	case "wrapping_sub_tab":
-	case "cutting_sub_tab":
-		$fields = "id, date, product, name, score, quality, inspector";
-		break;
-	case "storage_sub_tab":
-		$fields = "id, date, product, incharge, score, quality, inspector";
-		break;
-	case "defects_sub_tab":
-		$fields = "id, date, product, sample, judge, score, inspector";
-		break;
-	default:
-		echo "unknown tab";
-		return;
-}
-
-$column = explode(", ", $fields);		
-											// extract the column names from the $fields
-$table = sprintf("gwc_handmade.%s", explode("_", $tab)[0]);		// get the tablename from the $tab-name
-
-if ($table == "gwc_handmade.defects") {		// er zijn 3 defects tables..
-	$type = ["stickDefects", "packDefects", "boxDefects"];
-	$table = sprintf("gwc_handmade.%s", $type[$defects]);	
-}
+if ($page < 0)
+	return;
 
 
-$query = sprintf("SELECT %s	FROM %s ORDER BY id DESC", $fields, $table);
+// paging
+$start = $page*$length;
+$limit = " LIMIT ". $start .", ". $length;
+
+$fields = "id, date, batchNr, product, score, result";
+$column = explode(", ", $fields);		// extract the column names from the $fields
+
+// sorting
+$order = sprintf(" ORDER BY %s %s ", $column[$sort+1], $direction);
+
+// list the fields and make them sortable
+$selection = "id, date, batchNr*1 AS batchNr, product, score*1.0 AS score, (result%3+result) AS result";
+
+$query = sprintf("SELECT %s	FROM gwc_pline.inspection WHERE 1 %s %s", $selection, $order, $limit);
 $database->query($query);
-// echo $database->getQuery($query); return;
 $rows = $database->resultset();
 
 $output = array();
 
 foreach ($rows as $aRow) {
 	$regel = "<tr>";
+	
 	foreach ($column AS $field) {
-		if (strstr($field, "score")) {
-			$score = $aRow[$field];
-			$txt = sprintf("<center><span class='%s'>%s</span></center>", $score<95?'red':($score<97?'orange':'green' ), $score);
-			$regel = sprintf("%s<td>%s</td>", $regel, $txt);
+		if ($field =='result') {		// make the result column a coloured block
+			switch ($aRow[$field]) {
+				case 2: $status = "greenBackground";	break;
+				case 3: $status = "orangeBackground"; break;
+				case 4: $status = "redBackground";		break;
+				default: $status= "";
+			}
+			$txt = sprintf("<center><span class='%s'>%s</span></center>", $status, str_pad("", 5, "_", STR_PAD_BOTH));
+			$regel = sprintf("%s<td>%s</td>", $regel, str_replace("_", "&nbsp;&nbsp;", $txt));  
+		} elseif ($field =='score') {
+			$score = $aRow['score'];
+			$regel = sprintf("%s<td><center><span class='%s'>%s</span></center></td>", $regel, $score<95?'red':($score<97?'orange':'green' ), $score);
 		} elseif ($field =='id') {
-			$regel = sprintf("%s<td style='display:none'>%s</td>", $regel, $aRow[$field]);
+			$regel = sprintf("%s<td style='display:none'>%s</td>", $regel, $aRow['id']);			
 		} else {
-			$regel = sprintf("%s<td><center>%s</center></td>", $regel, $aRow[$field]);
+			$regel = sprintf('%s<td><center>%s</center></td>', $regel, $aRow[$field]);
 		}
 	}
+
 	$regel .= "</tr>";
 	$output['records'][] = $regel;
 }
 
 $database->endTransaction();
+
+$output["crc"] = md5($regel);
 
 echo json_encode( $output );
 

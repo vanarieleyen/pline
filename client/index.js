@@ -148,6 +148,15 @@ $(document).ready(function() {
 		$.jStorage.set("pline_defectsstab", 0);
 	if ($.jStorage.get("pline_settingstab") == null)
 		$.jStorage.set("pline_settingstab", 0);
+			
+	$.jStorage.set("pline.historylist", {
+		lang: $.jStorage.get("lang"),
+		page: 0,
+		sort: 0,
+		direction: "DESC",
+		crc: "",
+		length: 30
+	});	
 
 	fill_labels();
 
@@ -160,7 +169,7 @@ $(document).ready(function() {
 			keus = ui.newPanel[0].id;
 			switch (keus) {
 				case "data_tab":			
-					show_datatab();
+					//show_datatab();
 					$.jStorage.set("pline_maintab", 0);
 					break;
 				case "history_tab": 	
@@ -168,20 +177,20 @@ $(document).ready(function() {
 					$.jStorage.set("pline_maintab", 1);
 					break;
 				case "evaluate_tab": 
-					show_evaluation();		
+					//show_evaluation();		
 					$.jStorage.set("pline_maintab", 2);
 					break;
 				case "settings_tab": 	
-					show_specs();
+					//show_specs();
 					$.jStorage.set("pline_maintab", 3);
 					break;
 			}
 		},
 		create: function( event, ui ) {
 			switch (initialtab) {
-				case 0: show_datatab(); break;
+				//case 0: show_datatab(); break;
 				case 1: show_history(); break;
-				case 2: show_evaluation(); break;
+				//case 2: show_evaluation(); break;
 			}
 		}
 	});
