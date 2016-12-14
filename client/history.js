@@ -1,11 +1,11 @@
 
 var history_content = {
 	contents: [
-		m("div", {style: "height:41em; overflow:auto"},
+		m("div", {style: "height:33em; overflow:auto"},
 			m("table#lijst", {width: "99%"}, [
 				m("thead.header", [
 					m("th", {style:"display:none"}, m("label", "ID")),
-					["th.DATE","th.BATCHNR","th.PRODUCT","th.PSCORE","th.IRESULT"].map(function (label, idx) {
+					["th.DATE.underline","th.BATCHNR","th.PRODUCT","th.PSCORE","th.IRESULT"].map(function (label, idx) {
 						return m(label, {nr:idx});
 					})
 				]), 
@@ -23,13 +23,9 @@ var history_content = {
 
 		$('#history #lijst tbody').on('click', 'td', function(e) {		// open the selected row
 			var id = parseInt($(this).parent().find("td:first").text());
-			var table = $.jStorage.get("handmade_lasttab").split('_')[0];
-			
-			if (table=="defects") // defects are split into different tables
-				table = Array("stickDefects", "packDefects", "boxDefects")[$.jStorage.get("handmade_defectstab")];
 
-			$.jStorage.set("handmade.current."+table, id);
-			show_data(table);		// update the data in the tab before it is selected
+			$.jStorage.set("pline.current", id);
+			show_data("inspection");		// update the data in the tab before it is selected
 			$('.PACKING50').click();
 		});
 		
@@ -77,11 +73,26 @@ var history_content = {
 			})	
 		});
 		
+		// sorteer een kolom
 		$("#history th").click(function () {
 			var options = $.jStorage.get("pline.historylist");
 			options.sort = $(this).attr("nr");
 			options.direction = (options.direction == "ASC") ? "DESC" : "ASC";
 
+			// remove sort indicator from all columns
+			$(this).parent().find("th").each(function () {
+				$(this).removeClass("underline");
+				$(this).find('.arrow').remove();
+			})
+
+			// add new sort indicator
+			$(this).addClass("underline");
+			if (options.direction == "ASC") 
+				$(this).append("<span class='arrow'> &#9650;</span>");
+			else
+				$(this).append("<span class='arrow'> &#9660;</span>");
+
+			// get the data
 			$.getJSON("server/list_history.php",	{
 				lang: options.lang,
 				page: options.page,

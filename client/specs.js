@@ -4,98 +4,126 @@ var specs_content = {
 		m("span.flex-row#data_header", {style: "background-color:rgba(0,255,255,0.05)"}, 
 			m("span.flex-col", [
 				m("fieldset.fieldset_header", {style: "width:95%"}, [
-					m("legend.PRODUCT"),
-					m("table", {width: "100%"}, [
-						[ {label:"label.NAME", field:"name"}, {label:"label.PRODNR", field:"nr"} ].map(function (a) {
-							return m("tr", [
-											m("td",	m(a.label)),
-											m("td",	m("input[type=text]", {name: a.field, style:"width:20em"}))
-										])
-						})
-					])
-				]),
-				m("fieldset.fieldset_header", {style: "width:95%"}, [
-					m("legend.ROLLING_PROCESS"),						
-					m("table", {width: "100%"}, [
-						m("tr", {align: "center"}, [
-							m("td",	m("label.LENGTH")),
-							m("td",	m("input[type=text].number", {name: "rol_l_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "rol_l_max"}))
-						]),
-						m("tr", {align: "center"}, [
-							m("td",	m("label.CIRCUMFERENCE")),
-							m("td",	m("input[type=text].number", {name: "rol_c_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "rol_c_max"}))
-						]),
-						m("tr", {align: "center"}, [
-							m("td",	m("label.WEIGHT")),
-							m("td",	m("input[type=text].number", {name: "rol_w_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "rol_w_max"}))
-						]),
-						m("tr", {align: "center"}, [
-							m("td",	m("label.PRESSUREDROP")),
-							m("td",	m("input[type=text].number", {name: "rol_p_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "rol_p_max"}))
-						]),
-						m("tr", {align: "center"}, [
-							m("td",	m("label.BLEND_ACC")),
-							m("td",	m("input[type=text].number", {name: "rol_blendacc_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "rol_blendacc_max"}))
-						]),
-						m("tr", {align: "center"}, [
-							m("td",	m("label.PD_ACC")),
-							m("td",	m("input[type=text].number", {name: "rol_pdacc_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "rol_pdacc_max"}))
-						]),
-						[	
-							{label:"label.SURFACE_OUT", field:"rol_surfout"},	
-							{label:"label.TIGHTNESS_OUT", field:"rol_tightout"}
-						].map(function (a) {
-							return m("tr",  {align: "center"}, [
-											m("td",	m(a.label)),
-											m("td",	{colspan: "3"}, m("input[type=text].number", {name: a.field}))
-										])
-						})
-					])
-				]),
-				m("fieldset.fieldset_header", {style: "width:95%"}, [
-					m("legend.WRAPPING_PROCESS"),
-					m("table", {width: "100%"}, [
-						m("tr", {align: "center"}, [
-							m("td",	m("label.WEIGHT")),
-							m("td",	m("input[type=text].number", {name: "weight_w_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "weight_w_max"}))
-						]),
-						m("tr", {align: "center"}, [
-							m("td",	m("label.MOISTURE")),
-							m("td",	m("input[type=text].number", {name: "moist_w_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "moist_w_max"}))
+					m("legend.SPECS"),
+					m("div", {style: "height:31em; overflow:auto"}, [
+						m("table", {width:"100%"},
+							m("tr", [
+								m("td", {width:"50%"},
+									m("table", {width:"100%"}, [
+										[{label:"th.NAME", field:"name"},{label:"th.SPECSNR", field:"number"}].map(function (a) {
+											return m("tr", [m(a.label), m("input", {name:a.field, style:"width:15em"}) ] )
+										})
+									])
+								),
+								m("th.REMARK"),
+								m("td", {rowspan:"2"}, m("textarea[name=remark]", {style: "width:18em; resize:none"})	)
+							])
+						),
+						m("table", {width:"100%"}, [
+							m("tr", m("th.REGAIN_1", {colspan:"3"})),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.INPUTMOIST", field1:"1_matinMoistMin", field2:"1_matinMoistMax", unit:"(%)"},
+								{th:"th.OUTPUTMOIST", field1:"1_matoutMoistMin", field2:"1_matoutMoistMax", unit:"(%)"},
+								{th:"th.OUTPUTTEMP", field1:"1_matoutTempMin", field2:"1_matoutTempMax", unit:"(℃)"}
+							].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", {align:"left"}, [
+								m("th.CHARGE_ACCUR"), m("td", {colspan:"2"}, [m("input.number[name=1_accuracy]"), m("span", "(%)")] )
+							]),
+							m("tr", m("th.REGAIN_2", {colspan:"3"})),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.INPUTMOIST", field1:"2_matinMoistMin", field2:"2_matinMoistMax", unit:"(%)"},
+								{th:"th.OUTPUTMOIST", field1:"2_matoutMoistMin", field2:"2_matoutMoistMax", unit:"(%)"},
+								{th:"th.OUTPUTTEMP", field1:"2_matoutTempMin", field2:"2_matoutTempMax", unit:"(℃)"}
+							].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", {align:"left"}, [
+								m("th.CHARGE_ACCUR"), m("td", {colspan:"2"}, [m("input.number[name=2_accuracy]"), m("span", "(%)")] )
+							]),
+							m("tr", m("th.STORAGE", {colspan:"3"})),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.STORAGETIME", field1:"storTimeMin", field2:"storTimeMax", unit:"(h)"}	].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", m("th.CUT_STRIPS", {colspan:"3"})),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.CUT_WIDTH", field1:"cutWidthMin", field2:"cutWidthMax", unit:"(mm)"}	].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", m("th.MOIST_HEAT", {colspan:"3"})),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.INPUTMOIST", field1:"cyl_matinMoistMin", field2:"cyl_matinMoistMax", unit:"(%)"},
+								{th:"th.OUTPUTMOIST", field1:"cyl_matoutMoistMin", field2:"cyl_matoutMoistMax", unit:"(%)"},
+								{th:"th.OUTPUTTEMP", field1:"cyl_matoutTempMin", field2:"cyl_matoutTempMax", unit:"(℃)"}
+							].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", m("th.AIR_DRYING", {colspan:"3"})),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.OUTPUTMOIST", field1:"dry_matoutMoistMin", field2:"dry_matoutMoistMax", unit:"(%)"},
+								{th:"th.OUTPUTTEMP", field1:"dry_matoutTempMin", field2:"dry_matoutTempMax", unit:"(℃)"}
+							].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", m("th.BLEND_CUT", {colspan:"3"})),
+							m("tr", {align:"left"}, [
+									m("th.BLEND_ACCUR"), m("td", [m("span", "≤"),  m("input.number[name=blendcutAccuracy]"), m("span", "(%)")] )
+							]),
+							m("tr", m("th.BLEND_EXP", {colspan:"3"})),
+							m("tr", {align:"left"}, [
+									m("th.BLEND_ACCUR"), m("td", [m("span", "≤"),  m("input.number[name=blendexpAccuracy]"), m("span", "(%)")] )
+							]),
+							m("tr", m("th.BLEND_STORAGE", {colspan:"3"})),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.MOIST_CONTENT", field1:"blendstorMoistMin", field2:"blendstorMoistMax", unit:"(%)"}	].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", m("th.FLAVORING", {colspan:"3"})),
+							m("tr", {align:"left"}, [
+									m("th.FLAVORING_ACCURACY"), m("td", [m("span", "≤"),  m("input.number[name=blendflavorAccuracy]"), m("span", "(%)")] )
+							]),
+							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
+							[	{th:"th.OUTPUTMOIST", field1:"flavor_matoutMoistMin", field2:"flavor_matoutMoistMax", unit:"(%)"}	].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field1+"]"), m("span", a.unit)] ), 
+													m("td", [m("input.number[name="+a.field2+"]"), m("span", a.unit)] )
+												])
+							}),
+							m("tr", m("th.ADDITIONAL_INSPECTIONS", {colspan:"3"})),
+							[	{th:"th.LONG_STEMS", field:"amountLongStems"},	{th:"th.SHORT_STEMS", field1:"amountShortStems"}].map(function (a) {
+								return m("tr", {align:"left"}, [
+													m(a.th), m("td", [m("input.number[name="+a.field+"]")] )
+												])
+							}),
+							m("tr", {align:"left"},m("th.FILLING_POWER"), m("td", [m("input.number[name=fillingPower]"), m("span", "(cm³/g)")] ))
+							
+							
 						])
 					])
-				]),
-				m("fieldset.fieldset_header", {style: "width:95%"}, [
-					m("legend.MACHINE_CUTTING"),
-					m("div", {style: "height: 4em"})
-				]),
-				m("fieldset.fieldset_header", {style: "width:95%"}, [
-					m("legend.STORAGE_PROCESS"),
-					m("div"),
-					m("table", {width: "100%"}, [
-						m("tr", {align: "center"}, [
-							m("td",	m("label.MOISTURE")),
-							m("td",	m("input[type=text].number", {name: "moist_s_min"})),
-							m("td",	 m("hr")),
-							m("td",	m("input[type=text].number", {name: "moist_s_max"}))
-						])
-					])
+
 				])
 			]),
 			m("span.flex-col#data_header",

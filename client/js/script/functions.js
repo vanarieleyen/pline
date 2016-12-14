@@ -442,27 +442,25 @@ $(document).on("keyup", "input.number", function() {
 });
 
 // sets the current record pointer
-function get_current (table) {
-	var name = table.split('.')[1];
-	
-	if ($.jStorage.get("handmade.current."+name) == null) {	// for first-time start-ups 
+function get_current() {
+	if ($.jStorage.get("pline.current") == null) {	// for first-time start-ups 
 		$.getJSON('server/get_record.php', { 
 			query: 'SELECT max(id) AS id FROM '+table
 		}, function(data) {
-			$.jStorage.set("handmade.current."+name, data.id);	// NULL when none found
+			$.jStorage.set("pline.current", data.id);	// NULL when none found
 		});
 	} else {
 		$.getJSON('server/get_record.php', { 
-			query: 'SELECT id FROM '+table+' WHERE id='+$.jStorage.get("handmade.current."+name)
+			query: 'SELECT id FROM gwc_pline.inspection WHERE id='+$.jStorage.get("pline.current")
 		},	function(data) {
 			if (data.id == null) {
 				$.getJSON('server/get_record.php', { 
-					query: 'SELECT max(id) AS id FROM '+table
+					query: 'SELECT max(id) AS id FROM gwc_pline.inspection'
 				}, function(data) {
-					$.jStorage.set("handmade.current."+name, data.id);	// NULL when none found
+					$.jStorage.set("pline.current", data.id);	// NULL when none found
 				});
 			} else {
-				$.jStorage.set("handmade.current."+name, data.id);
+				$.jStorage.set("pline.current", data.id);
 			}
 		});
 	}
@@ -472,7 +470,7 @@ function get_current (table) {
 function next_rec(table) {
 	var name = table.split('.')[1];
 	
-	this.current = $.jStorage.get("handmade.current."+name);
+	this.current = $.jStorage.get("pline.current");
 	$.getJSON('server/get_record.php', { 
 		query: 'SELECT * FROM '+table+' WHERE id = ' + this.current + ' LIMIT 1'
 	}, function(data) {
@@ -481,14 +479,14 @@ function next_rec(table) {
 				query: 'SELECT * FROM '+table+' WHERE id > "' + data.id + '" ORDER BY id ASC LIMIT 1'
 			}, function(data) {
 				if (data.rowcount != 0) {	// als er nog records worden gevonden...
-					$.jStorage.set("handmade.current."+name, data.id);
+					$.jStorage.set("pline.current", data.id);
 				}	
 			});
 		} else {
 			$.getJSON('server/get_record.php', { 
 				query: 'SELECT max(id) AS id FROM '+table
 			},	function(data) {
-				$.jStorage.set("handmade.current."+name, data.id);	// NULL when none found
+				$.jStorage.set("pline.current", data.id);	// NULL when none found
 			});
 		}		
 	});
@@ -499,7 +497,7 @@ function next_rec(table) {
 function prev_rec(table) {
 	var name = table.split('.')[1];
 	
-	this.current = $.jStorage.get("handmade.current."+name);
+	this.current = $.jStorage.get("pline.current");
 	$.getJSON('server/get_record.php', { 
 		query: 'SELECT * FROM '+table+' WHERE id = ' + this.current + ' LIMIT 1'
 	}, function(data) {
@@ -508,14 +506,14 @@ function prev_rec(table) {
 				query: 'SELECT * FROM '+table+' WHERE id < "' + data.id + '" ORDER BY id DESC LIMIT 1'
 			}, function(data) {
 				if (data.rowcount != 0) {	// als er nog records worden gevonden...
-					$.jStorage.set("handmade.current."+name, data.id);
+					$.jStorage.set("pline.current", data.id);
 				}	
 			});		
 		} else {
 			$.getJSON('server/get_record.php', { 
 				query: 'SELECT min(id) AS id FROM '+table
 			},	function(data) {
-				$.jStorage.set("handmade.current."+name, data.id);	// NULL when none found
+				$.jStorage.set("pline.current", data.id);	// NULL when none found
 			});
 		}		
 	});
@@ -523,67 +521,20 @@ function prev_rec(table) {
 }
 
 // make a new record
-function new_rec(table, element) {
+function new_rec(table) {
 	var name = table.split('.')[1];
 	
 	$.getJSON('server/new.php', {	
 			table: table
 	}, function(data) {
 		if (data.id != null) {
-			$.jStorage.set("handmade.current."+name, data.id);
-			$(element+" input").not("[type=button]").removeAttr("disabled");
-			$(element+" textarea").removeAttr("disabled");
-			$(element+" select").removeAttr("disabled");
-			$(element+" checkbox").attr("disabled", "disabled");
+			$.jStorage.set("pline.current", data.id);
+			$("input").not("[type=button]").removeAttr("disabled");
+			$("textarea").removeAttr("disabled");
+			$("select").removeAttr("disabled");
+			$("checkbox").attr("disabled", "disabled");
 		}
 		show_data(name);
-	});
-}
-
-// create all the gauges used on the rolling and storage pages
-function create_gauges() {
-	var scale = Array();
-	var kleuren = $.jStorage.get("handmade.gradient");
-	
-	for (i=100; i>0; i-=4) {
-		val = kleuren[(100-i)/4];
-		scale.push({"from": (i-4)/100, "to": i/100, "color": val});		// load the gradient for the scale
-	}
-	var options = {		// default options for the gauges
-		renderTo: 'rl',
-		title: "CPK",
-		fontTitleSize: "30pt",
-		colorTitle: "black",
-		animation: true,
-		animationDuration: 500,
-		animatedValue: true,
-		animationRule: "linear",
-		animateOnInit: true,
-		needleCircleInner: false,
-		needleCircleOuter: true,
-		needleCircleSize: 5,
-		needleWidth: 3,
-		needleShadow: false,
-		needleType: "arrow",
-		colorNeedle: "rgba(0,0,0,0.7)",
-		colorNeedleEnd: "rgba(0,0,0,0.5)",
-		colorNeedleCircleOuter: "darkgrey",
-		borders: false,
-		fontNumbersSize: "20pt",
-		majorTicks: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
-		borderShadowWidth: 0,
-		colorPlate: "rgba(255,255,255,0)",
-		highlights: scale,
-		valueBox: false,
-		maxValue: 1.0,
-		minValue: 0.0,
-		height: 100,
-		width: 100	
-	};
-
-	["r-lengte","r-omtrek","r-gewicht","r-pd","w-moisture","w-gewicht","s-moisture"].map(function(choice) {
-		options.renderTo = choice;
-		new RadialGauge(options);
 	});
 }
 
@@ -663,435 +614,77 @@ function colorSeries(element, soort, spec) {		// set the color of a row of field
 
 // load the data for the page
 function load_data(table) {
-	$.jStorage.set("handmade_table", table);
+	$.jStorage.set("pline_table", table);
 	show_data(table); 
 }
 
 // shows the data from a table
 function show_data(table) {
+ 
+	get_current();	// get the current record pointer
 	
-	// get the current location 
-	get_current("gwc_handmade."+table);
-	
-	var id = $.jStorage.get("handmade.current."+table);
-	var sql = sprintf('SELECT * FROM gwc_handmade.%s WHERE id=%s', table, id);
+	var id = $.jStorage.get("pline.current");
+	var sql = sprintf('SELECT * FROM gwc_pline.%s WHERE id=%s', table, id);
 
 	if (id != null)	{
 		$.getJSON('server/get_record.php', { 
 			query: sql
 		}, function(data) {
 			switch (table) {
-				case "rolling":
+				case "inspection":
+					var lang = $.jStorage.get("lang");
+
 					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.rolling") == null) {
-						$("#rolling input").not("[type=button]").attr("disabled", "disabled");
-						$("#rolling textarea").attr("disabled", "disabled");
+					if ($.jStorage.get("pline.current") == null) {
+						$("input").not("[type=button]").attr("disabled", "disabled");
+						$("textarea").attr("disabled", "disabled");
 					}
 					
 					// fill the selectbox options
-					$.getJSON('server/get_names.php', function(data) {
-						$('#rolling [name=inspector]').empty().append(data.inspectors);	
-						$('#rolling [name=name]').empty().append(data.sampling);	
+					$.get('server/get_inspector.php', function(data) {
+						$('#data [name=inspector]').empty().append(data);	
+						$('#data [name=inspectorDis]').empty().append(data);
 					});
-					$.get('server/get_products.php',  function(data) {
-						$('#rolling [name=product]').empty().append(data);	
-					});				
+					$.get('server/get_productionstatus.php?lang='+lang, function(data) {$('#data [name=prodStat]').empty().append(data);	});
+					$.get('server/get_inspectionresult.php?lang='+lang, function(data) {$('#data [name=result]').empty().append(data);	});
+					$.get('server/get_disposal.php?lang='+lang, function(data) {$('#data [name=disposal]').empty().append(data);	});
+					$.get('server/get_specs.php?lang='+lang, function(data) {$('#data [name=number]').empty().append(data);	});
+					$.get('server/get_products.php?lang='+lang, function(data) {$('#data [name=product]').empty().append(data);	});	
+					$.get('server/get_status.php?lang='+lang, function(data) {
+						$('#physdata [name=1_moistOK]').empty().append(data);	
+						$('#physdata [name=2_moistOK]').empty().append(data);
+						$('#physdata [name=rawMatOK]').empty().append(data);
+						$('#physdata [name=storageMatOK]').empty().append(data);
+						$('#physdata [name=flavorOK]').empty().append(data);			
+						$('#physdata [name=blendcutMatOK]').empty().append(data);
+						$('#physdata [name=blendexpMatOK]').empty().append(data);
+						$('#physdata [name=blendreOK]').empty().append(data);
+						$('#physdata [name=blendstorMix]').empty().append(data);
+					});	
 				
 					// add option when it is not in the select
-					["inspector", "product"].map(function (label) {
-						if (!$('#rolling [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#rolling [name='+label+']'));
+					["inspector", "product", "inspectorDis", "number"].map(function (label) {
+						if (!$('#data [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
+							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#data [name='+label+']'));
 						}
 					});
 
-					["date","product","name","remarks","inspector","surfout","tightout","blendacc","pdacc"].map(function (label) {
-						$("#rolling [name="+label+"]").val(data[label]);
+					["date","batchNr","product","number","prodStat","inspector","result","pendingReason","disposal","matNotNR","inspectorDis"].map(function (label) {
+						$("#data [name="+label+"]").val(data[label]);
 					});
-					["score","quality"].map(function (label) {	$("#rolling [name="+label+"]").html(data[label]);	});
+					["score"].map(function (label) {	$("#data ."+label).html(data[label]);	});
 
-					db.rolling.lengte.field.map(function(field) {		$("#rolling [name="+field+"]").val(data[field]);	});
-					db.rolling.omtrek.field.map(function(field) {		$("#rolling [name="+field+"]").val(data[field]);	});
-					db.rolling.gewicht.field.map(function(field) {	$("#rolling [name="+field+"]").val(data[field]);	});
-					db.rolling.pd.field.map(function(field) {				$("#rolling [name="+field+"]").val(data[field]);	});
-					
-					var spec = getSpec(data.product, data.date);
-					["lengte","omtrek","gewicht","pd"].map(function(choice) {
-						mini_chart("rolling", choice, id);		// show minichart
-						colorSeries("rolling", choice, spec);								// color the inputs
-						
-						if (spec != null) { // calculate and show the cpk
-							var serie = [];
-							db.rolling[choice].field.map(function (field) {
-								var waarde = parseFloat(data[field]);
-								if (!isNaN(waarde))
-									serie.push(waarde);
-							});
-							var result = cpk(spec[db.rolling[choice].spec.min], spec[db.rolling[choice].spec.max], serie);
-							gauge = document.gauges.get("r-"+choice);
-							if (gauge != null) {
-								gauge.value = Math.min(Math.max(result, 0), 1);
-								gauge.update();
-							}
-						} else {	// product is not filled, so no specs
-							gauge = document.gauges.get("r-"+choice);
-							if (gauge != null) {
-								gauge.value = 0.0;
-								gauge.update();
-							}
-						}
+					["rawMatOK","1_matinMoistA","1_matinMoistB","1_moistOK","1_matoutMoistA","1_matoutMoistB","1_matoutTempA","1_matoutTempB","1_accuracy",
+					"2_matinMoistA","2_matinMoistB","2_moistOK","2_matoutMoistA","2_matoutMoistB","2_matoutTempA","2_matoutTempB","2_accuracy",
+					"storageTime","storageMatOK","cutWidth","cyl_matinMoistA","cyl_matinMoistB","cyl_matoutMoistA","cyl_matoutMoistB",
+					"cyl_matoutTempA","cyl_matoutTempB","dry_matoutMoistA","dry_matoutMoistB","dry_matoutTempA","dry_matoutTempB",
+					"flavorOK","flavorAccuracy","flavor_matoutMoistA","flavor_matoutMoistB","flavor_matoutMoistC","flavor_matoutMoistD",
+					"blendcutMatOK","blendcutAccuracy","blendexpMatOK","blendexpAccuracy","blendreID","blendreOK","blendstorMix",
+					"blendstorMoistA","blendstorMoistB","blendstorMoistC","blendstorMoistD",
+					"amountLongStems","amountShortStems","fillingPower"].map(function (label) {
+						$("#physdata [name="+label+"]").val(data[label]);
 					});
 					
-					["surfout","tightout","blendacc","pdacc"].map(function (label) {
-						setColor("#rolling", label, spec);
-					});
-					break;
-				case "wrapping":
-					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.wrapping") == null) {
-						$("#wrapping input").not("[type=button]").attr("disabled", "disabled");
-						$("#wrapping textarea").attr("disabled", "disabled");
-					}	
-					
-					// fill the selectbox options
-					$.getJSON('server/get_names.php', function(data) {
-						$('#wrapping [name=inspector]').empty().append(data.inspectors);	
-						$('#wrapping [name=name]').empty().append(data.sampling);	
-					});
-					$.get('server/get_products.php', function(data) {
-						$('#wrapping [name=product]').empty().append(data);	
-					});
-
-					// add option when it is not in the select
-					["inspector", "product"].map(function (label) {
-						if (!$('#wrapping [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#wrapping [name='+label+']'));
-						}
-					});
-
-					db.wrapping.gewicht.field.map(function(field) {		$("#wrapping [name="+field+"]").val(data[field]);	});
-					db.wrapping.moisture.field.map(function(field) {	$("#wrapping [name="+field+"]").val(data[field]);	});
-					
-					var spec = getSpec(data.product, data.date);
-
-					["gewicht","moisture"].map(function(choice) {
-						mini_chart("wrapping", choice, id);				// show minichart
-						colorSeries("wrapping", choice, spec);		// color the inputs
-						
-						if (spec != null) { // calculate and show the cpk
-							var serie = [];
-							db.wrapping[choice].field.map(function (field) {
-								var waarde = parseFloat(data[field]);
-								if (!isNaN(waarde))
-									serie.push(waarde);
-							});
-							var result = cpk(spec[db.wrapping[choice].spec.min], spec[db.wrapping[choice].spec.max], serie);
-							gauge = document.gauges.get("w-"+choice);
-							if (gauge != null) {
-								gauge.value = Math.min(Math.max(result, 0), 1);
-								gauge.update();
-							}
-						} else {	// product is not filled, so no specs
-							gauge = document.gauges.get("w-"+choice);
-							if (gauge != null) {
-								gauge.value = 0.0;
-								gauge.update();
-							}
-						}
-					});
-					
-					["date","product","name","inspector","remarks","incision","seam","empty","hole","tightness","veins",
-								"crack","splice","color","headend","wrapok","crease","spot","blot"].map(function (label) {
-						$("#wrapping [name="+label+"]").val(data[label]);
-					});
-					
-					var sum = 0;				// faults total
-					var allowed = 9;		// maximum allowed faults
-					var fields = ["incision","seam","empty","hole","tightness","veins","crack","splice","color","headend","wrapok","crease","spot","blot"];
-					fields.map(function (label) {
-						sum += (data[label].trim()=="") ? 0 : parseInt(data[label]);
-					});
-					fields.map(function (label) {
-						setColor("#wrapping", label, Math.max(Math.min(allowed-sum+1, allowed+1), 0.1));
-					});
-
-					["score","quality"].map(function (label) {	$("#wrapping [name="+label+"]").html(data[label]);	});		
-					break;
-				case "cutting":
-					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.cutting") == null) {
-						$("#cutting input").not("[type=button]").attr("disabled", "disabled");
-						$("#cutting textarea").attr("disabled", "disabled");
-					}	
-					
-					// fill the selectbox options
-					$.getJSON('server/get_names.php', function(data) {
-						$('#cutting [name=inspector]').empty().append(data.inspectors);	
-						$('#cutting [name=name]').empty().append(data.sampling);	
-					});
-					$.get('server/get_products.php', function(data) {
-						$('#cutting [name=product]').empty().append(data);	
-					});
-
-					// add option when it is not in the select
-					["inspector", "product"].map(function (label) {
-						if (!$('#cutting [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#cutting [name='+label+']'));
-						}
-					});
-
-					["date","product","name","inspector","remarks","incision","seam","empty",
-								"crack","headend","crease","blot"].map(function (label) {
-						$("#cutting [name="+label+"]").val(data[label]);
-					});
-					
-					var sum = 0;				// faults total
-					var allowed = 6;		// maximum allowed faults
-					var fields = ["incision","seam","empty","crack","headend","crease","blot"];
-					fields.map(function (label) {
-						sum += (data[label].trim()=="") ? 0 : parseInt(data[label]);
-					});
-					fields.map(function (label) {
-						setColor("#cutting", label, Math.max(Math.min(allowed-sum+1, allowed+1), 0.1));
-					});
-
-					["score","quality"].map(function (label) {	$("#cutting [name="+label+"]").html(data[label]);	});
-					break;
-				case "storage":
-					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.storage") == null) {
-						$("#storage input").not("[type=button]").attr("disabled", "disabled");
-						$("#storage textarea").attr("disabled", "disabled");
-					}
-					
-					// fill the selectbox options
-					$.getJSON('server/get_names.php', function(data) {
-						$('#storage [name=inspector]').empty().append(data.inspectors);	
-						$('#storage [name=incharge]').empty().append(data.incharge);	
-					});
-					$.get('server/get_products.php', function(data) {
-						$('#storage [name=product]').empty().append(data);	
-					});
-
-					// add option when it is not in the select
-					["inspector", "product"].map(function (label) {
-						if (!$('#storage [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#storage [name='+label+']'));
-						}
-					});
-
-					["date","product","incharge","inspector","remarks","start","end","moistmin","moistmax",
-								"deworm","headend","empty","seam","hole","dopant","break"].map(function (label) {
-						$("#storage [name="+label+"]").val(data[label]);
-					});
-					["score","quality"].map(function (label) {	$("#storage [name="+label+"]").html(data[label]);	});
-					
-					var sum = 0;				// faults total
-					var allowed = 6;		// maximum allowed faults
-					var fields = ["deworm","headend","empty","seam","hole","dopant","break"];
-					fields.map(function (label) {
-						sum += (data[label].trim()=="") ? 0 : parseInt(data[label]);
-					});
-					fields.map(function (label) {
-						setColor("#storage", label, Math.max(Math.min(allowed-sum+1, allowed+1), 0.1));
-					});					
-					
-					for (var i=1; i<=8; i++) {
-						$("#storage [name=m"+i+"]").val(data["m"+i]);
-					}
-					
-					var spec = getSpec(data.product, data.date);
-					mini_chart("storage", "moisture", id);
-					colorSeries("storage", "moisture", spec);
-
-					if (spec != null) {
-						// calculate and show the cpk
-						serie = [];
-						db.storage.moisture.field.map(function (field) {
-							var waarde = parseFloat(data[field]);
-							if (!isNaN(waarde))
-								serie.push(waarde);
-						});
-						var result = cpk(spec[db.storage.moisture.spec.min], spec[db.storage.moisture.spec.max], serie);
-						gauge = document.gauges.get("s-moisture");
-						if (gauge != null) {
-							gauge.value = Math.min(Math.max(result, 0), 1);
-							gauge.update();
-						}
-					} else {	// product is not filled, so no specs
-						gauge = document.gauges.get("s-moisture");
-						if (gauge != null) {
-							gauge.value = 0.0;
-							gauge.update();
-						}
-					}
-											
-					break;
-				case "stickDefects":
-					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.stickDefects") == null) {
-						$("#stickDefects input").not("[type=button]").attr("disabled", "disabled");
-						$("#stickDefects textarea").attr("disabled", "disabled");
-						$("#stickDefects select").attr("disabled", "disabled");
-					}
-					
-					// fill the selectbox options
-					$.get('server/get_defects.php?type=stick ring', function(data) {
-						db.stickDefects.ring.field.map(function(field){	$('#stickDefects [name='+field+']').append(data);	});
-					});
-					$.get('server/get_defects.php?type=stick cel', function(data) {
-						db.stickDefects.cell.field.map(function(field){	$('#stickDefects [name='+field+']').append(data);	});
-					});
-					$.get('server/get_defects.php?type=stick set', function(data) {
-						db.stickDefects.set.field.map(function(field){	$('#stickDefects [name='+field+']').append(data);	});
-					});
-					$.get('server/get_defects.php?type=pack mark', function(data) {
-						db.stickDefects.pack.field.map(function(field){	$('#stickDefects [name='+field+']').append(data);	});
-					});
-					$.getJSON('server/get_names.php', function(data) {
-						$('#stickDefects [name=inspector]').empty().append(data.inspectors);	
-					});
-					$.get('server/get_products.php', function(data) {
-						$('#stickDefects [name=product]').empty().append(data);	
-					});
-					
-					// add option when it is not in the select
-					["inspector", "product"].map(function (label) {
-						if (!$('#stickDefects [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#stickDefects [name='+label+']'));
-						}
-					});
-
-					["date","product","sample","inspector","remarks","sjob","judge","sremarks"].map(function (label) {
-						$("#stickDefects [name="+label+"]").val(data[label]);
-					});
-					$("#stickDefects [name=score]").html(data.score);
-
-					var sum = 0;
-					var allowed = 6;		// maximum allowed faults
-					var fields = ["ringAmount","cellAmount","setAmount","packAmount"];
-					fields.map(function(label){
-						db.stickDefects[label].field.map(function(field) {
-							nr = data[field];
-							sum += (nr.trim()=="") ? 0 : parseInt(nr);
-							$("#stickDefects [name="+field+"]").val(nr);						// set amount
-							var defect = field.slice(0,-3);	// remove the _nr part
-							$("#stickDefects [name="+defect+"]").val(data[defect]);		// set defect
-						});
-					});
-					fields.map(function(label){
-						db.stickDefects[label].field.map(function(field) {
-							setColor("#stickDefects", field, Math.max(Math.min(allowed-sum+1, allowed+1), 0.1));
-						});
-					});
-					
-					break;
-				case "packDefects":
-					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.packDefects") == null) {
-						$("#packDefects input").not("[type=button]").attr("disabled", "disabled");
-						$("#packDefects textarea").attr("disabled", "disabled");
-						$("#packDefects select").attr("disabled", "disabled");
-					}
-					
-					// fill the selectbox options
-					$.get('server/get_defects.php?type=pack pack', function(data) {
-						for (var i=1; i<=3; i++)	$('#packDefects [name=ppd'+i+']').append(data);	
-					});
-					$.get('server/get_defects.php?type=pack mark', function(data) {
-						for (var i=1; i<=3; i++)	$('#packDefects [name=pm'+i+']').append(data);
-					});
-					$.getJSON('server/get_names.php', function(data) {
-						$('#packDefects [name=inspector]').empty().append(data.inspectors);	
-					});
-					$.get('server/get_products.php', function(data) {
-						$('#packDefects [name=product]').empty().append(data);	
-					});				
-				
-					// add option when it is not in the select
-					["inspector", "product"].map(function (label) {
-						if (!$('#packDefects [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#packDefects [name='+label+']'));
-						}
-					});
-
-					["date","product","sample","inspector","remarks","pjob","judge","premarks"].map(function (label) {
-						$("#packDefects [name="+label+"]").val(data[label]);
-					});
-					$("#packDefects [name=score]").html(data.score);
-					
-					var sum = 0;
-					var allowed = 6;		// maximum allowed faults
-					var fields = ["qualityAmount","packAmount"];
-					fields.map(function(label){
-						db.packDefects[label].field.map(function(field) {
-							nr = data[field];
-							sum += (nr.trim()=="") ? 0 : parseInt(nr);
-							$("#packDefects [name="+field+"]").val(nr);						// set amount
-							var defect = field.slice(0,-3);	// remove the _nr part
-							$("#packDefects [name="+defect+"]").val(data[defect]);		// set defect
-						});
-					});
-					fields.map(function(label){
-						db.packDefects[label].field.map(function(field) {
-							setColor("#packDefects", field, Math.max(Math.min(allowed-sum+1, allowed+1), 0.1));
-						});
-					});
-					
-					break;
-				case "boxDefects":
-					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.boxDefects") == null) {
-						$("#boxDefects input").not("[type=button]").attr("disabled", "disabled");
-						$("#boxDefects textarea").attr("disabled", "disabled");
-						$("#boxDefects select").attr("disabled", "disabled");
-					}
-					
-					// fill the selectbox options
-					$.get('server/get_defects.php?type=sleeve', function(data) {
-						for (var i=1; i<=3; i++)	$('#boxDefects [name=bsd'+i+']').append(data);	
-					});
-					$.get('server/get_defects.php?type=box box', function(data) {
-						for (var i=1; i<=3; i++)	$('#boxDefects [name=bb'+i+']').append(data);	
-					});
-					$.get('server/get_defects.php?type=pack mark', function(data) {
-						for (var i=1; i<=3; i++) 	$('#boxDefects [name=bm'+i+']').append(data);
-					});
-					$.getJSON('server/get_names.php', function(data) {
-						$('#boxDefects [name=inspector]').empty().append(data.inspectors);	
-					});
-					$.get('server/get_products.php', function(data) {
-						$('#boxDefects [name=product]').empty().append(data);	
-					});
-
-					// add option when it is not in the select
-					["inspector", "product"].map(function (label) {
-						if (!$('#boxDefects [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#boxDefects [name='+label+']'));
-						}
-					});
-
-					["date","product","sample","inspector","remarks","bjob","judge","bremarks"].map(function (label) {
-						$("#boxDefects [name="+label+"]").val(data[label]);
-					});
-					$("#boxDefects [name=score]").html(data.score);
-					
-					var sum = 0;
-					var allowed = 6;		// maximum allowed faults
-					var fields = ["sleeveAmount","boxAmount","packAmount"];
-					fields.map(function(label){
-						db.boxDefects[label].field.map(function(field) {
-							nr = data[field];
-							sum += (nr.trim()=="") ? 0 : parseInt(nr);
-							$("#boxDefects [name="+field+"]").val(nr);						// set amount
-							var defect = field.slice(0,-3);	// remove the _nr part
-							$("#boxDefects [name="+defect+"]").val(data[defect]);		// set defect
-						});
-					});
-					fields.map(function(label){
-						db.boxDefects[label].field.map(function(field) {
-							setColor("#boxDefects", field, Math.max(Math.min(allowed-sum+1, allowed+1), 0.1));
-						});
-					});
 					break;
 				case "specs":
 					// no records found - disable all input fields
@@ -1100,13 +693,6 @@ function show_data(table) {
 						$("#specs textarea").attr("disabled", "disabled");
 					}
 					show_specs();
-					break;
-				case "formulas":
-					["l_outlow","l_outhigh","l_inspec","c_outlow","c_outhigh","c_inspec","w_outlow","w_outhigh","w_inspec",
-								"p_outlow","p_outhigh","p_inspec","m_outlow","m_outhigh","m_inspec","m_2inspec","r_batch_score","r_batch_quality",
-								"w_batch_score","w_batch_quality","c_batch_score","c_batch_quality","s_batch_score","s_batch_quality"].map(function (label) {
-						$("#formulas [name="+label+"]").val(data[label]);
-					});
 					break;
 				case "users":
 					// no records found - disable all input fields
@@ -1124,7 +710,18 @@ function show_data(table) {
 		});
 	}
 }
-		
+	
+function show_formulas() {	
+	$.getJSON('server/get_range.php', {	// get the data 
+		query: "SELECT * FROM gwc_pline.formulas"
+	},	function(data) {
+		for (i = 0; i < data.count; i++) {
+			$("#formulas [number="+data[i].row.id+"]").val(data[i].row.formula);
+			$("#formulas [number="+data[i].row.id+"]").attr("modified", false);
+		}
+	});	
+}
+	
 function show_history() {
 	fill_labels();
 	var options = $.jStorage.get("pline.historylist");
@@ -1242,18 +839,6 @@ function show_names() {
 	});	
 }
 
-function show_datatab() {
-	// default tab when page is first loaded
-	var initialtab = $.jStorage.get("handmade_datatab");
-
-	switch (initialtab) {
-		case 0: load_data("rolling"); break;
-		case 1: load_data("wrapping"); break;
-		case 2: load_data("cutting"); break;
-		case 3: load_data("storage"); break;
-	}
-}
-	
 function show_evaluation() {
 	var start_date = $("#evaluate [name=start]").val();
 	var end_date = $("#evaluate [name=end]").val();

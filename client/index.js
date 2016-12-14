@@ -155,7 +155,7 @@ $(document).ready(function() {
 		sort: 0,
 		direction: "DESC",
 		crc: "",
-		length: 30
+		length: 25
 	});	
 
 	fill_labels();
@@ -169,7 +169,7 @@ $(document).ready(function() {
 			keus = ui.newPanel[0].id;
 			switch (keus) {
 				case "data_tab":			
-					//show_datatab();
+					show_data("inspection");
 					$.jStorage.set("pline_maintab", 0);
 					break;
 				case "history_tab": 	
@@ -188,8 +188,11 @@ $(document).ready(function() {
 		},
 		create: function( event, ui ) {
 			switch (initialtab) {
-				//case 0: show_datatab(); break;
-				case 1: show_history(); break;
+				case 0: show_data("inspection"); 
+					break;
+				case 1: show_history(); 
+					$("#history .underline").append("<span class='arrow'> &#9660;</span>"); // the sort arrow
+					break;
 				//case 2: show_evaluation(); break;
 			}
 		}

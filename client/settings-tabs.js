@@ -4,8 +4,8 @@ var settings_content = {
 		m("#tabs2.subtabs1", [
 			m("ul", [
 				[
-					{label:"label.SPECS", href:"#specs_sub_tab"},
 					{label:"label.PENALTY", href:"#formulas_sub_tab"},
+					{label:"label.PRODUCTS", href:"#specs_sub_tab"},
 					{label:"label.SETTINGS", href:"#users_sub_tab"},
 					{label:"label.NAAM", href:"#names_sub_tab"}
 				].map(function (a) {
@@ -29,28 +29,27 @@ var settings_content = {
 			return;
 		
 		// default tab when page is first loaded
-		var initialtab = $.jStorage.get("handmade_settingstab");
+		var initialtab = $.jStorage.get("pline_settingstab");
 		
 		$( "#tabs2" ).tabs({
 			active: initialtab,			// default tab when page is first loaded
 			activate: function( event, ui ) {
 				keus = ui.newPanel[0].id;
-				//console.log(ui);
 				switch (keus) {
-					case "specs_sub_tab":		$.jStorage.set("handmade_settingstab", 0);		load_data("specs");
+					case "formulas_sub_tab":	$.jStorage.set("pline_settingstab", 0);		show_formulas();
 												break;
-					case "formulas_sub_tab": 	$.jStorage.set("handmade_settingstab", 1);	load_data("formulas");
+					case "specs_sub_tab": 		$.jStorage.set("pline_settingstab", 1);	load_data("specs");
 												break;
-					case "users_sub_tab": 	$.jStorage.set("handmade_settingstab", 2);		load_data("users");
+					case "users_sub_tab":		 	$.jStorage.set("pline_settingstab", 2);		load_data("users");
 												break;
-					case "names_sub_tab": 	$.jStorage.set("handmade_settingstab", 3);		load_data("names");
+					case "names_sub_tab": 		$.jStorage.set("pline_settingstab", 3);		load_data("names");
 												break;
 				}
 			},
 			create: function( event, ui ) {
 				switch (initialtab) {
-					case 0: load_data("specs"); break;
-					case 1: load_data("formulas"); break;
+					case 0: show_formulas(); break;
+					case 1: load_data("specs"); break;
 					case 2: load_data("users"); break;
 					case 3: load_data("names"); break;
 				}

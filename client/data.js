@@ -77,6 +77,39 @@ var data_content = {
 		if (isInitialized) 
 			return;
 				
+		$("#data [name=inspectorDis]").addClass("last");		// set the last field
+
+			// update database after input is changed 
+		$("#data input:text").blur(function () {
+			var current = $.jStorage.get("pline.current");
+			var field = $(this).attr('name');
+			var value = $(this).val();
+			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );
+			$.getJSON('server/send_query.php', {query: sql}, function (data) {
+				$.getJSON('server/calc_penalties.php', {id: current});
+			});
+			show_data("inspection");
+		});
+		
+		$("#data select").blur(function () {
+			var current = $.jStorage.get("pline.current");
+			var field = $(this).attr('name');
+			var value = $(this).val();
+			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );	
+			$.getJSON('server/send_query.php', {query: sql}, function (data) {
+				$.getJSON('server/calc_penalties.php', {id: current});
+			});
+			show_data("inspection");
+		});
+		
+		$("#data textarea").blur(function () {
+			var current = $.jStorage.get("pline.current");	
+			var field = $(this).attr('name');
+			var value = $(this).val();
+			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );	
+			$.getJSON('server/send_query.php', {	query: sql	});			
+		})
+		
 		// default tab when page is first loaded
 		var initialtab = $.jStorage.get("pline_datatab");
 

@@ -174,8 +174,8 @@ var physdata_content = {
 				m("fieldset", [
 					m("legend.ADDITIONAL_INSPECTIONS"),
 					m("table", [
-						m("tr", [m("td.LONG_STEMS"), m("td", m("input.number[amountLongStems]"))]),
-						m("tr", [m("td.SHORT_STEMS"), m("td", m("input.number[amountShortStems]"))]),
+						m("tr", [m("td.LONG_STEMS"), m("td", m("input.number[name=amountLongStems]"))]),
+						m("tr", [m("td.SHORT_STEMS"), m("td", m("input.number[name=amountShortStems]"))]),
 						m("tr", [
 							m("td", [m("label.FILLING_POWER"), m("span", "(cm³/g)")]), 
 							m("td", m("input.number[name=fillingPower]"))
@@ -193,6 +193,45 @@ var physdata_content = {
 	controller: function (element, isInitialized) {		// only events and initialisation
 		if (isInitialized) 
 			return;
+		
+		$("#physdata [name=fillingPower]").addClass("last");		// set the last field
+
+		$("#physdata .new").click(function() {
+			new_rec("gwc_pline.inspection");
+		})
+		
+		$('#physdata .next').click(function() {
+			next_rec("gwc_pline.inspection");
+		});
+	
+		$('#physdata .prev').click(function() {
+			prev_rec("gwc_pline.inspection");
+		});		
+		
+			// update database after input is changed 
+		$("#physdata input:text").blur(function () {
+			var current = $.jStorage.get("pline.current");
+			var field = $(this).attr('name');
+			var value = $(this).val();
+			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );
+			$.getJSON('server/send_query.php', {query: sql}, function (data) {
+				$.getJSON('server/calc_penalties.php', {id: current});
+			});
+			show_data("inspection");
+		});
+		
+		$("#physdata select").blur(function () {
+			var current = $.jStorage.get("pline.current");
+			var field = $(this).attr('name');
+			var value = $(this).val();
+			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );	
+			$.getJSON('server/send_query.php', {query: sql}, function (data) {
+				$.getJSON('server/calc_penalties.php', {id: current});
+			});
+			show_data("inspection");
+		});
+		
+
 		
 	},
 	view: function () {

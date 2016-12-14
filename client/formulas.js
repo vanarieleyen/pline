@@ -6,86 +6,112 @@ var formulas_content = {
 				m("legend", "Cell"),
 				m("div", {style: "height:35em; overflow-y:auto"},
 					m("table", {width: "100%"}, [
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.ROLLING_PROCESS")) ),
-						m("tr", [ m("td", {width: "20%"}, m("", "A1")),	m("td", m("label.L_OUTLOW" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A2")),	m("td", m("label.L_OUTHIGH" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A3")),	m("td", m("label.L_INSPEC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A4")),	m("td", m("label.C_OUTLOW" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A5")),	m("td", m("label.C_OUTHIGH" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A6")),	m("td", m("label.C_INSPEC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A7")),	m("td", m("label.W_OUTLOW" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A8")),	m("td", m("label.W_OUTHIGH" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A9")),	m("td", m("label.W_INSPEC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A10")),	m("td", m("label.P_OUTLOW" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A11")),	m("td", m("label.P_OUTHIGH" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A12")),	m("td", m("label.P_INSPEC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A13")),	m("td", m("label.SURFACE_OUT" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A14")),	m("td", m("label.BLEND_ACC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A15")),	m("td", m("label.PD_ACC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A16")),	m("td", m("label.TIGHTNESS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "B1:B10")),	m("td", m("label.LENGTH" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "C1:C10")),	m("td", m("label.CIRCUMFERENCE" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "D1:D10")),	m("td", m("label.WEIGHT" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "E1:E10")),	m("td", m("label.PRESSUREDROP" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A17")),	m("td", m("label.BATCH_SCORE" )) ]),
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.WRAPPING_PROCESS")) ),
-						m("tr", [	m("td", {width: "20%"}, m("", "A18")),	m("td", m("label.WRAPPER_COLOR" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A19")),	m("td", m("label.HEADEND" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A20")),	m("td", m("label.WRAPPED_OK" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A21")),	m("td", m("label.INCISSION" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A22")),	m("td", m("label.HEAD_EMPTY" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A23")),	m("td", m("label.TIGHTNESS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A24")),	m("td", m("label.VEIN_LINES" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A25")),	m("td", m("label.CREASE" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A26")),	m("td", m("label.SPOTS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A27")),	m("td", m("label.BLOTS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A28")),	m("td", m("label.SEAMS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A29")),	m("td", m("label.HOLES" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A30")),	m("td", m("label.CRACKS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A31")),	m("td", m("label.SPLICES" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A32")),	m("td", m("label.BATCH_SCORE" )) ]),
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.MACHINE_CUTTING")) ),
-						m("tr", [	m("td", {width: "20%"}, m("", "A33")),	m("td", m("label.HEADEND" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A34")),	m("td", m("label.INCISSION" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A35")),	m("td", m("label.HEAD_EMPTY" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A36")),	m("td", m("label.CREASE" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A37")),	m("td", m("label.BLOTS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A38")),	m("td", m("label.SEAMS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A39")),	m("td", m("label.CRACKS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A40")),	m("td", m("label.BATCH_SCORE" )) ]),
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.STORAGE_PROCESS")) ),
-						m("tr", [	m("td", {width: "20%"}, m("", "A41")),	m("td", m("label.DOPANT" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A42")),	m("td", m("label.HEADEND" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A43")),	m("td", m("label.HEAD_EMPTY" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A44")),	m("td", m("label.SEAMS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A45")),	m("td", m("label.HOLES" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A46")),	m("td", m("label.CRACKS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "A47")),	m("td", m("label.MILDEW_WORMS" )) ]),
-						m("tr", [ m("td", {width: "20%"}, m("", "A48")),	m("td", m("label.M_OUTLOW" )) ]),
-						m("tr", [ m("td", {width: "20%"}, m("", "A49")),	m("td", m("label.M_OUTHIGH" )) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A1")),	m("td", m("label.RAWMATOK" )) ]),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.REGAIN_1")) ),
+						m("tr", [ m("td", {width: "20%"}, m("", "A2")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.INPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A3")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.INPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A4")),	m("td", [m("label.INPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A5")),	m("td", [m("label.INPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A6")),	m("td", m("label.MOISTSTAT" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A7")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A8")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A9")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A10")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A11")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A12")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A13")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A14")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (2)") ]) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A15")),	m("td", m("label.CHARGE_ACCUR" )) ]),
 						
-						m("tr", [	m("td", {width: "20%"}, m("", "A50")),	m("td", m("label.M_INSPEC" )) ]),
-						m("tr", [ m("td", {width: "20%"}, m("", "A51")),	m("td", m("label.M_2INSPEC" )) ]),
-						m("tr", [ m("td", {width: "20%"}, m("", "A52")),	m("td", m("label.BATCH_SCORE" )) ]),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.REGAIN_2")) ),
+						m("tr", [ m("td", {width: "20%"}, m("", "A16")),	m("td", [m("label.INPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A17")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.INPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A18")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.INPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A19")),	m("td", [m("label.INPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A20")),	m("td", m("label.MOISTSTAT" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A21")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A22")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A23")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A24")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A25")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A26")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A27")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A28")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (2)") ]) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A29")),	m("td", m("label.CHARGE_ACCUR" )) ]),						
 						
-						m("tr", [	m("td", {width: "20%"}, m("", "F1:F8")),		m("td", m("label.MOISTURE" )) ]),
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.SPECS")) ),
-						m("tr", [	m("td", {width: "20%"}, m("", "S1 (min)")),	m("td", m("label.LENGTH" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S2 (max)")),	m("td", m("label.LENGTH" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S3 (min)")),	m("td", m("label.CIRCUMFERENCE" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S4 (max)")),	m("td", m("label.CIRCUMFERENCE" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S5 (min)")),	m("td", m("label.WEIGHT" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S6 (max)")),	m("td", m("label.WEIGHT" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S7 (min)")),	m("td", m("label.PRESSUREDROP" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S8 (max)")),	m("td", m("label.PRESSUREDROP" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S9 (min)")),	m("td", m("label.MOISTURE" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S10 (max)")),m("td", m("label.MOISTURE" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S11 (min)")), m("td", m("label.BLEND_ACC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S12 (max)")), m("td", m("label.BLEND_ACC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S13 (min)")), m("td", m("label.PD_ACC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S14 (max)")), m("td", m("label.PD_ACC" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S15")), m("td", m("label.TIGHTNESS" )) ]),
-						m("tr", [	m("td", {width: "20%"}, m("", "S16")), m("td", m("label.SURFACE_OUT" )) ]),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.STORAGE")) ),
+						m("tr", [	m("td", {width: "20%"}, m("", "A30")),	m("td", m("label.STORAGETIME" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A31")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.STORAGETIME" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A32")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.STORAGETIME" )]) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A33")),	m("td", m("label.MATERIAL" )) ]),
+						
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.CUT_STRIPS")) ),
+						m("tr", [	m("td", {width: "20%"}, m("", "A34")),	m("td", m("label.CUT_WIDTH" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A35")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.CUT_WIDTH" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A36")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.CUT_WIDTH" )]) ]),
+
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.MOIST_HEAT")) ),
+						m("tr", [ m("td", {width: "20%"}, m("", "A37")),	m("td", [m("label.INPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A38")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.INPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A39")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.INPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A40")),	m("td", [m("label.INPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A41")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A42")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A43")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A44")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A45")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A46")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A47")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A48")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (2)") ]) ]),
+	
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.AIR_DRYING")) ),
+						m("tr", [ m("td", {width: "20%"}, m("", "A49")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A50")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A51")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A52")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A53")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A54")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A55")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTTEMP" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A56")),	m("td", [m("label.OUTPUTTEMP" ), m("span", " (2)") ]) ]),
+						
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_CUT")) ),
+						m("tr", [	m("td", {width: "20%"}, m("", "A57")),	m("td", m("label.MATERIAL" )) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A58")),	m("td", m("label.BLEND_ACCUR" )) ]),
+						
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_EXP")) ),
+						m("tr", [	m("td", {width: "20%"}, m("", "A59")),	m("td", m("label.MATERIAL" )) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A60")),	m("td", m("label.BLEND_ACCUR" )) ]),
+						
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_RECYCLED")) ),
+						m("tr", [	m("td", {width: "20%"}, m("", "A61")),	m("td", m("label.MATERIAL" )) ]),
+						
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.FLAVORING")) ),
+						m("tr", [	m("td", {width: "20%"}, m("", "A62")),	m("td", m("label.MATERIAL" )) ]),
+						m("tr", [	m("td", {width: "20%"}, m("", "A63")),	m("td", m("label.FLAVORING_ACCURACY" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A64")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A65")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A66")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.OUTPUTMOIST" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A67")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (2)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A68")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (3)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A69")),	m("td", [m("label.OUTPUTMOIST" ), m("span", " (4)") ]) ]),
+						
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_STORAGE")) ),
+						m("tr", [	m("td", {width: "20%"}, m("", "A70")),	m("td", m("label.MATERIAL" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A71")),	m("td", [m("label.MOIST_CONTENT" ), m("span", " (1)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A72")),	m("td", [m("span.MINSPECS"), m("span", ": "), m("label.MOIST_CONTENT" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A73")),	m("td", [m("span.MAXSPECS"), m("span", ": "), m("label.MOIST_CONTENT" )]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A74")),	m("td", [m("label.MOIST_CONTENT" ), m("span", " (2)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A75")),	m("td", [m("label.MOIST_CONTENT" ), m("span", " (3)") ]) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A76")),	m("td", [m("label.MOIST_CONTENT" ), m("span", " (4)") ]) ]),
+						
+						m("tr", [	m("td", {width: "20%"}, m("", "A77")),	m("td", m("label.LONG_STEMS" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A78")),	m("td", [m("span.SPECS"), m("span", ": "), m("label.LONG_STEMS" )]) ]),
+						
+						m("tr", [	m("td", {width: "20%"}, m("", "A79")),	m("td", m("label.SHORT_STEMS" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A80")),	m("td", [m("span.SPECS"), m("span", ": "), m("label.SHORT_STEMS" )]) ]),
+						
+						m("tr", [	m("td", {width: "20%"}, m("", "A81")),	m("td", m("label.FILLING_POWER" )) ]),
+						m("tr", [ m("td", {width: "20%"}, m("", "A82")),	m("td", [m("span.SPECS"), m("span", ": "), m("label.FILLING_POWER" )]) ])
 					])
 				)
 			]),
@@ -93,34 +119,56 @@ var formulas_content = {
 				m("legend", "Formula"),
 				m("div", {style: "height:35em; overflow-y:auto"},
 					m("table", {width: "100%"}, [
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.ROLLING_PROCESS")) ),
-						m("tr", [ m("td", m("label.L_OUTLOW")),		m("td", m("input[name=l_outlow].formula" )) ]),
-						m("tr", [	m("td", m("label.L_OUTHIGH")), 	m("td", m("input[name=l_outhigh].formula" )) ]),
-						m("tr", [	m("td", m("label.L_INSPEC")),		m("td", m("input[name=l_inspec].formula" )) ]),
-						m("tr", [ m("td", m("label.C_OUTLOW")),		m("td", m("input[name=c_outlow].formula" )) ]),
-						m("tr", [	m("td", m("label.C_OUTHIGH")), 	m("td", m("input[name=c_outhigh].formula" )) ]),
-						m("tr", [	m("td", m("label.C_INSPEC")),		m("td", m("input[name=c_inspec].formula" )) ]),
-						m("tr", [ m("td", m("label.W_OUTLOW")),		m("td", m("input[name=w_outlow].formula" )) ]),
-						m("tr", [	m("td", m("label.W_OUTHIGH")), 	m("td", m("input[name=w_outhigh].formula" )) ]),
-						m("tr", [	m("td", m("label.W_INSPEC")),		m("td", m("input[name=w_inspec].formula" )) ]),
-						m("tr", [ m("td", m("label.P_OUTLOW")),		m("td", m("input[name=p_outlow].formula" )) ]),
-						m("tr", [	m("td", m("label.P_OUTHIGH")), 	m("td", m("input[name=p_outhigh].formula" )) ]),
-						m("tr", [	m("td", m("label.P_INSPEC")),		m("td", m("input[name=p_inspec].formula" )) ]),
-						m("tr", [	m("td", m("label.BATCH_SCORE")),		m("td", m("input[name=r_batch_score].formula" )) ]),
-						m("tr", [	m("td", m("label.BATCH_QUALITY")),	m("td", m("input[name=r_batch_quality].formula" )) ]),
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.WRAPPING_PROCESS")) ),
-						m("tr", [	m("td", m("label.BATCH_SCORE")),		m("td", m("input[name=w_batch_score].formula" )) ]),
-						m("tr", [	m("td", m("label.BATCH_QUALITY")),	m("td", m("input[name=w_batch_quality].formula" )) ]),
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.MACHINE_CUTTING")) ),
-						m("tr", [	m("td", m("label.BATCH_SCORE")),		m("td", m("input[name=c_batch_score].formula" )) ]),
-						m("tr", [	m("td", m("label.BATCH_QUALITY")),	m("td", m("input[name=c_batch_quality].formula" )) ]),
-						m("tr", m("td[colspan=2]", {align:"center"}, m("label.STORAGE_PROCESS")) ),
-						m("tr", [ m("td", m("label.M_OUTLOW")),		m("td", m("input[name=m_outlow].formula" )) ]),
-						m("tr", [	m("td", m("label.M_OUTHIGH")), 	m("td", m("input[name=m_outhigh].formula" )) ]),
-						m("tr", [	m("td", m("label.M_INSPEC")),		m("td", m("input[name=m_inspec].formula" )) ]),
-						m("tr", [	m("td", m("label.M_2INSPEC")),	m("td", m("input[name=m_2inspec].formula" )) ]),
-						m("tr", [	m("td", m("label.BATCH_SCORE")),		m("td", m("input[name=s_batch_score].formula" )) ]),
-						m("tr", [	m("td", m("label.BATCH_QUALITY")),	m("td", m("input[name=s_batch_quality].formula" )) ])
+						m("tr", [ m("td.RAWMATOK"), m("td", m("input.formula", {number: "1"} )) ]),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.REGAIN_1")) ),
+						["INPUTMOIST","MOISTSTAT","OUTPUTMOIST","OUTPUTTEMP","CHARGE_ACCUR"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+2} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.REGAIN_2")) ),
+						["INPUTMOIST","MOISTSTAT","OUTPUTMOIST","OUTPUTTEMP","CHARGE_ACCUR"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+7} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.STORAGE")) ),
+						["STORAGETIME","MATERIAL"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+12} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.CUT_STRIPS")) ),
+						["CUT_WIDTH"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+14} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.MOIST_HEAT")) ),
+						["INPUTMOIST","OUTPUTMOIST","OUTPUTTEMP"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+15} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.AIR_DRYING")) ),
+						["OUTPUTMOIST","OUTPUTTEMP"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+18} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_CUT")) ),
+						["MATERIAL","BLEND_ACCUR"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+20} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_EXP")) ),
+						["MATERIAL","BLEND_ACCUR"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+22} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_RECYCLED")) ),
+						["MATERIAL"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+24} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.FLAVORING")) ),
+						["MATERIAL","FLAVORING_ACCURACY","OUTPUTMOIST"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+25} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.BLEND_STORAGE")) ),
+						["MATERIAL","MOIST_CONTENT"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+28} )) ])
+						}),
+						m("tr", m("td[colspan=2]", {align:"center"}, m("label.ADDITIONAL_INSPECTIONS")) ),
+						["LONG_STEMS","SHORT_STEMS","FILLING_POWER"].map(function (label, idx) {
+							return m("tr", [ m("td."+label), m("td", m("input.formula", {number: idx+30} )) ])
+						})
+
 					])
 				)
 			])
@@ -133,48 +181,23 @@ var formulas_content = {
 		if (isInitialized) 
 			return;
 			
-		$("#formulas [name=s_batch_quality]").addClass("last");		// set the last field
+		$("#formulas [number=32]").addClass("last");		// set the last field
 		
-		// make sure the id of the formulas is set to 1
-		$.jStorage.set("handmade.current.formulas", 1);		// only one fixed record with id=1
+		// set modified when there is a change
+		$('#formulas input').not(':input[type=button]').on('keyup', function () {
+			$(this).attr("modified", true);
+		});
 		
-		// save the data
-		$("#formulas .save").click(function() {
-			var l_outlow = 				$("#formulas [name=l_outlow]").val();
-			var l_outhigh = 			$("#formulas [name=l_outhigh]").val();
-			var l_inspec = 				$("#formulas [name=l_inspec]").val();
-			var c_outlow = 				$("#formulas [name=c_outlow]").val();
-			var c_outhigh = 			$("#formulas [name=c_outhigh]").val();
-			var c_inspec = 				$("#formulas [name=c_inspec]").val();
-			var w_outlow = 				$("#formulas [name=w_outlow]").val();
-			var w_outhigh = 			$("#formulas [name=w_outhigh]").val();
-			var w_inspec = 				$("#formulas [name=w_inspec]").val();
-			var p_outlow = 				$("#formulas [name=p_outlow]").val();
-			var p_outhigh = 			$("#formulas [name=p_outhigh]").val();
-			var p_inspec = 				$("#formulas [name=p_inspec]").val();
-			var m_outlow = 				$("#formulas [name=m_outlow]").val();
-			var m_outhigh = 			$("#formulas [name=m_outhigh]").val();
-			var m_inspec = 				$("#formulas [name=m_inspec]").val();
-			var m_2inspec = 			$("#formulas [name=m_2inspec]").val();
-			var r_batch_score = 	$("#formulas [name=r_batch_score]").val();
-			var r_batch_quality = $("#formulas [name=r_batch_quality]").val();
-			var w_batch_score = 	$("#formulas [name=w_batch_score]").val();
-			var w_batch_quality = $("#formulas [name=w_batch_quality]").val();
-			var c_batch_score = 	$("#formulas [name=c_batch_score]").val();
-			var c_batch_quality = $("#formulas [name=c_batch_quality]").val();
-			var s_batch_score = 	$("#formulas [name=s_batch_score]").val();
-			var s_batch_quality = $("#formulas [name=s_batch_quality]").val();
-
-			sql = sprintf("UPDATE gwc_handmade.formulas SET l_outlow='%s', l_outhigh='%s', l_inspec='%s', c_outlow='%s', c_outhigh='%s', c_inspec='%s', \
-					w_outlow='%s', w_outhigh='%s', w_inspec='%s', p_outlow='%s', p_outhigh='%s', p_inspec='%s', m_outlow='%s', m_outhigh='%s', m_inspec='%s', m_2inspec='%s', \
-					r_batch_score='%s', r_batch_quality='%s', w_batch_score='%s', w_batch_quality='%s', c_batch_score='%s', c_batch_quality='%s', \
-					s_batch_score='%s', s_batch_quality='%s' WHERE id=1",
-					l_outlow, l_outhigh, l_inspec, c_outlow, c_outhigh, c_inspec, w_outlow, w_outhigh, w_inspec,  p_outlow, p_outhigh, p_inspec,
-					m_outlow, m_outhigh, m_inspec, m_2inspec, r_batch_score, r_batch_quality, w_batch_score, w_batch_quality,
-					c_batch_score, c_batch_quality, s_batch_score, s_batch_quality );
-
-			$.getJSON('server/send_query.php', {	query: sql	});	
-		})
+		// save changes
+		$('#formulas .save').on('click', function () {
+			$('#formulas input').each(function () {
+				if ($(this).attr("modified")=='true') {
+					val = $(this).val();
+					sql = sprintf("UPDATE gwc_pline.formulas SET formula='%s' WHERE id=%s", val, $(this).attr("number") );
+					$.getJSON('server/send_query.php', {query: sql});		
+				}
+			})
+		});
 		
 	},
 	view: function () {

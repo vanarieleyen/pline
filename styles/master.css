@@ -17,6 +17,10 @@ html,body {
 
 .number {	width: 5em;	}
 
+.underline {
+	text-decoration: underline;
+}
+
 .flagbox {
 	position: absolute;
 	width: 90px;
