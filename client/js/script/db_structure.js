@@ -3,24 +3,26 @@
 		db: remaining tables (data)
 */
 var dbs = {
-	id: 		"id",
-	pid: 		"pid",
-	number:	"number",
-	naam:		"name",
-	remark:	"remark",
+	id: 		{field: "id"},
+	pid: 		{field: "pid"},
+	number:	{field: "number"},
+	naam:		{field: "name"},
+	remark:	{field: "remark"},
 	date:		{start: "start", end: "end"},
 	regain1:	{
 		matinmoist:		{min:"1_matinMoistMin",	max:"1_matinMoistMax"},
 		matoutmoist:	{min:"1_matoutMoistMin", max:"1_matoutMoistMax"},
-		matouttemp:		{min:"1_matoutTempMin",	max:"1_matoutTempMax"}
+		matouttemp:		{min:"1_matoutTempMin",	max:"1_matoutTempMax"},
+		accuracy:			{field: "1_accuracy"}
 	},
 	regain2:	{
 		matinmoist:		{min:"2_matinMoistMin",	max:"2_matinMoistMax"},
 		matoutmoist:	{min:"2_matoutMoistMin", max:"2_matoutMoistMax"},
-		matouttemp:		{min:"2_matoutTempMin",	max:"2_matoutTempMax"}
+		matouttemp:		{min:"2_matoutTempMin",	max:"2_matoutTempMax"},
+		accuracy:			{field: "2_accuracy"}
 	},
 	storage:				{min:"storTimeMin", max:"storTimeMax"},
-	cutwidth:			{min:"cutWidthMin", max:"cutWidthMax"},
+	cutwidth:				{min:"cutWidthMin", max:"cutWidthMax"},
 	cylheat:	{
 		matinmoist:		{min:"cyl_matinMoistMin",	max:"cyl_matinMoistMax"},
 		matoutmoist:	{min:"cyl_matoutMoistMin",	max:"cyl_matoutMoistMax"},
@@ -31,9 +33,12 @@ var dbs = {
 		matouttemp:		{min:"dry_matoutTempMin",	max:"dry_matoutTempMax"}
 	},
 	blending: 			{min:"blendstorMoistMin", max:"blendstorMoistMax"},
+	blendcutacc:		{field: "blendcutAccuracy"},
+	blendexpacc:		{field: "blendexpAccuracy"},
+	blendflavacc:		{field: "blendflavorAccuracy"},
 	flavoring:			{min:"flavor_matoutMoistMin", max:"flavor_matoutMoistMax"},
 	stems:				{long:"amountLongStems", short:"amountShortStems"},
-	filling:				"fillingPower"
+	filling:	{field: "fillingPower"}
 }
 
 var db = {

@@ -198,6 +198,7 @@ var physdata_content = {
 
 		$("#physdata .new").click(function() {
 			new_rec("gwc_pline.inspection");
+			show_data("inspection");
 		})
 		
 		$('#physdata .next').click(function() {
@@ -210,7 +211,7 @@ var physdata_content = {
 		
 			// update database after input is changed 
 		$("#physdata input:text").blur(function () {
-			var current = $.jStorage.get("pline.current");
+			var current = $.jStorage.get("pline.current.inspection");
 			var field = $(this).attr('name');
 			var value = $(this).val();
 			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );
@@ -221,7 +222,7 @@ var physdata_content = {
 		});
 		
 		$("#physdata select").blur(function () {
-			var current = $.jStorage.get("pline.current");
+			var current = $.jStorage.get("pline.current.inspection");
 			var field = $(this).attr('name');
 			var value = $(this).val();
 			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );	

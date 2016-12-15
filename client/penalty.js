@@ -47,7 +47,7 @@ var penalty_content = {
 					m("legend.STORAGE"),
 					m("table", {width:"100%"}, [
 						m("tr", [m("td.STORAGETIME"), m("td", {align:"right"}, m("label.storTime"))]),
-						m("tr", [m("td.MATERIAL"), m("span","("), m("label.BATCHNOTMIXED"), m("span",")"), m("td", {align:"right"}, m("label.stormatOK"))])
+						m("tr", [m("td", [m("label.MATERIAL"), m("span"," ("), m("label.BATCHNOTMIXED"), m("span",")")]), m("td", {align:"right"}, m("label.stormatOK"))] ) 
 					])
 				]),
 				m("fieldset", [
@@ -96,14 +96,14 @@ var penalty_content = {
 				m("fieldset", [
 					m("legend.BLEND_CUT"),
 					m("table", {width:"100%"}, [
-						m("tr", [m("td.MATERIAL"), m("span","("), m("label.CUTREQUIREMENTS"), m("span",")"), m("td", {align:"right"}, m("label.blendcutStemID"))]),
+						m("tr", [m("td", [m("label.MATERIAL"), m("span"," ("), m("label.CUTREQUIREMENTS"), m("span",")")]), m("td", {align:"right"}, m("label.blendcutStemID"))]),
 						m("tr", [m("td.BLEND_ACCUR"), m("td", {align:"right"}, m("label.blendcutAccuracy"))])
 					])
 				]),
 				m("fieldset", [
 					m("legend.BLEND_EXP"),
 					m("table", {width:"100%"}, [
-						m("tr", [m("td.MATERIAL"), m("span","("), m("label.EXPREQUIREMENTS"), m("span",")"), m("td", {align:"right"}, m("label.blendexpMatOK"))]),
+						m("tr", [m("td", [m("label.MATERIAL"), m("span"," ("), m("label.EXPREQUIREMENTS"), m("span",")")]), m("td", {align:"right"}, m("label.blendexpMatOK"))]),
 						m("tr", [m("td.BLEND_ACCUR"), m("td", {align:"right"}, m("label.blendexpAccuracy"))])
 					])
 				]),
@@ -147,9 +147,15 @@ var penalty_content = {
 		if (isInitialized) 
 			return;
 		
-		
+		$('#penalties .next').click(function() {
+			next_rec("gwc_pline.inspection");
+		});
+	
+		$('#penalties .prev').click(function() {
+			prev_rec("gwc_pline.inspection");
+		});		
 	},
 	view: function () {
-		return m("#penalty", this.contents);
+		return m("#penalties", this.contents);
 	}
 }

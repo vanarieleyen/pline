@@ -528,13 +528,12 @@ function new_rec(table) {
 			table: table
 	}, function(data) {
 		if (data.id != null) {
-			$.jStorage.set("pline.current", data.id);
+			$.jStorage.set("pline.current."+name, data.id);
 			$("input").not("[type=button]").removeAttr("disabled");
 			$("textarea").removeAttr("disabled");
 			$("select").removeAttr("disabled");
 			$("checkbox").attr("disabled", "disabled");
 		}
-		show_data(name);
 	});
 }
 
@@ -685,6 +684,18 @@ function show_data(table) {
 						$("#physdata [name="+label+"]").val(data[label]);
 					});
 					
+					var sql = sprintf("SELECT * FROM gwc_pline.penalties WHERE id=%s",  data.penalties);
+					$.getJSON('server/get_record.php', {
+						query: sql
+					},	function(pen) {
+						["FeedMatID","1_matinMoist","1_matMoistID","1_matoutMoist","1_matoutTemp","1_accuracy","2_matinMoist","2_matMoistID",
+						"2_matoutMoist","2_matoutTemp","2_accuracy","storTime","stormatOK","cutWidth","cyl_matinMoist","cyl_matoutMoist","cyl_matoutTemp",
+						"dry_matoutMoist","dry_matoutTemp","blendflavorMatOK","blendflavorAccuracy","blendflavorMoist","blendcutStemID","blendcutAccuracy",
+						"blendexpMatOK","blendexpAccuracy","blendreMatOK","blendstorMatOK","blendstorMoist","amountLongStems","amountShortStems",
+						"fillingPower"].map(function (label) {
+							$("#penalties ."+label).html(pen[label]);
+						})
+					});
 					break;
 				case "specs":
 					// no records found - disable all input fields
@@ -696,7 +707,7 @@ function show_data(table) {
 					break;
 				case "users":
 					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.users") == null) {
+					if ($.jStorage.get("pline.current.users") == null) {
 						$("#users input").not("[type=button]").attr("disabled", "disabled");
 						$("#users checkbox").attr("disabled", "disabled");
 						$("#users .save").attr("disabled", "disabled");
@@ -753,7 +764,7 @@ function show_users() {
 
 // display all the details of the selected user
 function show_user_details(id) {
-	var sql = sprintf('SELECT * FROM gwc_handmade.users WHERE id=%s', id);
+	var sql = sprintf('SELECT * FROM gwc_pline.users WHERE id=%s', id);
 
 	if (id != null)	{
 		$.getJSON('server/get_record.php', { 
@@ -771,7 +782,7 @@ function show_user_details(id) {
 			$("#users [name=gebruik]").html(data.gebruik);
 		});	
 	}
-	$.jStorage.set("handmade.current.users", id);
+	$.jStorage.set("pline.current.users", id);
 }
 
 // fill the specs list
@@ -811,10 +822,10 @@ function show_spec_history(id) {
 
 // display all the details of the selected specification
 function show_spec_details(id) {
-	var sql = sprintf('SELECT * FROM gwc_handmade.specs WHERE id=%s', id);
+	var sql = sprintf('SELECT * FROM gwc_pline.specs WHERE id=%s', id);
 	var fields = [];
 
-	$.jStorage.set("handmade.current.specs", id);
+	$.jStorage.set("pline.current.specs", id);
 
 	if (id != null)	{
 		$.getJSON('server/get_record.php', { 
@@ -831,30 +842,30 @@ function show_spec_details(id) {
 
 function show_names() {
 	$.getJSON('server/get_record.php', { 
-		query: "SELECT * FROM gwc_handmade.names WHERE id=1"
+		query: "SELECT * FROM gwc_pline.names WHERE id=1"
 	}, function(data) {
 		$("#names [name=inspector]").val(data.inspector);
-		$("#names [name=sampling]").val(data.name);
-		$("#names [name=incharge]").val(data.incharge);
 	});	
 }
 
 function show_evaluation() {
 	var start_date = $("#evaluate [name=start]").val();
 	var end_date = $("#evaluate [name=end]").val();
-	
+	alert();
 	// fill the selectbox options
 	$.getJSON('server/get_evalselect.php', {
 		start: start_date,
 		end: end_date,
-		prod: 0,
-		samp: 0,
-		step: 0,
+		product: 0,
+		prodStat: 0,
+		result: 0,
+		disposal: 0,
 		lang: $.jStorage.get("lang")
 	},function(data) {	
-		$('#evaluate [name=sampling]').empty().append(data.sampling);	
+		$('#evaluate [name=prodStat]').empty().append(data.prodStat);	
 		$('#evaluate [name=product]').empty().append(data.product);
-		$('#evaluate [name=stage]').empty().append(data.stage);	
+		$('#evaluate [name=result]').empty().append(data.result);
+		$('#evaluate [name=disposal]').empty().append(data.disposal);		
 	});
 
 	// set the onchange events for start/end date
@@ -865,25 +876,21 @@ function show_evaluation() {
 			  onSelect: function () { 
 					var start_date = $("#evaluate [name=start]").val();
 					var end_date = $("#evaluate [name=end]").val();
-					
-					$("#evaluate .summaries table").css("display","none");		// hide all summaries
-					
-					$("#evaluate .summaries th[name]").each(function () {
-						$(this).text("");		// clear all summaries
-					});
 
 					// fill the selectbox options
 					$.getJSON('server/get_evalselect.php', {
 						start: start_date,
 						end: end_date,
-						prod: 0,
-						samp: 0,
-						step: 0,
+						product: 0,
+						prodStat: 0,
+						result: 0,
+						disposal: 0,
 						lang: $.jStorage.get("lang")
 					},function(data) {	
-						$('#evaluate [name=sampling]').empty().append(data.sampling);	
+						$('#evaluate [name=prodStat]').empty().append(data.prodStat);	
 						$('#evaluate [name=product]').empty().append(data.product);
-						$('#evaluate [name=stage]').empty().append(data.stage);	
+						$('#evaluate [name=result]').empty().append(data.result);
+						$('#evaluate [name=disposal]').empty().append(data.disposal);		
 					});
 			  }
 			});

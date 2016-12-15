@@ -113,14 +113,12 @@ var specs_content = {
 												])
 							}),
 							m("tr", m("th.ADDITIONAL_INSPECTIONS", {colspan:"3"})),
-							[	{th:"th.LONG_STEMS", field:"amountLongStems"},	{th:"th.SHORT_STEMS", field1:"amountShortStems"}].map(function (a) {
+							[	{th:"th.LONG_STEMS", field:"amountLongStems"},	{th:"th.SHORT_STEMS", field:"amountShortStems"}].map(function (a) {
 								return m("tr", {align:"left"}, [
 													m(a.th), m("td", [m("input.number[name="+a.field+"]")] )
 												])
 							}),
 							m("tr", {align:"left"},m("th.FILLING_POWER"), m("td", [m("input.number[name=fillingPower]"), m("span", "(cm³/g)")] ))
-							
-							
 						])
 					])
 
@@ -166,86 +164,70 @@ var specs_content = {
 		if (isInitialized) 
 			return;
 	
-		$("#specs [name=moist_s_max]").addClass("last");		// set the last field
+		$("#specs [name=fillingPower]").addClass("last");		// set the last field
 		
 		// new spec
 		$("#specs .new").click(function() {
-			new_rec("gwc_handmade.specs", "#specs");
+			new_rec("gwc_pline.specs", "#specs");
 			show_specs();
 		})		
 		
 		// save the data
 		$("#specs .save").click(function() {
-			var id = $.jStorage.get("handmade.current.specs");
+			var id = $.jStorage.get("pline.current.specs");
 			
-			var name = $("#specs [name=name]").val();
-			var nr = $("#specs [name=nr]").val();
-			var rol_l_min = $("#specs [name=rol_l_min]").val();
-			var rol_l_max = $("#specs [name=rol_l_max]").val();
-			var rol_c_min = $("#specs [name=rol_c_min]").val();
-			var rol_c_max = $("#specs [name=rol_c_max]").val();
-			var rol_w_min = $("#specs [name=rol_w_min]").val();
-			var rol_w_max = $("#specs [name=rol_w_max]").val();
-			var rol_p_min = $("#specs [name=rol_p_min]").val();
-			var rol_p_max = $("#specs [name=rol_p_max]").val();
-			var moist_s_min = $("#specs [name=moist_s_min]").val();
-			var moist_s_max = $("#specs [name=moist_s_max]").val();
-			var rol_blendacc_min = $("#specs [name=rol_blendacc_min]").val();
-			var rol_blendacc_max = $("#specs [name=rol_blendacc_max]").val();
-			var rol_pdacc_min = $("#specs [name=rol_pdacc_min]").val();
-			var rol_pdacc_max = $("#specs [name=rol_pdacc_max]").val();
-			var rol_surfout = $("#specs [name=rol_surfout]").val();
-			var rol_tightout = $("#specs [name=rol_tightout]").val();
-			var moist_w_min = $("#specs [name=moist_w_min]").val();
-			var moist_w_max = $("#specs [name=moist_w_max]").val();
-			var weight_w_min = $("#specs [name=weight_w_min]").val();
-			var weight_w_max = $("#specs [name=weight_w_max]").val();
+			var val = {};
+			fields = getFields(dbs);		// get all the field names from dbs
+			fields.map(function(fieldname){
+				switch (fieldname) {
+					case "id":
+					case "pid":	
+					case "start":
+					case "end": return;
+				}
+				val[fieldname] = $("#specs [name="+fieldname+"]").val();
+			});
 		
 			$.getJSON('server/get_record.php', { 
-				query: 'SELECT * FROM gwc_handmade.specs WHERE id='+id
+				query: 'SELECT * FROM gwc_pline.specs WHERE id='+id
 			}, function(data) {
 				var pid = data.pid;
 				if (data.pid != "-1") {		// de specs zijn al eens opgeslagen
-					//console.log("add new record");
 					$.getJSON('server/send_query.php', {
-						query: sprintf("UPDATE gwc_handmade.specs SET end=NOW() WHERE pid=%s AND end='3000-01-01'",	pid)		// terminate the end-date	
+						query: sprintf("UPDATE gwc_pline.specs SET end=NOW() WHERE pid=%s AND end='3000-01-01'",	pid)		// terminate the end-date
 					}, function () {
-						new_rec("gwc_handmade.specs", "#specs");
-						id = $.jStorage.get("handmade.current.specs");
-						
-						var sql = sprintf("UPDATE gwc_handmade.specs SET pid='%s', name='%s', nr='%s', rol_l_min='%s', rol_l_max='%s', rol_c_min='%s', rol_c_max='%s', \
-							rol_w_min='%s', rol_w_max='%s', moist_s_min='%s', moist_s_max='%s', rol_surfout='%s', rol_tightout='%s', rol_p_min='%s', rol_p_max='%s', \
-							rol_blendacc_min='%s', rol_blendacc_max='%s', rol_pdacc_min='%s', rol_pdacc_max='%s', \
-							moist_w_min='%s', moist_w_max='%s', weight_w_min='%s', weight_w_max='%s' WHERE id=%s",	
-							pid, name, nr, rol_l_min, rol_l_max, rol_c_min, rol_c_max, rol_w_min, rol_w_max, moist_s_min, moist_s_max, rol_surfout, rol_tightout, 
-							rol_p_min, rol_p_max, rol_blendacc_min, rol_blendacc_max, rol_pdacc_min, rol_pdacc_max, moist_w_min, moist_w_max, weight_w_min, weight_w_max, id);
+						new_rec("gwc_pline.specs");
+						id = $.jStorage.get("pline.current.specs");
+
+						var sql = sprintf("UPDATE gwc_pline.specs SET pid='%s'", pid);
+						$.each(val, function(field, value) {
+							sql = sprintf("%s, %s='%s'", sql, field, value);
+						})
+						sql = sprintf("%s WHERE id=%s", sql, id);
+
 						$.getJSON('server/send_query.php', {	query: sql	});
 					});						
 				} else {
-					//console.log("update existing record");
 					pid = data.id;
 					
-					var sql = sprintf("UPDATE gwc_handmade.specs SET pid='%s', name='%s', nr='%s', rol_l_min='%s', rol_l_max='%s', rol_c_min='%s', rol_c_max='%s', \
-						rol_w_min='%s', rol_w_max='%s', moist_s_min='%s', moist_s_max='%s', rol_surfout='%s', rol_tightout='%s', rol_p_min='%s', rol_p_max='%s', \
-						rol_blendacc_min='%s', rol_blendacc_max='%s', rol_pdacc_min='%s', rol_pdacc_max='%s', \
-						moist_w_min='%s', moist_w_max='%s', weight_w_min='%s', weight_w_max='%s' WHERE id=%s",	
-						pid, name, nr, rol_l_min, rol_l_max, rol_c_min, rol_c_max, rol_w_min, rol_w_max, moist_s_min, moist_s_max, rol_surfout, rol_tightout, 
-						rol_p_min, rol_p_max, rol_blendacc_min, rol_blendacc_max, rol_pdacc_min, rol_pdacc_max, moist_w_min, moist_w_max, weight_w_min, weight_w_max, id);
+					var sql = sprintf("UPDATE gwc_pline.specs SET pid='%s'", pid);
+					$.each(val, function(field, value) {
+						sql = sprintf("%s, %s='%s'", sql, field, value);
+					})
+					sql = sprintf("%s WHERE id=%s", sql, id);
 					$.getJSON('server/send_query.php', {	query: sql	});
 				}
 				
 				// reload all product select-boxes with the new data
 				$.get('server/get_products.php', function(data) {
-					Array("#stickDefects","packDefects","#boxDefects","#rolling","#wrapping","#cutting","#storage").map(function(element){
-						$(element+' [name=product]').empty().append(data);
-					});
+					$('#data [name=product]').empty().append(data);
 				});
 			});
 			
 			$.getJSON('server/get_record.php', {		// refresh the specs in localstorage 
-				query: 'SELECT * FROM gwc_handmade.specs'
+				query: 'SELECT * FROM gwc_pline.specs'
 			}, function(data) {
-				$.jStorage.set("handmade.specs", data.row);
+				$.jStorage.set("pline.specs", data.row);
 			});
 			
 			show_specs();

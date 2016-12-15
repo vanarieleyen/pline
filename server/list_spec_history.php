@@ -20,7 +20,7 @@ $fields = "id, start, end";
 
 $column = explode(", ", $fields);															// extract the column names from the $fields
 
-$query = sprintf("SELECT %s FROM gwc_handmade.specs WHERE pid=(SELECT pid FROM gwc_handmade.specs WHERE id=%s) ORDER BY end DESC",
+$query = sprintf("SELECT %s FROM gwc_pline.specs WHERE pid=(SELECT pid FROM gwc_pline.specs WHERE id=%s) ORDER BY end DESC",
 									$fields, $id);
 $database->query($query);
 $rows = $database->resultset();

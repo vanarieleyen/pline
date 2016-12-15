@@ -12,11 +12,11 @@ $database->query("SET lc_time_names = 'zh_CN'");
 $database->execute();
 
 // set table and field names with corresponding label
-$fields = "id, name, nr";
+$fields = "id, name, number";
 
 $column = explode(", ", $fields);															// extract the column names from the $fields
 
-$query = sprintf("SELECT %s	FROM gwc_handmade.specs WHERE DATE(end)='3000-01-01' ORDER BY id DESC", $fields);
+$query = sprintf("SELECT %s	FROM gwc_pline.specs WHERE DATE(end)='3000-01-01' ORDER BY id DESC", $fields);
 $database->query($query);
 $rows = $database->resultset();
 

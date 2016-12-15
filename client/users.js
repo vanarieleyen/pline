@@ -94,16 +94,16 @@ var users_content = {
 		
 		// new user
 		$("#users .new").click(function() {
-			new_rec("gwc_handmade.users", "#users");
+			new_rec("gwc_pline.users");
 			show_users();
 		});
 		
 		// delete a user
 		$('#users .delete').on('click', function(e) {		
-			var id = $.jStorage.get("handmade.current.users");
+			var id = $.jStorage.get("pline.current.users");
 
 			$.getJSON('server/send_query.php', {
-				query: "DELETE FROM gwc_handmade.users WHERE id="+id	
+				query: "DELETE FROM gwc_pline.users WHERE id="+id	
 			}, function () {
 				$('#users .delete').attr('disabled', 'disabled');
 				show_users();
@@ -119,9 +119,9 @@ var users_content = {
 			var admin = 		$('#users [name=admin]').prop("checked") ? 1 : 0;
 			var names = 		$('#users [name=names]').prop("checked") ? 1 : 0;
 			var readonly =	$('#users [name=readonly]').prop("checked") ? 1 : 0;
-			var id = 				$.jStorage.get("handmade.current.users");
+			var id = 				$.jStorage.get("pline.current.users");
 
-			sql = sprintf("UPDATE gwc_handmade.users SET name='%s', login='%s', specs='%s', formulas='%s', admin='%s', names='%s', readonly='%s' WHERE id=%s",
+			sql = sprintf("UPDATE gwc_pline.users SET name='%s', login='%s', specs='%s', formulas='%s', admin='%s', names='%s', readonly='%s' WHERE id=%s",
 					name, login, specs, formulas, admin, names, readonly, id );
 
 			$.getJSON('server/send_query.php', {	query: sql	});	

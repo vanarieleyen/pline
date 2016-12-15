@@ -3,7 +3,7 @@ var history_content = {
 	contents: [
 		m("div", {style: "height:33em; overflow:auto"},
 			m("table#lijst", {width: "99%"}, [
-				m("thead.header", [
+				m("thead.header", {style:"cursor:hand"},[
 					m("th", {style:"display:none"}, m("label", "ID")),
 					["th.DATE.underline","th.BATCHNR","th.PRODUCT","th.PSCORE","th.IRESULT"].map(function (label, idx) {
 						return m(label, {nr:idx});

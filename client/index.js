@@ -193,7 +193,7 @@ $(document).ready(function() {
 				case 1: show_history(); 
 					$("#history .underline").append("<span class='arrow'> &#9660;</span>"); // the sort arrow
 					break;
-				//case 2: show_evaluation(); break;
+				case 2: show_evaluation(); break;
 			}
 		}
 	});
