@@ -186,3 +186,50 @@ select {
     text-decoration: underline;
     background: white;
 }
+
+// tabs used on the export preview
+#datatabs13 {
+	background: none;
+}
+.mytabs13.table {
+	border-collapse: collapse;	
+}
+.subtabs13 { 
+    background: transparent !important;  
+    border: none; 
+} 
+.subtabs13 .ui-widget-header { 
+    background: transparent; 
+    border: 0px;
+} 
+.subtabs13 .ui-widget-content {  
+    border: 1px !important; 
+} 
+.subtabs13 .ui-tabs-nav .ui-state-default { 
+	margin-top: -6px;
+} 
+.subtabs13 .ui-tabs-nav .ui-state-active a { 
+    text-decoration: underline;
+}
+/* put the tabs ate the bottom */
+.subtabs13 .ui-tabs-nav { 
+    position: absolute; 
+    bottom: -1.6em; 
+    padding: 0em 0.2em 0.1em; 
+} 
+.subtabs13 .ui-tabs-nav li { 
+    border-top: none; 
+    border-bottom: 1px solid #ccc !important; 
+    -moz-border-radius: 0px 0px 4px 4px; 
+    -webkit-border-radius: 0px 0px 4px 4px; 
+    border-radius: 0px 0px 4px 4px; 
+}
+
+.subtabs13 .ui-tabs-panel {
+    height: 30em;
+    overflow: auto;
+} 
+
+.rowcol {
+	background-color: yellow;
+}

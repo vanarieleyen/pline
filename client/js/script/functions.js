@@ -851,7 +851,7 @@ function show_names() {
 function show_evaluation() {
 	var start_date = $("#evaluate [name=start]").val();
 	var end_date = $("#evaluate [name=end]").val();
-	alert();
+
 	// fill the selectbox options
 	$.getJSON('server/get_evalselect.php', {
 		start: start_date,
@@ -896,74 +896,11 @@ function show_evaluation() {
 			});
 		})
 	}, 100);
-	
 }
 
-function calcSummary(stage, what, data, spec) {		
-	var amount = 0;
-	var outspec = 0;
-	var serie = [];
-	var dbs = db[stage][what];
-	$.each(data.row, function (key, row) {
-		$.each(dbs.field, function(key, field) {
-			if (row[field] != "") {
-				waarde = parseFloat(row[field]);
-				if (!isNaN(waarde)) {
-					serie.push(waarde);
-					amount++;
-					if (waarde < spec[dbs.spec.min] || waarde > spec[dbs.spec.max])
-						outspec++;
-				}
-			}
-		});
-	});
-	$("#evaluate #"+stage+" [name="+what+"] [name=amount]").text( amount );
-	$("#evaluate #"+stage+" [name="+what+"] [name=cpk]").text( cpk(spec[dbs.spec.min], spec[dbs.spec.max], serie) );
-	$("#evaluate #"+stage+" [name="+what+"] [name=avg]").text( jStat.mean(serie).toFixed(2) );
-	$("#evaluate #"+stage+" [name="+what+"] [name=dev]").text( jStat.stdev(serie).toFixed(2) );
-	$("#evaluate #"+stage+" [name="+what+"] [name=var]").text( jStat.variance(serie).toFixed(2) );
-	$("#evaluate #"+stage+" [name="+what+"] [name=out]").text( outspec );
+function show_export() {
+
 }
-
-// show the summary in the evaluation page
-function showSummary() {
-	var start_date = $("#evaluate [name=start]").val();
-	var end_date = $("#evaluate [name=end]").val();
-	var product = $("#evaluate [name=product]").val();
-	var sampling = $("#evaluate [name=sampling]").val();
-	var stage = $("#evaluate [name=stage]").val();
-	var spec = getSpec(product, end_date);
-	
-	if (spec == null)	return;		// no summary without specs
-
-	pc = (product != "0") ? sprintf(" AND product='%s' ", product) : "";
-	sc = (sampling != '0')  ? sprintf(" AND name='%s' ", sampling) : "";
-	sql = sprintf("SELECT * FROM gwc_handmade.%s WHERE DATE(date) BETWEEN '%s' AND '%s'%s%s", stage, start_date, end_date, pc, sc);
-
-	$.getJSON('server/get_record.php', { 
-		query: sql
-	}, function(data) {
-		switch (stage) {
-			case "rolling":
-				["lengte","omtrek","gewicht","pd"].map(function(keus) {
-					calcSummary(stage, keus, data, spec);
-				});
-				break;
-			case "wrapping":
-				["gewicht","moisture"].map(function(keus) {
-					calcSummary(stage, keus, data, spec);
-				});
-				break;
-			case "storage":
-				["moisture"].map(function(keus) {
-					calcSummary(stage, keus, data, spec);
-				});
-				break;
-		}
-	});
-}
-
-
 
 // calculate Cp (process capability)
 function cp(LSL, USL, VAL) {

@@ -55,14 +55,73 @@ var evaluate_content = {
 					])
 				)
 			])
-		)	
+		),
+		m("#tabs.subtabs1", [
+			m("ul", [
+				[
+					{label:"label.CHARTS", href:"#charts_tab"},
+					{label:"label.EXPORT", href:"#export_tab"}
+				].map(function (a) {
+					return m("li", 
+									m("a", {href: a.href, tabindex:"-1", class: "last" }, [
+										m(a.label)
+									])
+								)
+				})
+			]),
+			[			// the tabs used by ui-tabs
+				//m("#charts_tab", m.component(physdata_content)),
+				//m("#export_tab", m("div"))
+				m("#export_tab", m.component(export_content))
+			]
+		]),
+		m("iframe.excel_export", {style:"display:none"})
 	],
 	controller: function (element, isInitialized) {		// only events and initialisation
 		if (isInitialized) 
 			return;
 
 		$("#evaluate [name=disposal]").addClass("last");		// set the last field
-					
+
+		$('#evaluate .select').click(function(){
+			//$('#evaluate .EXPORT').click();
+			createSheet();
+		});
+		
+		$('#evaluate .export').click(function() {
+			$("#evaluate .excel_export").attr("src", 'server/export_sheets.php?'+
+								'start='+$('#evaluate [name=start]').val()+
+								'&end='+$('#evaluate [name=end]').val()+
+								'&prodstat='+$('#evaluate [name=prodStat]').val()+
+								'&result='+$('#evaluate [name=result]').val()+
+								'&disposal='+$('#evaluate [name=disposal').val()+
+								'&product='+$('#evaluate [name=product] option:selected').text() );	
+		});
+						
+		// default tab when page is first loaded
+		var initialtab = $.jStorage.get("pline_evaluationtab");
+
+		$( "#evaluate #tabs" ).tabs({
+			active: initialtab,
+			activate: function( event, ui ) {
+				keus = ui.newPanel[0].id;
+				switch (keus) {
+					case "charts_tab":			
+						$.jStorage.set("pline_evaluationtab", 0);
+						break;
+					case "export_tab": 	
+						$.jStorage.set("pline_evaluationtab", 1);
+						break;
+				}
+			},
+			create: function( event, ui ) {
+				switch (initialtab) {
+					//case 0: show_charts(); break;
+					case 1: show_export(); break;
+				}
+			}
+		});
+		
 		var nu = new Date();
 		$('#evaluate [name=start]').val(nu.format("yyyy-MM-dd") );
 		$('#evaluate [name=end]').val(nu.format("yyyy-MM-dd") );

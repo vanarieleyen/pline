@@ -62,6 +62,7 @@ include('data.js');			// parent
 
 include('history.js');
 
+include('export.js');
 include('evaluate.js');
 
 include('specs.js');					// children of settings-tab
