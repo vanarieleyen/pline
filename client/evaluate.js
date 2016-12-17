@@ -44,11 +44,9 @@ var evaluate_content = {
 						),
 						m("td", 
 							m("table", {width: "100%"}, [
-								["select", "export"].map(function (label) {							
-									return m("tr", [
-													m("td",	m("input[type=button]", {class:label, id:label, style:"width:8em"}))
-												])
-								})
+								m("tr", [
+									m("td",	m("input[type=button]", {class:"export", id:"export", style:"width:8em"}))
+								])
 							])
 						)
 						
@@ -70,32 +68,28 @@ var evaluate_content = {
 				})
 			]),
 			[			// the tabs used by ui-tabs
-				//m("#charts_tab", m.component(physdata_content)),
-				//m("#export_tab", m("div"))
+				m("#charts_tab", m.component(charts_content)),
 				m("#export_tab", m.component(export_content))
 			]
-		]),
-		m("iframe.excel_export", {style:"display:none"})
+		])
 	],
 	controller: function (element, isInitialized) {		// only events and initialisation
 		if (isInitialized) 
 			return;
 
 		$("#evaluate [name=disposal]").addClass("last");		// set the last field
-
-		$('#evaluate .select').click(function(){
-			//$('#evaluate .EXPORT').click();
-			createSheet();
-		});
 		
-		$('#evaluate .export').click(function() {
-			$("#evaluate .excel_export").attr("src", 'server/export_sheets.php?'+
+		$('#evaluate #export').click(function() {
+			$("iframe").remove();
+			var src = 'server/export_sheets.php?'+
 								'start='+$('#evaluate [name=start]').val()+
 								'&end='+$('#evaluate [name=end]').val()+
 								'&prodstat='+$('#evaluate [name=prodStat]').val()+
 								'&result='+$('#evaluate [name=result]').val()+
 								'&disposal='+$('#evaluate [name=disposal').val()+
-								'&product='+$('#evaluate [name=product] option:selected').text() );	
+								'&product='+$('#evaluate [name=product] option:selected').text();
+	
+			$("#evaluate").append('<iframe .excel_export style="display:none" src="'+src+'" >' );
 		});
 						
 		// default tab when page is first loaded
@@ -117,7 +111,7 @@ var evaluate_content = {
 			create: function( event, ui ) {
 				switch (initialtab) {
 					//case 0: show_charts(); break;
-					case 1: show_export(); break;
+					//case 1: show_export(); break;
 				}
 			}
 		});
@@ -148,6 +142,9 @@ var evaluate_content = {
 				$('#evaluate [name=product]').empty().append(data.product);
 				$('#evaluate [name=result]').empty().append(data.result);
 				$('#evaluate [name=disposal]').empty().append(data.disposal);		
+
+				if ($.jStorage.get("pline_evaluationtab") == 1)						
+					createSheet();
 			});
 		})
 		

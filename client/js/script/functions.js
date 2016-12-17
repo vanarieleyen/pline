@@ -891,6 +891,9 @@ function show_evaluation() {
 						$('#evaluate [name=product]').empty().append(data.product);
 						$('#evaluate [name=result]').empty().append(data.result);
 						$('#evaluate [name=disposal]').empty().append(data.disposal);		
+
+						if ($.jStorage.get("pline_evaluationtab") == 1)						
+							createSheet();
 					});
 			  }
 			});
@@ -898,9 +901,6 @@ function show_evaluation() {
 	}, 100);
 }
 
-function show_export() {
-
-}
 
 // calculate Cp (process capability)
 function cp(LSL, USL, VAL) {

@@ -63,6 +63,7 @@ include('data.js');			// parent
 include('history.js');
 
 include('export.js');
+include('charts.js');
 include('evaluate.js');
 
 include('specs.js');					// children of settings-tab
@@ -134,6 +135,12 @@ $(document).ready(function() {
 					$("#names textarea").attr("disabled","disabled");
 					$("#names input").attr("disabled","disabled");
 				}
+				if (data.guest == 1) {
+					$("input").not(":button").attr("disabled","disabled");
+					$("select").attr("disabled","disabled");
+					$("textarea").attr("disabled","disabled");
+					$(".new").attr("disabled","disabled");
+				}
 			}
 		})	
 		$("#loginpop").popdown();
@@ -145,8 +152,8 @@ $(document).ready(function() {
 		$.jStorage.set("pline_maintab", 0);
 	if ($.jStorage.get("pline_datatab") == null)
 		$.jStorage.set("pline_datatab", 0);
-	if ($.jStorage.get("pline_defectsstab") == null)
-		$.jStorage.set("pline_defectsstab", 0);
+	if ($.jStorage.get("pline_evaluationtab") == null)
+		$.jStorage.set("pline_evaluationtab", 0);
 	if ($.jStorage.get("pline_settingstab") == null)
 		$.jStorage.set("pline_settingstab", 0);
 			

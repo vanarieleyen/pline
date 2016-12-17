@@ -31,6 +31,7 @@ $condition = sprintf("%s%s", $condition, $product=='---' ? "" : " AND t1.product
 $query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'gwc_pline' AND TABLE_NAME = 'inspection' ";
 $database->query($query);
 $rows = $database->resultset();
+
 $inspectionFields = ""; 
 foreach ($rows AS $row) {
 	$inspectionFields = sprintf("%st1.%s AS %s, ", $inspectionFields, $row['COLUMN_NAME'], $row['COLUMN_NAME']);
@@ -41,6 +42,7 @@ $inspectionFields = substr($inspectionFields, 0, -2);
 $query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'gwc_pline' AND TABLE_NAME = 'specs' ";
 $database->query($query);
 $rows = $database->resultset();
+
 $specFields = ""; 
 foreach ($rows AS $row) {
 	$specFields = sprintf("%st2.%s AS spec_%s, ", $specFields, $row['COLUMN_NAME'], $row['COLUMN_NAME']);
@@ -52,6 +54,7 @@ $query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA 
 $database->query($query);
 $rows = $database->resultset();
 $penaltyFields = ""; 
+
 foreach ($rows AS $row) {
 	$penaltyFields = sprintf("%st3.%s AS pen_%s, ", $penaltyFields, $row['COLUMN_NAME'], $row['COLUMN_NAME']);
 }
@@ -119,6 +122,9 @@ foreach ($rows AS $row) {
 
 // Create new PHPExcel object
 $objPHPExcel = new PHPExcel();
+
+// create the writer
+$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel5");
 
 // generate excel column names (A,B,C..Z  AA,AB..)
 function num2alpha($n) {
@@ -1281,6 +1287,11 @@ $objPHPExcel->removeSheetByIndex(0);	// remove the default (not used) first shee
 
 $output = pathinfo(__FILE__, PATHINFO_FILENAME).".xls";
 
+ob_start();
+$objWriter->save('php://output');
+$xlsData = ob_get_contents();
+ob_end_clean();
+
 // Redirect output to a client’s web browser (Excel5)
 header('Content-Type: application/vnd.ms-excel');
 header('Content-Disposition: attachment;filename='.$output);
@@ -1294,10 +1305,8 @@ header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
 header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
 header ('Pragma: public'); // HTTP/1.0
 
-$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-$objWriter->save('php://output');
-echo 'end';
-
+//$objWriter->save('php://output');
+echo $xlsData;
 $objPHPExcel->__destruct();
 
 exit;
