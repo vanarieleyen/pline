@@ -442,25 +442,25 @@ $(document).on("keyup", "input.number", function() {
 });
 
 // sets the current record pointer
-function get_current() {
-	if ($.jStorage.get("pline.current") == null) {	// for first-time start-ups 
+function get_current(table) {
+	if ($.jStorage.get("pline.current.inspection") == null) {	// for first-time start-ups 
 		$.getJSON('server/get_record.php', { 
-			query: 'SELECT max(id) AS id FROM '+table
+			query: 'SELECT max(id) AS id FROM gwc_pline.'+table
 		}, function(data) {
-			$.jStorage.set("pline.current", data.id);	// NULL when none found
+			$.jStorage.set("pline.current.inspection", data.id);	// NULL when none found
 		});
 	} else {
 		$.getJSON('server/get_record.php', { 
-			query: 'SELECT id FROM gwc_pline.inspection WHERE id='+$.jStorage.get("pline.current")
+			query: 'SELECT id FROM gwc_pline.inspection WHERE id='+$.jStorage.get("pline.current.inspection")
 		},	function(data) {
 			if (data.id == null) {
 				$.getJSON('server/get_record.php', { 
 					query: 'SELECT max(id) AS id FROM gwc_pline.inspection'
 				}, function(data) {
-					$.jStorage.set("pline.current", data.id);	// NULL when none found
+					$.jStorage.set("pline.current.inspection", data.id);	// NULL when none found
 				});
 			} else {
-				$.jStorage.set("pline.current", data.id);
+				$.jStorage.set("pline.current.inspection", data.id);
 			}
 		});
 	}
@@ -470,7 +470,7 @@ function get_current() {
 function next_rec(table) {
 	var name = table.split('.')[1];
 	
-	this.current = $.jStorage.get("pline.current");
+	this.current = $.jStorage.get("pline.current."+name);
 	$.getJSON('server/get_record.php', { 
 		query: 'SELECT * FROM '+table+' WHERE id = ' + this.current + ' LIMIT 1'
 	}, function(data) {
@@ -479,14 +479,14 @@ function next_rec(table) {
 				query: 'SELECT * FROM '+table+' WHERE id > "' + data.id + '" ORDER BY id ASC LIMIT 1'
 			}, function(data) {
 				if (data.rowcount != 0) {	// als er nog records worden gevonden...
-					$.jStorage.set("pline.current", data.id);
+					$.jStorage.set("pline.current."+name, data.id);
 				}	
 			});
 		} else {
 			$.getJSON('server/get_record.php', { 
 				query: 'SELECT max(id) AS id FROM '+table
 			},	function(data) {
-				$.jStorage.set("pline.current", data.id);	// NULL when none found
+				$.jStorage.set("pline.current."+name, data.id);	// NULL when none found
 			});
 		}		
 	});
@@ -497,7 +497,7 @@ function next_rec(table) {
 function prev_rec(table) {
 	var name = table.split('.')[1];
 	
-	this.current = $.jStorage.get("pline.current");
+	this.current = $.jStorage.get("pline.current."+name);
 	$.getJSON('server/get_record.php', { 
 		query: 'SELECT * FROM '+table+' WHERE id = ' + this.current + ' LIMIT 1'
 	}, function(data) {
@@ -506,14 +506,14 @@ function prev_rec(table) {
 				query: 'SELECT * FROM '+table+' WHERE id < "' + data.id + '" ORDER BY id DESC LIMIT 1'
 			}, function(data) {
 				if (data.rowcount != 0) {	// als er nog records worden gevonden...
-					$.jStorage.set("pline.current", data.id);
+					$.jStorage.set("pline.current."+name, data.id);
 				}	
 			});		
 		} else {
 			$.getJSON('server/get_record.php', { 
 				query: 'SELECT min(id) AS id FROM '+table
 			},	function(data) {
-				$.jStorage.set("pline.current", data.id);	// NULL when none found
+				$.jStorage.set("pline.current."+name, data.id);	// NULL when none found
 			});
 		}		
 	});
@@ -550,11 +550,11 @@ if ($.jStorage.get("pline.gradient") == null) {
 	})();
 }
 
-function setColor(element, soort, spec) {		// set the color of a single field (spec = specifications or value)
+function setColor(group, field, spec) {		// set the color of a single field (spec = specifications or value)
 	var kleuren = $.jStorage.get("pline.gradient");
 	var pct = 0;
 
-	el = $(element+" [name="+soort+"]");
+	el = $(group+" [name="+field+"]");
 	
 	if (spec == null) {
 		el.css("background-color", "white");
@@ -565,8 +565,18 @@ function setColor(element, soort, spec) {		// set the color of a single field (s
 		el.css("background-color", "silver" );
 	} else {
 		if (typeof spec == "object") {
-			valmin = (specmin==null) ? -spec[specmax] : spec[specmin];
-			valmax = (specmax==null) ? 200-spec["rol_"+soort+"_max"] : spec[specmax];
+			if (specmin == specmax) {
+				if (field == "fillingPower") {		// single value spec , the greater the better
+					valmin = spec[specmin];
+					valmax = 2*spec[specmax];
+				} else {													// single value spec, the less the better
+					valmin = -spec[specmin];
+					valmax = spec[specmax];
+				}
+			} else {			
+				valmin = (specmin==null) ? -spec[specmax] : spec[specmin];
+				valmax = (specmax==null) ? 200-spec["rol_"+soort+"_max"] : spec[specmax];
+			}
 			sp = specLimits(valmin, valmax);
 		} else {
 			sp = specLimits(-spec, spec);
@@ -583,16 +593,15 @@ function setColor(element, soort, spec) {		// set the color of a single field (s
 	return pct;
 }
 
-// regain1, matoutmoist
-function colorSeries(element, soort, spec) {		// set the color of a row of fields (l1,l2... m1,m2...)
+function colorSeries(group, soort, spec) {		// set the color of a row of fields (l1,l2... m1,m2...)
 	var totaal = 0.0;
 	var aantal = 0;
 
-	specmin = db[element][soort].spec.min;
-	specmax = db[element][soort].spec.max;
-	
-	db[element][soort].field.map(function (field) {
-		totaal += setColor("#"+element, field, spec);
+	specmin = db[group][soort].spec.min;
+	specmax = db[group][soort].spec.max;
+
+	db[group][soort].field.map(function (field) {
+		totaal += setColor("#"+group, field, spec);
 		aantal++;
 	});
 	return Math.max(1, Math.min(100-totaal/aantal, 99)); // 1..99
@@ -607,9 +616,9 @@ function load_data(table) {
 // shows the data from a table
 function show_data(table) {
  
-	get_current();	// get the current record pointer
+	get_current(table);	// get the current record pointer
 	
-	var id = $.jStorage.get("pline.current");
+	var id = $.jStorage.get("pline.current.inspection");
 	var sql = sprintf('SELECT * FROM gwc_pline.%s WHERE id=%s', table, id);
 
 	if (id != null)	{
@@ -621,7 +630,7 @@ function show_data(table) {
 					var lang = $.jStorage.get("lang");
 
 					// no records found - disable all input fields
-					if ($.jStorage.get("pline.current") == null) {
+					if ($.jStorage.get("pline.current.inspection") == null) {
 						$("input").not("[type=button]").attr("disabled", "disabled");
 						$("textarea").attr("disabled", "disabled");
 					}
@@ -689,13 +698,15 @@ function show_data(table) {
 						{group:"regain1",choice:"matouttemp"}, {group:"regain1",choice:"accuracy"},
 						{group:"regain2",choice:"matinmoist"}, {group:"regain2",choice:"matoutmoist"},
 						{group:"regain2",choice:"matouttemp"}, {group:"regain2",choice:"accuracy"},
-						{group:"storage",choice:"time"},
-						{group:"drying",choice:"matoutmoist"}, {group:"drying",choice:"matouttemp"}
-
+						{group:"storage",choice:"time"}, {group:"cutting",choice:"breedte"},
+						{group:"drying",choice:"matoutmoist"}, {group:"drying",choice:"matouttemp"},
+						{group:"flavor",choice:"matoutmoist"}, {group:"flavor",choice:"accuracy"},
+						{group:"cylheat",choice:"matinmoist"}, {group:"cylheat",choice:"matoutmoist"}, {group:"cylheat",choice:"matouttemp"},
+						{group:"stems",choice:"long"}, {group:"stems",choice:"short"}, {group:"stems",choice:"filling"},
+						{group:"blend",choice:"moisture"}, {group:"blend",choice:"cutacc"}, {group:"blend",choice:"expacc"}
 					].map(function(a) {
 						colorSeries(a.group, a.choice, spec);								// color the inputs
 					});
-					
 					break;
 				case "specs":
 					// no records found - disable all input fields

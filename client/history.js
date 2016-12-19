@@ -24,7 +24,7 @@ var history_content = {
 		$('#history #lijst tbody').on('click', 'td', function(e) {		// open the selected row
 			var id = parseInt($(this).parent().find("td:first").text());
 
-			$.jStorage.set("pline.current", id);
+			$.jStorage.set("pline.current.inspection", id);
 			show_data("inspection");		// update the data in the tab before it is selected
 			$('.PACKING50').click();
 		});

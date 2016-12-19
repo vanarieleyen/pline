@@ -87,11 +87,11 @@ var specs_content = {
 							}),
 							m("tr", m("th.BLEND_CUT", {colspan:"3"})),
 							m("tr", {align:"left"}, [
-									m("th.BLEND_ACCUR"), m("td", [m("span", "≤"),  m("input.number[name=blendcutAccuracy]"), m("span", "(%)")] )
+									m("th.BLEND_ACCUR"), m("td", [m("span", "≤ "),  m("input.number[name=blendcutAccuracy]"), m("span", "(%)")] )
 							]),
 							m("tr", m("th.BLEND_EXP", {colspan:"3"})),
 							m("tr", {align:"left"}, [
-									m("th.BLEND_ACCUR"), m("td", [m("span", "≤"),  m("input.number[name=blendexpAccuracy]"), m("span", "(%)")] )
+									m("th.BLEND_ACCUR"), m("td", [m("span", "≤ "),  m("input.number[name=blendexpAccuracy]"), m("span", "(%)")] )
 							]),
 							m("tr", m("th.BLEND_STORAGE", {colspan:"3"})),
 							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
@@ -103,7 +103,7 @@ var specs_content = {
 							}),
 							m("tr", m("th.FLAVORING", {colspan:"3"})),
 							m("tr", {align:"left"}, [
-									m("th.FLAVORING_ACCURACY"), m("td", [m("span", "≤"),  m("input.number[name=blendflavorAccuracy]"), m("span", "(%)")] )
+									m("th.FLAVORING_ACCURACY"), m("td", [m("span", "≤ "),  m("input.number[name=blendflavorAccuracy]"), m("span", "(%)")] )
 							]),
 							m("tr", {align:"left"}, [	m("td"), m("th.MIN"), m("th.MAX")	]),
 							[	{th:"th.OUTPUTMOIST", field1:"flavor_matoutMoistMin", field2:"flavor_matoutMoistMax", unit:"(%)"}	].map(function (a) {
@@ -115,10 +115,10 @@ var specs_content = {
 							m("tr", m("th.ADDITIONAL_INSPECTIONS", {colspan:"3"})),
 							[	{th:"th.LONG_STEMS", field:"amountLongStems"},	{th:"th.SHORT_STEMS", field:"amountShortStems"}].map(function (a) {
 								return m("tr", {align:"left"}, [
-													m(a.th), m("td", [m("input.number[name="+a.field+"]")] )
+													m(a.th), m("td", [m("span", "≤ "), m("input.number[name="+a.field+"]")] )
 												])
 							}),
-							m("tr", {align:"left"},m("th.FILLING_POWER"), m("td", [m("input.number[name=fillingPower]"), m("span", "(cm³/g)")] ))
+							m("tr", {align:"left"},m("th.FILLING_POWER"), m("td", [m("span", "≥ "), m("input.number[name=fillingPower]"), m("span", "(cm³/g)")] ))
 						])
 					])
 

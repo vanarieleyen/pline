@@ -73,7 +73,7 @@ var physdata_content = {
 				]),
 				m("fieldset", [
 					m("legend.CUT_STRIPS"),
-					m("table#cutwidth", [
+					m("table#cutting", [
 						m("tr", m("td",[m("label.CUT_WIDTH"), m("span", "(mm)")]), m("input.number[name=cutWidth]")	)
 					])
 				]),
@@ -114,7 +114,7 @@ var physdata_content = {
 				]),
 				m("fieldset", [
 					m("legend.FLAVORING"),
-					m("table", [
+					m("table#flavor", [
 						m("tr", [
 							m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=flavorOK]")]),
 							m("td", {colspan:"3"}, [m("label.FLAVORING_ACCURACY"), m("input.number[name=flavorAccuracy]")])
@@ -128,52 +128,54 @@ var physdata_content = {
 				])
 			]),
 			m("span.flex-col", {style: "background-color:rgba(0,255,255,0.05)"}, [
-				m("fieldset", [
-					m("legend.BLEND_CUT"),
-					m("table", [
-						m("tr", [
-							m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendcutMatOK]")]),
-							m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
-							m("td", m("input.number[name=blendcutAccuracy]"))
+				m("#blend", [
+					m("fieldset", [
+						m("legend.BLEND_CUT"),
+						m("table", [
+							m("tr", [
+								m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendcutMatOK]")]),
+								m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
+								m("td", m("input.number[name=blendcutAccuracy]"))
+							])
 						])
-					])
-				]),
-				m("fieldset", [
-					m("legend.BLEND_EXP"),
-					m("table", [
-						m("tr", [
-							m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendexpMatOK]")]),
-							m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
-							m("td", m("input.number[name=blendexpAccuracy]"))
+					]),
+					m("fieldset", [
+						m("legend.BLEND_EXP"),
+						m("table", [
+							m("tr", [
+								m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendexpMatOK]")]),
+								m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
+								m("td", m("input.number[name=blendexpAccuracy]"))
+							])
 						])
-					])
-				]),
-				m("fieldset", [
-					m("legend.BLEND_RECYCLED"),
-					m("table", [
-						m("tr", [
-							m("td.BLEND_RECYCLED_NR"), m("td", m("input.number[name=blendreID]")),
-							m("td.BLEND_RECYCLED_OK"),  m("td", {colspan:"2"}, m("select[name=blendreOK]"))
+					]),
+					m("fieldset", [
+						m("legend.BLEND_RECYCLED"),
+						m("table", [
+							m("tr", [
+								m("td.BLEND_RECYCLED_NR"), m("td", m("input.number[name=blendreID]")),
+								m("td.BLEND_RECYCLED_OK"),  m("td", {colspan:"2"}, m("select[name=blendreOK]"))
+							])
 						])
-					])
-				]),
-				m("fieldset", [
-					m("legend.BLEND_STORAGE"),
-					m("table", [
-						m("tr", [
-							m("td", {colspan:"5"}, [m("label.MATERIAL"),  m("select[name=blendstorMix]")])
-						]),
-						m("tr", [
-							m("td",[m("label.MOIST_CONTENT"), m("span", "(%)")]), 
-							["blendstorMoistA","blendstorMoistB","blendstorMoistC","blendstorMoistD"].map(function(field) {
-								return m("td", m("input.number", {name:field}))
-							})
+					]),
+					m("fieldset", [
+						m("legend.BLEND_STORAGE"),
+						m("table", [
+							m("tr", [
+								m("td", {colspan:"5"}, [m("label.MATERIAL"),  m("select[name=blendstorMix]")])
+							]),
+							m("tr", [
+								m("td",[m("label.MOIST_CONTENT"), m("span", "(%)")]), 
+								["blendstorMoistA","blendstorMoistB","blendstorMoistC","blendstorMoistD"].map(function(field) {
+									return m("td", m("input.number", {name:field}))
+								})
+							])
 						])
-					])
+					]),
 				]),
 				m("fieldset", [
 					m("legend.ADDITIONAL_INSPECTIONS"),
-					m("table", [
+					m("table#stems", [
 						m("tr", [m("td.LONG_STEMS"), m("td", m("input.number[name=amountLongStems]"))]),
 						m("tr", [m("td.SHORT_STEMS"), m("td", m("input.number[name=amountShortStems]"))]),
 						m("tr", [
@@ -210,15 +212,17 @@ var physdata_content = {
 		});		
 		
 			// update database after input is changed 
-		$("#physdata input:text").blur(function () {
+		$("#physdata input").not(":button").blur(function () {
 			var current = $.jStorage.get("pline.current.inspection");
 			var field = $(this).attr('name');
 			var value = $(this).val();
+
 			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );
+			console.log(sql);
 			$.getJSON('server/send_query.php', {query: sql}, function (data) {
 				$.getJSON('server/calc_penalties.php', {id: current});
+				show_data("inspection");
 			});
-			show_data("inspection");
 		});
 		
 		$("#physdata select").blur(function () {

@@ -22,7 +22,9 @@ var dbs = {
 		accuracy:			{field: "2_accuracy"}
 	},
 	storage:				{min:"storTimeMin", max:"storTimeMax"},
-	cutwidth:				{min:"cutWidthMin", max:"cutWidthMax"},
+	cutting: {
+		breedte:				{min:"cutWidthMin", max:"cutWidthMax"}
+	},
 	cylheat:	{
 		matinmoist:		{min:"cyl_matinMoistMin",	max:"cyl_matinMoistMax"},
 		matoutmoist:	{min:"cyl_matoutMoistMin",	max:"cyl_matoutMoistMax"},
@@ -32,13 +34,18 @@ var dbs = {
 		matoutmoist:	{min:"dry_matoutMoistMin",	max:"dry_matoutMoistMax"},
 		matouttemp:		{min:"dry_matoutTempMin",	max:"dry_matoutTempMax"}
 	},
-	blending: 			{min:"blendstorMoistMin", max:"blendstorMoistMax"},
-	blendcutacc:		{field: "blendcutAccuracy"},
-	blendexpacc:		{field: "blendexpAccuracy"},
-	blendflavacc:		{field: "blendflavorAccuracy"},
+	blend: {
+		stormix:			{min:"blendstorMoistMin", max:"blendstorMoistMax"},
+		cutacc:				{min:"blendcutAccuracy", max:"blendcutAccuracy"}, //{field: "blendcutAccuracy"},
+		expacc:				{min:"blendexpAccuracy", max:"blendexpAccuracy"},	//{field: "blendexpAccuracy"},
+		flavacc:			{min:"blendflavorAccuracy", max:"blendflavorAccuracy"}, //{field: "blendflavorAccuracy"},
+	},
 	flavoring:			{min:"flavor_matoutMoistMin", max:"flavor_matoutMoistMax"},
-	stems:				{long:"amountLongStems", short:"amountShortStems"},
-	filling:	{field: "fillingPower"}
+	stems: {
+		long:					{min:"amountLongStems", max:"amountLongStems"},
+		short:				{min:"amountShortStems", max:"amountShortStems"},
+		filling:			{min:"fillingPower", max:"fillingPower"}
+	}
 }
 
 var db = {
@@ -74,7 +81,9 @@ var db = {
 		time:			{field: ["storageTime"],spec: dbs.storage},
 		matok:		{field: ["storageMatOK"],spec: []}
 	},
-	cutwidth:	{field: ["cutWidth"],spec: dbs.cutwidth},
+	cutting: {
+		breedte:		{field: ["cutWidth"],spec: dbs.cutting.breedte}
+	},
 	cylheat:		{
 		matinmoist:		{field: ["cyl_matinMoistA", "cyl_matinMoistB"], spec: dbs.cylheat.matinmoist},
 		matoutmoist:	{field: ["cyl_matoutMoistA", "cyl_matoutMoistB"], spec: dbs.cylheat.matoutmoist},
@@ -85,32 +94,23 @@ var db = {
 		matouttemp:		{field: ["dry_matoutTempA", "dry_matoutTempB"], spec: dbs.drying.matouttemp}
 	},
 	blend:		{
-		matoutmoist:	{field: ["blendstorMoistA", "blendstorMoistB", "blendstorMoistC", "blendstorMoistD"], spec: dbs.blending},
-		cut:	{
-			matOK:			{field: ["blendcutMatOK"],spec: []},
-			accuracy:		{field: ["blendcutAccuracy"],spec: []}
-		},
-		exp:	{
-			matOK:			{field: ["blendexpMatOK"],spec: []},
-			accuracy:		{field: ["blendexpAccuracy"],spec: []}
-		},
-		recycled:	{
-			matOK:			{field: ["blendreOK"],spec: []},
-			ID:				{field: ["blendreID"],spec: []}
-		},
-		storage:	{
-			mix:				{field: ["blendstorMix"],spec: []},
-		}
+		moisture:			{field: ["blendstorMoistA", "blendstorMoistB", "blendstorMoistC", "blendstorMoistD"], spec: dbs.blend.stormix},
+		cutok:				{field: ["blendcutMatOK"],spec: dbs.blend.stormix},
+		cutacc:				{field: ["blendcutAccuracy"],spec: dbs.blend.cutacc},
+		expok:				{field: ["blendexpMatOK"],spec: []},
+		expacc:				{field: ["blendexpAccuracy"],spec: dbs.blend.expacc},
+		reok:					{field: ["blendreOK"],spec: []},
+		reid:					{field: ["blendreID"],spec: []}
 	},
 	flavor:	{
 		matOK:			{field: ["flavorOK"],spec: []},
-		accuracy:		{field: ["flavorAccuracy"],spec: []},
+		accuracy:		{field: ["flavorAccuracy"],spec: dbs.blend.flavacc},
 		matoutmoist:	{field: ["flavor_matoutMoistA", "flavor_matoutMoistB", "flavor_matoutMoistC", "flavor_matoutMoistD"], spec: dbs.flavoring}	
 	},
 	stems: 	{
-		long:	 	{field: "amountLongStems", spec: dbs.stems.long},
-		long: 	{field: "amountShortStems", spec: dbs.stems.short},
-		filling:	{field: "fillingPower", spec: dbs.filling}
+		long:	 	{field: ["amountLongStems"], spec: dbs.stems.long},
+		short: 	{field: ["amountShortStems"], spec: dbs.stems.short},
+		filling:	{field: ["fillingPower"], spec: dbs.stems.filling}
 	}
 }
 

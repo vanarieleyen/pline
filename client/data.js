@@ -1,7 +1,7 @@
 
 var data_content = {
 	header: [
-		m("span.flex-row", {style: "background-color:rgba(0,255,255,0.05)"}, [
+		m("span.flex-row#data", {style: "background-color:rgba(0,255,255,0.05)"}, [
 			m("fieldset.fieldset_header", {style: "width:70%"}, [
 				m("legend.MEASUREMENTS"),
 				m("table", {width: "100%", border: "0"}, 
@@ -81,7 +81,7 @@ var data_content = {
 
 			// update database after input is changed 
 		$("#data input:text").blur(function () {
-			var current = $.jStorage.get("pline.current");
+			var current = $.jStorage.get("pline.current.inspection");
 			var field = $(this).attr('name');
 			var value = $(this).val();
 			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );
@@ -92,7 +92,7 @@ var data_content = {
 		});
 		
 		$("#data select").blur(function () {
-			var current = $.jStorage.get("pline.current");
+			var current = $.jStorage.get("pline.current.inspection");
 			var field = $(this).attr('name');
 			var value = $(this).val();
 			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );	
@@ -103,7 +103,7 @@ var data_content = {
 		});
 		
 		$("#data textarea").blur(function () {
-			var current = $.jStorage.get("pline.current");	
+			var current = $.jStorage.get("pline.current.inspection");	
 			var field = $(this).attr('name');
 			var value = $(this).val();
 			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );	
@@ -136,7 +136,7 @@ var data_content = {
 		
 	},		
 	view: function () {
-		return m("#data", [this.header, this.contents]);
+		return m("div", [this.header, this.contents]);
 	}
 }
 
