@@ -12,7 +12,7 @@ var physdata_content = {
 				]),
 				m("fieldset", [
 					m("legend.REGAIN_1"),
-					m("table", [
+					m("table#regain1", [
 						m("tr", [
 							m("td",[m("label.INPUTMOIST"), m("span", "(%)")]), ["1_matinMoistA","1_matinMoistB"].map(function(field) {
 								return m("td", m("input.number", {name:field}))
@@ -38,7 +38,7 @@ var physdata_content = {
 				]),
 				m("fieldset", [
 					m("legend.REGAIN_2"),
-					m("table", [
+					m("table#regain2", [
 						m("tr", [
 							m("td",[m("label.INPUTMOIST"), m("span", "(%)")]), ["2_matinMoistA","2_matinMoistB"].map(function(field) {
 								return m("td", m("input.number", {name:field}))
@@ -66,20 +66,20 @@ var physdata_content = {
 			m("span.flex-col", {style: "background-color:rgba(0,255,255,0.05)"}, [
 				m("fieldset", [
 					m("legend.STORAGE"),
-					m("table", [
+					m("table#storage", [
 						m("tr", [m("td",[m("label.STORAGETIME"), m("span", "(h)")]), m("td", m("input.number[name=storageTime]")) ]),
 						m("tr", [m("td.MATERIAL"),	m("td", {colspan: "2"}, m("select[name=rawMatOK]"))])	
 					])
 				]),
 				m("fieldset", [
 					m("legend.CUT_STRIPS"),
-					m("table", [
+					m("table#cutwidth", [
 						m("tr", m("td",[m("label.CUT_WIDTH"), m("span", "(mm)")]), m("input.number[name=cutWidth]")	)
 					])
 				]),
 				m("fieldset", [
 					m("legend.MOIST_HEAT"),
-					m("table", [
+					m("table#cylheat", [
 						m("tr", [
 							m("td",[m("label.INPUTMOIST"), m("span", "(%)")]), ["cyl_matinMoistA","cyl_matinMoistB"].map(function(field) {
 								return m("td", m("input.number", {name:field}))
@@ -99,7 +99,7 @@ var physdata_content = {
 				]),
 				m("fieldset", [
 					m("legend.AIR_DRYING"),
-					m("table", [
+					m("table#drying", [
 						m("tr", [
 							m("td",[m("label.OUTPUTMOIST"), m("span", "(%)")]), ["dry_matoutMoistA","dry_matoutMoistB"].map(function(field) {
 								return m("td", m("input.number", {name:field}))

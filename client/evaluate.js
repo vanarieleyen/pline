@@ -80,16 +80,26 @@ var evaluate_content = {
 		$("#evaluate [name=disposal]").addClass("last");		// set the last field
 		
 		$('#evaluate #export').click(function() {
-			$("iframe").remove();
-			var src = 'server/export_sheets.php?'+
-								'start='+$('#evaluate [name=start]').val()+
-								'&end='+$('#evaluate [name=end]').val()+
-								'&prodstat='+$('#evaluate [name=prodStat]').val()+
-								'&result='+$('#evaluate [name=result]').val()+
-								'&disposal='+$('#evaluate [name=disposal').val()+
-								'&product='+$('#evaluate [name=product] option:selected').text();
-	
-			$("#evaluate").append('<iframe .excel_export style="display:none" src="'+src+'" >' );
+			var start = $('#evaluate [name=start]').val();
+			var end = $('#evaluate [name=end]').val();
+			var prodstat = $('#evaluate [name=prodStat]').val();
+			var result = $('#evaluate [name=result]').val();
+			var disposal = $('#evaluate [name=disposal').val();
+			var product = $('#evaluate [name=product] option:selected').text();
+			var src =	sprintf('server/export_sheets.php?start=%s&end=%s&prodstat=%s&result=%s&disposal=%s&product=%s',
+										start, end, prodstat, result, disposal, product); 
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', src, true);
+			xhr.responseType = 'blob';
+			
+			xhr.onload = function(e) {
+			  if (this.status == 200) {
+			    var blob = this.response;			// get binary data
+			    saveAs(blob, "export.xls");		// save locally
+			  }
+			};
+			xhr.send();
 		});
 						
 		// default tab when page is first loaded

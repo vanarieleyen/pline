@@ -123,9 +123,6 @@ foreach ($rows AS $row) {
 // Create new PHPExcel object
 $objPHPExcel = new PHPExcel();
 
-// create the writer
-$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel5");
-
 // generate excel column names (A,B,C..Z  AA,AB..)
 function num2alpha($n) {
     for($r = ""; $n >= 0; $n = intval($n / 26) - 1)
@@ -153,6 +150,17 @@ function setColor($sheet, $range, $color) {
 			->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
 			->getStartColor()
 			->setRGB($color);
+}
+
+function writeLine($r, $field) {
+	global $sheet, $row, $aantal;
+	
+	for ($i=0; $i<$aantal; $i++) {
+		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
+		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
+		$sheet->setCellValue( $c1, $row[$i][$field] )
+				->mergeCells($c1.':'.$c2);	
+	}
 }
 
 foreach ($record AS $row) {		// walk through all the sheets
@@ -414,12 +422,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", $row[0]['spec_cutWidthMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_cutWidthMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['cutWidth'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'cutWidth');
 
 	// humidifying and heating (cylinder)
 	$r++;
@@ -512,7 +515,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
 		$sheet->setCellValue( $c1,  $row[$i]['dry_matoutTempA'] )
 				->setCellValue( $c2,  $row[$i]['dry_matoutTempB'] );
-	}		
+	}
 
 	// blending the cut stem
 	$r++;
@@ -534,12 +537,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['blendcutAccuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'blendcutAccuracy');
 
 	// blending the expanded tobacco
 	$r++;
@@ -561,12 +559,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['blendexpAccuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'blendexpAccuracy');
 
 	// blending recycling tobacco
 	$r++;
@@ -578,12 +571,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->getStyle(sprintf("B%d:B%d", $r, $r+1))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 	$sheet->setCellValue("C$r", "回收丝掺配通知号")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['blendreID'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'blendreID');
 
 	$r++;
 	$sheet->setCellValue("C$r", "按工艺要求使用")
@@ -616,12 +604,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['flavorAccuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+	writeLine($r, 'flavorAccuracy');
 
 	$res = calcSummary($row, $aantal, 0, 1, ['flavorAccuracy']);
 	$r++;
@@ -678,13 +661,8 @@ foreach ($record AS $row) {		// walk through all the sheets
 	$r++;
 	$sheet->setCellValue("A$r", "混丝贮存")
 			->mergeCells(sprintf("A%d:A%d", $r, $r+2))
-			->getStyle(sprintf("A%d:A%d", $r, $r+2))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $statOK[$row[$i]['blendstorMix']] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+			->getStyle(sprintf("A%d:A%d", $r, $r+2))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);	
+	writeLine($r, 'blendstorMix');
 
 	$r++;
 	$sheet->setCellValue("B$r", "贮丝含水率（%）")
@@ -725,35 +703,20 @@ foreach ($record AS $row) {		// walk through all the sheets
 	$sheet->setCellValue("C$r", "整丝率")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", $row[0]['spec_amountLongStems']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['amountLongStems'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'amountLongStems');
 	
 	$r++;
 	$sheet->setCellValue("C$r", "碎丝率")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", $row[0]['spec_amountShortStems']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['amountShortStems'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'amountShortStems');
 
 	$r++;
 	$sheet->setCellValue("B$r", "成品烟丝填充值（cm3/g）")
 			->setCellValue("C$r", "填充值")
 			->setCellValue("D$r", "≥")
 			->setCellValue("E$r", $row[0]['spec_fillingPower']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['fillingPower'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+	writeLine($r, 'fillingPower');
 
 	// seperator ///////////////////////////////////////////////////////////////////////////////
 	$r+=2;
@@ -789,12 +752,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("B$r", "物料识别")
 			->setCellValue("C$r", "原料标识符合配方")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_FeedMatID'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_FeedMatID');
 
 	// first moisture regain
 	$r++;
@@ -805,59 +763,34 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", $row[0]['spec_1_matinMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_1_matinMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_1_matinMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_1_matinMoist');
 	
 	$r++;
 	$sheet->setCellValue("B$r", "料液识别")
 			->setCellValue("C$r", "料液标识符合生产牌号")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_1_matMoistID'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_1_matMoistID');
 
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料含水率（%）")
 			->setCellValue("C$r", $row[0]['spec_1_matoutMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_1_matoutMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_1_matoutMoist'] )
-				->mergeCells($c1.':'.$c2);
-	}
+	writeLine($r, 'pen_1_matoutMoist');
 
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料温度（℃）")
 			->setCellValue("C$r", $row[0]['spec_1_matoutTempMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_1_matoutTempMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_1_matoutTemp'] )
-				->mergeCells($c1.':'.$c2);
-	}
+	writeLine($r, 'pen_1_matoutTemp');
 
 	$r++;
 	$sheet->setCellValue("B$r", "加料累计精度（%）")
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_1_accuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_1_accuracy');
 
 	// second moisture regain
 	$r++;
@@ -868,61 +801,35 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", $row[0]['spec_2_matinMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_2_matinMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_2_matinMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_2_matinMoist');
 	
 	$r++;
 	$sheet->setCellValue("B$r", "料液识别")
 			->setCellValue("C$r", "料液标识符合生产牌号")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_2_moistOK'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_2_moistOK');
 
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料含水率（%）")
 			->setCellValue("C$r", $row[0]['spec_2_matoutMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_2_matoutMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_2_matoutMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_2_matoutMoist');
 
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料温度（℃）")
 			->setCellValue("C$r", $row[0]['spec_2_matoutTempMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_2_matoutTempMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_2_matoutTemp'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_2_matoutTemp');
 
 	$r++;
 	$sheet->setCellValue("B$r", "加料累计精度（%）")
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_2_accuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}
-	
-	
+	writeLine($r, 'pen_2_accuracy');
+
 	// keep in storage
 	$r++;
 	$sheet->setCellValue("A$r", "贮叶")
@@ -932,23 +839,13 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", $row[0]['spec_storTimeMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_storTimeMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_storTime'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_storTime');
 	
 	$r++;
 	$sheet->setCellValue("B$r", "物料识别")
 			->setCellValue("C$r", "批次物料不应混装")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_stormatOK'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_stormatOK');
 
 	// cut into strips
 	$r++;
@@ -957,12 +854,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", $row[0]['spec_cutWidthMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_cutWidthMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_cutWidth'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_cutWidth');
 
 	// humidifying and heating (cylinder)
 	$r++;
@@ -973,36 +865,21 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", $row[0]['spec_cyl_matinMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_cyl_matinMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_cyl_matinMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_cyl_matinMoist');
 	
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料含水率（%）")
 			->setCellValue("C$r", $row[0]['spec_cyl_matoutMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_cyl_matoutMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_cyl_matoutMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_cyl_matoutTemp');
 
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料含水率（%）")
 			->setCellValue("C$r", $row[0]['spec_cyl_matoutTempMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_cyl_matoutTempMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_cyl_matoutTemp'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_cyl_matoutTemp');
 				
 	// air drying
 	$r++;
@@ -1013,24 +890,14 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->setCellValue("C$r", $row[0]['spec_dry_matoutMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_dry_matoutMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_dry_matoutMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_dry_matoutMoist');
 
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料温度（℃）")
 			->setCellValue("C$r", $row[0]['spec_dry_matoutTempMin'])
 			->setCellValue("D$r", "-")
-			->setCellValue("E$r", $row[0]['spec_dry_matoutTempMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1,  $row[$i]['pen_dry_matoutTemp'] )
-				->mergeCells($c1.':'.$c2);	
-	}		
+			->setCellValue("E$r", $row[0]['spec_dry_matoutTempMax']);	
+	writeLine($r, 'pen_dry_matoutTemp');
 
 	// blending the cut stem
 	$r++;
@@ -1040,24 +907,14 @@ foreach ($record AS $row) {		// walk through all the sheets
 	$sheet->setCellValue("B$r", "物料识别")
 			->setCellValue("C$r", "掺配梗丝标识符合工艺要求")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendcutStemID'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_blendcutStemID');
 
 	$r++;
 	$sheet->setCellValue("B$r", "掺配累计精度（%）")
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendcutAccuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_blendcutAccuracy');
 
 	// blending the expanded tobacco
 	$r++;
@@ -1067,24 +924,14 @@ foreach ($record AS $row) {		// walk through all the sheets
 	$sheet->setCellValue("B$r", "物料识别")
 			->setCellValue("C$r", "掺配膨胀丝标识符合工艺要求")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendexpMatOK'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_blendexpMatOK');
 
 	$r++;
 	$sheet->setCellValue("B$r", "掺配累计精度（%）")
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendexpAccuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_blendexpAccuracy');
 
 	// blending recycling tobacco
 	$r++;
@@ -1096,12 +943,7 @@ foreach ($record AS $row) {		// walk through all the sheets
 			->getStyle(sprintf("B%d:B%d", $r, $r+1))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
 	$sheet->setCellValue("C$r", "回收丝掺配通知号")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendreMatOK'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_blendreMatOK');
 
 	//  Add spice & flavor
 	$r++;
@@ -1111,60 +953,35 @@ foreach ($record AS $row) {		// walk through all the sheets
 	$sheet->setCellValue("B$r", "物料识别")
 			->setCellValue("C$r", "料液标识符合生产牌号")
 			->mergeCells("C$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendflavorMatOK'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
-
+	writeLine($r, 'pen_blendflavorMatOK');
+	
 	$r++;
 	$sheet->setCellValue("B$r", "加香累计精度（%）")
 			->setCellValue("C$r", "累计精度")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", "1");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendflavorAccuracy'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+	writeLine($r, 'pen_blendflavorAccuracy');
 
 	$r++;
 	$sheet->setCellValue("B$r", "出口物料含水率（%）")
 			->setCellValue("C$r", $row[0]['spec_flavor_matoutMoistMin'])
 			->setCellValue("D$r", "-")
 			->setCellValue("E$r", $row[0]['spec_flavor_matoutMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendflavorMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+	writeLine($r, 'pen_blendflavorMoist');
 
 	// blend tobaccos storage
 	$r++;
 	$sheet->setCellValue("A$r", "混丝贮存")
 			->mergeCells(sprintf("A%d:A%d", $r, $r+2))
 			->getStyle(sprintf("A%d:A%d", $r, $r+2))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendstorMatOK'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+	writeLine($r, 'pen_blendstorMatOK');
 
 	$r++;
 	$sheet->setCellValue("B$r", "贮丝含水率（%）")
 			->setCellValue("C$r", $row[0]['spec_blendstorMoistMin'])
 			->setCellValue("D$r", "-")
-			->setCellValue("E$r", $row[0]['spec_blendstorMoistMax']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_blendstorMoist'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+			->setCellValue("E$r", $row[0]['spec_blendstorMoistMax']);	
+	writeLine($r, 'pen_blendstorMoist');
 
 	// special link
 	$r++;
@@ -1177,136 +994,70 @@ foreach ($record AS $row) {		// walk through all the sheets
 	$sheet->setCellValue("C$r", "整丝率")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", $row[0]['spec_amountLongStems']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_amountLongStems'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_amountLongStems');
 	
 	$r++;
 	$sheet->setCellValue("C$r", "碎丝率")
 			->setCellValue("D$r", "≤")
 			->setCellValue("E$r", $row[0]['spec_amountShortStems']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_amountShortStems'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pen_amountShortStems');
 
 	$r++;
 	$sheet->setCellValue("B$r", "成品烟丝填充值（cm3/g）")
 			->setCellValue("C$r", "填充值")
 			->setCellValue("D$r", "≥")
 			->setCellValue("E$r", $row[0]['spec_fillingPower']);
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_fillingPower'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+	writeLine($r, 'pen_fillingPower');
 	
 	// summary
 	$r++;
 	$sheet->setCellValue("A$r", "制丝综合质量得分")
 			->mergeCells("A$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pen_score'] )
-				->mergeCells($c1.':'.$c2);	
-	}	
+	writeLine($r, 'pen_score');
 	
 	$r++;
 	$sheet->setCellValue("A$r", "判定结果")
 			->mergeCells("A$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $result[$row[$i]['result']] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'result');
 	
 	$r++;
 	$sheet->setCellValue("A$r", "待判或不合格原因")
 			->mergeCells("A$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['pendingReason'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'pendingReason');
 
 	$r++;
 	$sheet->setCellValue("A$r", "检验员")
 			->mergeCells("A$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['inspector'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'inspector');
 
 	$r++;
 	
 	$r++;
 	$sheet->setCellValue("A$r", "待判或不合格物料处理方式")
 			->mergeCells("A$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $disposal[$row[$i]['disposal']] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'disposal');
 
 	$r++;
 	$sheet->setCellValue("A$r", "物料处理通知编号")
 			->mergeCells("A$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['matNotNR'] )
-				->mergeCells($c1.':'.$c2);	
-	}
+	writeLine($r, 'matNotNR');
 
 	$r++;
 	$sheet->setCellValue("A$r", "检验员")
 			->mergeCells("A$r:E$r");
-	for ($i=0; $i<$aantal; $i++) {
-		$c1 = sprintf("%s%d", num2alpha(($i*2)+5), $r);
-		$c2 = sprintf("%s%d", num2alpha(($i*2)+6), $r);
-		$sheet->setCellValue( $c1, $row[$i]['inspectorDis'] )
-				->mergeCells($c1.':'.$c2);	
-	}
-
+	writeLine($r, 'inspectorDis');
 					
 }
 
-$objPHPExcel->removeSheetByIndex(0);	// remove the default (not used) first sheet
+//$objPHPExcel->removeSheetByIndex(0);	// remove the default (not used) first sheet
 
 $output = pathinfo(__FILE__, PATHINFO_FILENAME).".xls";
 
-ob_start();
+// create the writer
+$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel5");
+
 $objWriter->save('php://output');
-$xlsData = ob_get_contents();
-ob_end_clean();
 
-// Redirect output to a client’s web browser (Excel5)
-header('Content-Type: application/vnd.ms-excel');
-header('Content-Disposition: attachment;filename='.$output);
-header('Cache-Control: max-age=0');
-// If you're serving to IE 9, then the following may be needed
-header('Cache-Control: max-age=1');
-
-// If you're serving to IE over SSL, then the following may be needed
-header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
-header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
-header ('Pragma: public'); // HTTP/1.0
-
-//$objWriter->save('php://output');
-echo $xlsData;
 $objPHPExcel->__destruct();
 
 exit;

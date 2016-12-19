@@ -391,9 +391,9 @@ $(document).on("keydown", ".last", function(e) {
 // read all specifications and store these in localstorage
 (function () {
 	$.getJSON('server/get_record.php', { 
-		query: 'SELECT * FROM gwc_handmade.specs'
+		query: 'SELECT * FROM gwc_pline.specs'
 	}, function(data) {
-		$.jStorage.set("handmade.specs", data.row);
+		$.jStorage.set("pline.specs", data.row);
 	});
 })();
 
@@ -411,7 +411,7 @@ function specLimits(lower, upper) {
 
 // return the specifications for a product on a certain date
 function getSpec(product, date) {
-	var specs = $.jStorage.get("handmade.specs");
+	var specs = $.jStorage.get("pline.specs");
 
 	for (i=0; specs[i]; i++) {
 		row = specs[i];
@@ -538,7 +538,7 @@ function new_rec(table) {
 }
 
 // create an array (0..25) of gradients from green to red and store it in gradient
-if ($.jStorage.get("handmade.gradient") == null) {
+if ($.jStorage.get("pline.gradient") == null) {
 	(function () {
 		var kleuren = Array();
 		for (percent=100; percent>=0; percent-=4) {
@@ -546,28 +546,14 @@ if ($.jStorage.get("handmade.gradient") == null) {
 	    g = percent>50 ? 255 : Math.floor((percent*2)*255/100);
 	    kleuren.push('rgb('+r+','+g+',0)');
 		}
-		$.jStorage.set("handmade.gradient", kleuren);
+		$.jStorage.set("pline.gradient", kleuren);
 	})();
 }
 
 function setColor(element, soort, spec) {		// set the color of a single field (spec = specifications or value)
-	var kleuren = $.jStorage.get("handmade.gradient");
+	var kleuren = $.jStorage.get("pline.gradient");
 	var pct = 0;
-	
-	switch (soort) {
-		case "surfout":
-			specmin = null;	specmax = "rol_surfout";
-			break;
-		case "tightout":
-			specmin = null;	specmax = "rol_tightout";
-			break;
-		case "surfacc":
-		case "pdacc":
-			specmin = "rol_"+soort+"_min";
-			specmax = null;
-			break;
-	}
-	
+
 	el = $(element+" [name="+soort+"]");
 	
 	if (spec == null) {
@@ -576,7 +562,7 @@ function setColor(element, soort, spec) {		// set the color of a single field (s
 	}
 	waarde = parseFloat(el.val());
 	if (isNaN(waarde)) {
-		el.css("background-color", kleuren[0] );
+		el.css("background-color", "silver" );
 	} else {
 		if (typeof spec == "object") {
 			valmin = (specmin==null) ? -spec[specmax] : spec[specmin];
@@ -597,6 +583,7 @@ function setColor(element, soort, spec) {		// set the color of a single field (s
 	return pct;
 }
 
+// regain1, matoutmoist
 function colorSeries(element, soort, spec) {		// set the color of a row of fields (l1,l2... m1,m2...)
 	var totaal = 0.0;
 	var aantal = 0;
@@ -696,10 +683,23 @@ function show_data(table) {
 							$("#penalties ."+label).html(pen[label]);
 						})
 					});
+					
+					var spec = getSpec(data.product, data.date);
+					[ {group:"regain1",choice:"matinmoist"}, {group:"regain1",choice:"matoutmoist"},
+						{group:"regain1",choice:"matouttemp"}, {group:"regain1",choice:"accuracy"},
+						{group:"regain2",choice:"matinmoist"}, {group:"regain2",choice:"matoutmoist"},
+						{group:"regain2",choice:"matouttemp"}, {group:"regain2",choice:"accuracy"},
+						{group:"storage",choice:"time"},
+						{group:"drying",choice:"matoutmoist"}, {group:"drying",choice:"matouttemp"}
+
+					].map(function(a) {
+						colorSeries(a.group, a.choice, spec);								// color the inputs
+					});
+					
 					break;
 				case "specs":
 					// no records found - disable all input fields
-					if ($.jStorage.get("handmade.current.specs") == null) {
+					if ($.jStorage.get("pline.current.specs") == null) {
 						$("#specs input").not("[type=button]").attr("disabled", "disabled");
 						$("#specs textarea").attr("disabled", "disabled");
 					}
