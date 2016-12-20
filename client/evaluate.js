@@ -1,60 +1,61 @@
 
 var evaluate_content = {
 	contents: [
-		m("span.flex-row", {style: "background-color:rgba(0,255,255,0.05)"},
-			m("fieldset.fieldset_header", {style: "width:100%"}, [
-				m("legend.SELECT"),
-				m("table", {width: "100%"}, 
-					m("tr", [
-						m("td", 
-							m("table", {width:"100%"}, [
-								[	{label:"label.START_DATE", name:"start"},	{label:"label.END_DATE", name:"end"} ].map(function (a) {							
-									return m("tr", [
-													m("td",	m(a.label)),
-													m("td",	m("input.datum[type:text]", {name: a.name}))
-												])
-								})
-							])
-						),
-						m("td", 
-							m("table", {width:"100%"}, [
-								[
-									{label:"label.PRODUCT", name:"product"},
-									{label:"label.PRODUCTIONSTATUS", name:"prodStat"}
-								].map(function (a) {							
-									return m("tr", [
-													m("td",	m(a.label)),
-													m("td",	m("select", {name: a.name}))
-												])
-								})
-							])
-						),
-						m("td", 
-							m("table", {width:"100%"},  [
-								[
-									{label:"label.IRESULT", name:"result"},
-									{label:"label.DISPOSAL", name:"disposal"}
-								].map(function (a) {							
-									return m("tr", [
-													m("td",	m(a.label)),
-													m("td",	m("select", {name: a.name}))
-												])
-								})
-							])
-						),
-						m("td", 
-							m("table", {width: "100%"}, [
-								m("tr", [
-									m("td",	m("input[type=button]", {class:"export", id:"export", style:"width:8em"}))
+		m("#evaluate", {style: "width:100%"},
+			m("span.flex-row", {style: "background-color:rgba(0,255,255,0.05)"},
+				m("fieldset.fieldset_header", {style: "width:100%"}, [
+					m("legend.SELECT"),
+					m("table", {width: "100%"}, 
+						m("tr", [
+							m("td", 
+								m("table", {width:"100%"}, [
+									[	{label:"label.START_DATE", name:"start"},	{label:"label.END_DATE", name:"end"} ].map(function (a) {							
+										return m("tr", [
+														m("td",	m(a.label)),
+														m("td",	m("input.datum[type:text]", {name: a.name}))
+													])
+									})
 								])
-							])
-						)
-						
-					])
-				)
-			])
+							),
+							m("td", 
+								m("table", {width:"100%"}, [
+									[
+										{label:"label.PRODUCT", name:"product"},
+										{label:"label.PRODUCTIONSTATUS", name:"prodStat"}
+									].map(function (a) {							
+										return m("tr", [
+														m("td",	m(a.label)),
+														m("td",	m("select", {name: a.name}))
+													])
+									})
+								])
+							),
+							m("td", 
+								m("table", {width:"100%"},  [
+									[
+										{label:"label.IRESULT", name:"result"},
+										{label:"label.DISPOSAL", name:"disposal"}
+									].map(function (a) {							
+										return m("tr", [
+														m("td",	m(a.label)),
+														m("td",	m("select", {name: a.name}))
+													])
+									})
+								])
+							),
+							m("td", 
+								m("table", {width: "100%"}, [
+									m("tr", [
+										m("td",	m("input[type=button]", {class:"export", id:"export", style:"width:8em"}))
+									])
+								])
+							)
+						])
+					)
+				])
+			)
 		),
-		m("#tabs.subtabs1", [
+		m("#evaltabs.subtabs1", [
 			m("ul", [
 				[
 					{label:"label.CHARTS", href:"#charts_tab"},
@@ -78,7 +79,7 @@ var evaluate_content = {
 			return;
 
 		$("#evaluate [name=disposal]").addClass("last");		// set the last field
-		
+
 		$('#evaluate #export').click(function() {
 			var start = $('#evaluate [name=start]').val();
 			var end = $('#evaluate [name=end]').val();
@@ -105,9 +106,10 @@ var evaluate_content = {
 		// default tab when page is first loaded
 		var initialtab = $.jStorage.get("pline_evaluationtab");
 
-		$( "#evaluate #tabs" ).tabs({
+		$( "#evaltabs" ).tabs({
 			active: initialtab,
 			activate: function( event, ui ) {
+				show_evaluation();
 				keus = ui.newPanel[0].id;
 				switch (keus) {
 					case "charts_tab":			
@@ -119,10 +121,7 @@ var evaluate_content = {
 				}
 			},
 			create: function( event, ui ) {
-				switch (initialtab) {
-					//case 0: show_charts(); break;
-					//case 1: show_export(); break;
-				}
+				show_evaluation();
 			}
 		});
 		
@@ -153,13 +152,19 @@ var evaluate_content = {
 				$('#evaluate [name=result]').empty().append(data.result);
 				$('#evaluate [name=disposal]').empty().append(data.disposal);		
 
-				if ($.jStorage.get("pline_evaluationtab") == 1)						
-					createSheet();
+				if ($.jStorage.get("pline_evaluationtab") == 1) {			
+					spin();
+					window.setTimeout(function() {
+						createSheet();
+						$( "#waiting" ).remove();	// remove the spinner
+					}, 100);
+				}					
+
 			});
 		})
 		
 	},
 	view: function () {
-		return m("#evaluate", this.contents);
+		return m("div", this.contents);
 	}
 }

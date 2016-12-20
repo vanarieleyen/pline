@@ -81,7 +81,7 @@ var tabContents = [
 ]
 
 var uiTabs = [
-	m("#tabs.pagecontainer", [
+	m("#maintabs.pagecontainer", [
 		m("ul", [
 			[
 				{label:"label.PACKING50", href:"#data_tab"},
@@ -171,7 +171,7 @@ $(document).ready(function() {
 	// default tab when page is first loaded
 	var initialtab = $.jStorage.get("pline_maintab");
 		
-	$( "#tabs" ).tabs({
+	$( "#maintabs" ).tabs({
 		active: initialtab,
 		activate: function( event, ui ) {
 			keus = ui.newPanel[0].id;

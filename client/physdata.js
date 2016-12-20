@@ -128,50 +128,48 @@ var physdata_content = {
 				])
 			]),
 			m("span.flex-col", {style: "background-color:rgba(0,255,255,0.05)"}, [
-				m("#blend", [
-					m("fieldset", [
-						m("legend.BLEND_CUT"),
-						m("table", [
-							m("tr", [
-								m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendcutMatOK]")]),
-								m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
-								m("td", m("input.number[name=blendcutAccuracy]"))
-							])
+				m("fieldset", [
+					m("legend.BLEND_CUT"),
+					m("table#blend", [
+						m("tr", [
+							m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendcutMatOK]")]),
+							m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
+							m("td", m("input.number[name=blendcutAccuracy]"))
 						])
-					]),
-					m("fieldset", [
-						m("legend.BLEND_EXP"),
-						m("table", [
-							m("tr", [
-								m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendexpMatOK]")]),
-								m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
-								m("td", m("input.number[name=blendexpAccuracy]"))
-							])
+					])
+				]),
+				m("fieldset", [
+					m("legend.BLEND_EXP"),
+					m("table#blend", [
+						m("tr", [
+							m("td", {colspan:"2"}, [m("label.MATERIAL"),  m("select[name=blendexpMatOK]")]),
+							m("td",[m("label.BLEND_ACCUR"), m("span", "(%)")]), 
+							m("td", m("input.number[name=blendexpAccuracy]"))
 						])
-					]),
-					m("fieldset", [
-						m("legend.BLEND_RECYCLED"),
-						m("table", [
-							m("tr", [
-								m("td.BLEND_RECYCLED_NR"), m("td", m("input.number[name=blendreID]")),
-								m("td.BLEND_RECYCLED_OK"),  m("td", {colspan:"2"}, m("select[name=blendreOK]"))
-							])
+					])
+				]),
+				m("fieldset", [
+					m("legend.BLEND_RECYCLED"),
+					m("table#blend", [
+						m("tr", [
+							m("td.BLEND_RECYCLED_NR"), m("td", m("input.number[name=blendreID]")),
+							m("td.BLEND_RECYCLED_OK"),  m("td", {colspan:"2"}, m("select[name=blendreOK]"))
 						])
-					]),
-					m("fieldset", [
-						m("legend.BLEND_STORAGE"),
-						m("table", [
-							m("tr", [
-								m("td", {colspan:"5"}, [m("label.MATERIAL"),  m("select[name=blendstorMix]")])
-							]),
-							m("tr", [
-								m("td",[m("label.MOIST_CONTENT"), m("span", "(%)")]), 
-								["blendstorMoistA","blendstorMoistB","blendstorMoistC","blendstorMoistD"].map(function(field) {
-									return m("td", m("input.number", {name:field}))
-								})
-							])
+					])
+				]),
+				m("fieldset", [
+					m("legend.BLEND_STORAGE"),
+					m("table#blend", [
+						m("tr", [
+							m("td", {colspan:"5"}, [m("label.MATERIAL"),  m("select[name=blendstorMix]")])
+						]),
+						m("tr", [
+							m("td",[m("label.MOIST_CONTENT"), m("span", "(%)")]), 
+							["blendstorMoistA","blendstorMoistB","blendstorMoistC","blendstorMoistD"].map(function(field) {
+								return m("td", m("input.number", {name:field}))
+							})
 						])
-					]),
+					])
 				]),
 				m("fieldset", [
 					m("legend.ADDITIONAL_INSPECTIONS"),
@@ -218,11 +216,25 @@ var physdata_content = {
 			var value = $(this).val();
 
 			sql = sprintf('UPDATE gwc_pline.inspection SET %s="%s" WHERE id=%s', field, value, current );
-			console.log(sql);
 			$.getJSON('server/send_query.php', {query: sql}, function (data) {
 				$.getJSON('server/calc_penalties.php', {id: current});
-				show_data("inspection");
 			});
+
+			var spec = getSpec($("#data [name=product]").val(), $("#data [name=date]").val() );
+			[ {group:"regain1",choice:"matinmoist"}, {group:"regain1",choice:"matoutmoist"},
+				{group:"regain1",choice:"matouttemp"}, {group:"regain1",choice:"accuracy"},
+				{group:"regain2",choice:"matinmoist"}, {group:"regain2",choice:"matoutmoist"},
+				{group:"regain2",choice:"matouttemp"}, {group:"regain2",choice:"accuracy"},
+				{group:"storage",choice:"time"}, {group:"cutting",choice:"breedte"},
+				{group:"drying",choice:"matoutmoist"}, {group:"drying",choice:"matouttemp"},
+				{group:"flavor",choice:"matoutmoist"}, {group:"flavor",choice:"accuracy"},
+				{group:"cylheat",choice:"matinmoist"}, {group:"cylheat",choice:"matoutmoist"}, {group:"cylheat",choice:"matouttemp"},
+				{group:"stems",choice:"long"}, {group:"stems",choice:"short"}, {group:"stems",choice:"filling"},
+				{group:"blend",choice:"moisture"}, {group:"blend",choice:"cutacc"}, {group:"blend",choice:"expacc"}
+			].map(function(a) {
+				colorSeries(a.group, a.choice, spec);								// color the inputs
+			});
+
 		});
 		
 		$("#physdata select").blur(function () {
@@ -233,7 +245,6 @@ var physdata_content = {
 			$.getJSON('server/send_query.php', {query: sql}, function (data) {
 				$.getJSON('server/calc_penalties.php', {id: current});
 			});
-			show_data("inspection");
 		});
 		
 

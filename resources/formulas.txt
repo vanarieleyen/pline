@@ -1,129 +1,181 @@
-A1 = AD4 = Amount length out of lower limit - 长度偏小次数
-A2 = AE4 = Amount length out of upper limit - 长度偏大次数
-A3 = AF4 = Amount length within limit - 长度合格次数
-A4 = AG4 = Amount circumference out of lower limit - 圆周偏小次数
-A5 = AH4 = Amount circumference out of upper limit - 圆周偏大次数
-A6 = AI4 = Amount circumference within limit - 圆周合格次数
-A7 = AJ4 = Amount weight out of lower limit - 质量偏小次数
-A8 = AK4 = Amount weight out of upper limit - 质量偏大次数
-A9 = AL4 = Amount weight within limit - 质量合格次数
-A10 = AM4 = Amount PD out of lower limit - 吸阻偏小次数
-A11 = AN4 = Amount PD out of upper limit - 吸阻偏大次数
-A12 = AO4 = Amount PD within limit - 吸阻合格次数
-A13 = Z4 = surfout - 表面（支）(surface - nr out of specs)
-A14 = AB4 = blendacc - 配方 精度%(Blend accuracy %)
-A15 = AC4 = pdacc - 吸阻合格率%(pd accuracy %)
-A16 = AA4 = tightness - 松紧度（支）tightness - nr out of spec
-A17 = AP6 = batch score (see formula below)
+A1	= J6 = inspection: rawMatOK
+FeedMatID: =if(A1="","",if(A1="不符合",-30,0))
 
-	B1:B10 = length (translates to B1:B10 where B1=length1, B2=length2 etc.)
-	S1 = spec:rol_l_min
-	S2 = spec:rol_l_max	
-	C1:C10 = circ (translates to C1:C10 where C1=circ1, C2=circ2 etc.)
-	S3 = spec:rol_c_min
-	S4 = spec:rol_c_max	
-	D1:D10 = weight (translates to D1:D10 where D1=weight1, D2=weight2 etc.)
-	S5 = spec:rol_w_min
-	S6 = spec:rol_w_max	
-	E1:E10 = pd (translates to E1:E10 where E1=pd1, E2=pd2 etc.)
-	S7 = spec:rol_p_min
-	S8 = spec:rol_p_max	
-	F1:F8 = moisture (translates to F1:F8 where F1=m1, F2=m2 etc.)
-	S9 = spec:moist_s_min
-	S10 = spec:moist_s_max
+A2 = I7 = specs: 1_matinMoistMax (1st regain mat moisture input MAX)
+A3 = G7 = specs: 1_matinMoistMin (1st regain mat moisture input MIN)
+A4 = J7 = inspection: 1_matinMoistA
+A5 = K7 = inspection: 1_matinMoistB
+old: (error because might add an empty cell + added check for empty specs)
+1_matinMoist: 	=if(A4="","",if(A4<A3,-0.2,if(A4>A2,-0.2,0)))
+					+if(A5="","",if(A5<A3,-0.2,if(A5>A2,-0.2,0)))
+new:
+1_matinMoist:	=IF(OR(A2="",A3="",AND(A4="",A5="")),"", IF(OR(A4="",AND(A4>A3,A4<A2)),0,-0.2)+IF(OR(A5="",AND(A5>A3,A5<A2)),0,-0.2))
 
-A18 = AW4 = color - 茄衣颜色（color of wrapper）
-A19 = AX4 = headend - 头尾（head and end）
-A20 = AY4 = wrapok - 转数（number of turns - wrapped ok）
-A21 = AZ4 = incision - 切口（incision）
-A22 = BA4 = empty - 空头（empty head） 
-A23 = BB4 = tightness - 松紧度（tightness）
-A24 = BC4 = veins - 脉纹（vein lines）
-A25 = BD4 = crease - 折痕（crease
-A26 = BE4 = spot - 病斑（spots）
-A27 = BF4 = blot - 污痕（blot）
-A28 = BG4 = seam - 缝口（seam）
-A29 = BH4 = hole - 洞眼（hole）
-A30 = BI4 = break - 破皮（breakage）
-A31 = BJ4 = splice - 拼接（splice）
-A32 = BK4 = batch score (see below)
+A6 = J8 = 1_moistOK
+1_matMoistID: =if(A7="","",if(A6="不符合",-30,0))
 
-A33 = F4 = headend - 头尾(head and end)
-A34 = G4 = incision - 切口(incision)
-A35 = H4 = empty - 空头(empty head)
-A36 = I4 = crease - 折痕(crease/folds)
-A37 = J4 = blot - 污痕(blot)
-A38 = K4 = seam - 缝口(seam)
-A39 = L4 = break - 破皮(breakage)
-A40 = M4 = score (see below)
+A7 = J9 = inspection: 1_matoutMoistA
+A8 = G9 = specs: 	1_matoutMoistMin
+A9 = I9 = specs: 1_matoutMoistMax
+A10 = K9 = inspection: 1_matoutMoistB
+old: (error because might add an empty cell + added check for empty specs)
+1_matoutMoist: =if(A7="","",if(A7<A8,-0.3,if(A7>A9,-0.3,0)))
+					+if(A10="","",if(A10<A8,-0.3,if(A10>A9,-0.3,0)))
+new:
+1_matoutMoist: =IF(OR(A8="",A9="",AND(A7="",A10="")),"", IF(OR(A7="",AND(A7>A8,A7<A9)),0,-0.2)+IF(OR(A10="",AND(A10>A8,A10<A9)),0,-0.2))
 
-A41 = L6 = dopant - 杂物（支）(dopant)
-A42 = M6 = headend - 头尾（支）(head and end)
-A43 = N6 = empty - 空头（支）(empty head)
-A44 = O6 = seam - 缝口（支）(seam)
-A45 = P6 = hole - 洞眼（支）(hole)
-A46 = Q6 = break - 破皮（支）(breakage)
-A47 = K6 = deworm - 有无生霉/虫蛀)(mildew/worms damage)
-A48 = V6 = Amount moisture out of lower limit - 水分偏小次数
-A49 = W6 = Amount moisture out of upper limit - 水分偏大次数
-A50 = X6 = Amount moisture within limit - 水分合格次数
-A51 = Y6 = Amount moisture ±0.5% spec- 水标±0.5%次数
-A52 = Z6 = score (see below)
+A11 = J10 = inspection: 1_matoutTempA
+A12 = G10 = specs: 1_matoutTempMin
+A13 = I10 = specs: 1_matoutTempMax
+A14 = K10 = inspection: 1_matoutTempB
+old: (error because might add an empty cell + added check for empty specs)
+1_matoutTemp: 	=if(A11="","",if(A11<A12,-0.2,if(A11>A13,-0.2,0)))
+					+if(A14="","",if(A14<A12,-0.2,if(A14>A13,-0.2,0)))
+new:
+1_matoutTemp: 	=IF(OR(A12="",A13="",AND(A11="",A14="")),"", IF(OR(A11="",AND(A11>A12,A11<A13)),0,-0.2)+IF(OR(A14="",AND(A14>A12,A14<A13)),0,-0.2))
 
-----------------------------------------------------------------------------------------------------------------------
-rolling process
+A15 = J11 = inspection: 1_accuracy
+old: (remove / and optimize)
+1_accuracy: =if(A15="","",if(A15="/",0,if(A15<1,0,if(A15>1.5,if(A15<=2.5,-3,-15),-1))))
+new
+1_accuracy: =IF(A15="","", IF(A15<1, 0, IF(AND(A15>=1,A15<1.5), -1, IF(A15<=2.5, -3, -15))))
 
-A1: =COUNTIF(B1:B10,"<"&S1)
-A2: =COUNTIF(B1:B10,">"&S2)
-A3: =COUNTIF(B1:B10,">="&S1) - COUNTIF(B1:B10,">"&S2)
-A4: =COUNTIF(C1:C10,"<"&S3)
-A5: =COUNTIF(C1:C10,">"&S4)
-A6: =COUNTIF(C1:C10,">="&S3) - COUNTIF(C1:C10,">"&S4)
-A7: =COUNTIF(D1:D10,"<"&S5)
-A8: =COUNTIF(D1:D10,">"&S6)
-A9: =COUNTIF(D1:D10,">="&S5) - COUNTIF(D1:D10,">"&S6)
-A10: =COUNTIF(E1:E10,"<"&S7)
-A11: =COUNTIF(E1:E10,">"&S8)
-A12: =COUNTIF(E1:E10,">="&S7) - COUNTIF(E1:E10,">"&S8)
+A16 = J12 = inspection: 2_matinMoistA
+A17 = G12 = specs: 2_matinMoistMin
+A18 = I12 = specs: 2_matinMoistMax
+A19 = K12 = inspection: 2_matinMoistB
+old: (error because might add an empty cell + added check for empty specs)
+2_matinMoist: 	=if(A16="","",if(A16<A17,-0.2,if(A16>A18,-0.2,0)))
+					+if(A19="","",if(A19<A17,-0.2,if(A19>A18,-0.2,0)))
+new:
+2_matinMoist:	=IF(OR(A17="",A18="",AND(A16="",A19="")),"", IF(OR(A16="",AND(A16>A17,A16<A18)),0,-0.2)+IF(OR(A19="",AND(A19>A17,A19<A18)),0,-0.2))	
 
-AP4 = 批次 得分(batch score): 
-=100-(A1+A2)*0.5-(A4+A5)*0.4-(A7+A8)*0.3-A13*0.4-A16*0.5-(A10+A11)*1+(IF(A14="","",IF(A14<S11,-4,IF(A14>=((S11+S12)/2),IF(A14<S12,-1,0),-2))))+(IF(A15="","",IF(A15<S13,-5,IF(A15>=((S14-13)/2),IF(A15<S14,-2,0),-4))))
+A20 = J13 = inspection: 2_moistOK
+2_matMoistID: =if(A20="","",if(A20="不符合",-30,0))
 
-AQ4 = 批次    质量  判定(quality determination of batch):
-=IF(OR(A17<85,(A1+A2)>6,(A4+A5)>6,(A7+A8)>6,A13>S16,(A1+A2+A4+A5+A7+A8+A13)>13,A16>S15,A14<(S11-10),A15<(S13-10)),"不合格","合格")
+A21 = J14 = inspection: 2_matoutMoistA
+A22 = G14 = specs: 2_matoutMoistMin
+A23 = I14 = specs: 2_matoutMoistMax
+A24 = K14 = inspection: 2_matoutMoistB
+old: (error because might add an empty cell + added check for empty specs)
+2_matoutMoist: =if(A21="","",if(A21<A22,-0.3,if(A21>A23,-0.3,0)))
+					+if(A24="","",if(A24<A22,-0.3,if(A24>A23,-0.3,0)))
+new:
+2_matoutMoist: =IF(OR(A22="",A23="",AND(A21="",A24="")),"", IF(OR(A21="",AND(A21>A22,A21<A23)),0,-0.2)+IF(OR(A24="",AND(A24>A22,A24<A23)),0,-0.2))
 
-----------------------------------------------------------------------------------------------------------------------		
-wrapping process
-BK4 = 批次 得分(batch score) :
-=100-A18*0.2-A19*0.5-A20*0.2-A21*0.5-A22*1-A23*0.5-A24*0.2-A25*0.2-A26*0.2-A27*0.5-A28*0.5-A29*1-A30*1-A31*0.5
+A25 = J15 = inspection: 2_matoutTempA
+A26 = G15 = specs: 2_matoutTempMin
+A27 = I15 = specs: 2_matoutTempMax
+A28 = K15 = inspection: 2_matoutTempB
+old: (error because might add an empty cell + added check for empty specs)
+2_matoutTemp: =if(A25="","",if(A25<A26,-0.2,if(A25>A27,-0.2,0)))
+					+if(A28="","",if(A28<A26,-0.2,if(A28>A27,-0.2,0)))
+new:
+2_matoutTemp: 	=IF(OR(A26="",A27="",AND(A25="",A28="")),"", IF(OR(A25="",AND(A25>A26,A25<A27)),0,-0.2)+IF(OR(A28="",AND(A28>A26,A28<A27)),0,-0.2))				
 
-BL4 = 批次    质量  判定(quality determination of batch):
-=IF(OR(A32<96,(A18+A20+A24+A25+A26)>8,(A19+A21+A23+A27+A28+A31)>6,(A18+A19+A20+A21+A22+A23+A24+A25+A26+A27+A28+A29+A30+A31)>9),"不合格","合格")
+A29 = J16 = inspection: 2_accuracy
+old: (remove / and optimize)
+2_accuracy: =if(A29="","",if(A29="/",0,if(A29<1,0,if(A29>1.5,if(A29<=2.5,-3,-15),-1))))
+new
+2_accuracy: =IF(A29="","", IF(A29<1, 0, IF(AND(A29>=1,A29<1.5), -1, IF(A29<=2.5, -3, -15))))
 
-----------------------------------------------------------------------------------------------------------------------
-machine cutting
-M4 = 批次 得分(batch score):
-=100-A33*0.5-A34*0.5-A35*1-A36*0.2-A37*0.5-A38*0.5-A39*1
+A30 = J17 = inspection: storageTime
+A31 = G17 = specs: storTimeMin
+A32 = I17 = specs: storTimeMax
+old: (optimize + added check for empty specs)
+storTime: =if(A30="","",if(A30<A31,-1,if(A30>A32,-1,0)))
+new:
+storTime: 	=IF(OR(A31="",A32="",A30=""),"",IF(AND(A30>=A31,A30<=A32),0,-1))
 
-N4 = 批次    质量  判定(quality determination of batch):
-=IF(OR(A40<90),"不合格","合格")
+A33 = J18 = storageMatOK
+stormatOK: =if(A33="","",if(A33="不符合",-30,0))
 
-----------------------------------------------------------------------------------------------------------------------
-storage
+A34 = J19 = inspection: cutWidth
+A35 = G19 = specs: cutWidthMin
+A36 = I19 = specs: cutWidthMax
+old: (remove slash and optimize + added check for empty specs)
+cutWidth: =if(A34="","",if(A34="/",0,if(A34<A35,-1,if(A34>A36,-1,0))))
+new:
+cutWidth:	=IF(OR(A35="",A36="",A34=""),"",IF(AND(A34>A35,A34<A36),0,-1))
 
-A49: =COUNTIF(F1:F8,"<"&S9)
-A48: =COUNTIF(F1:F8,">"&S10)
-A51: =COUNTIF(F1:F8,">="&S9) - COUNTIF(F1:F8,">"S10)
-A52: =COUNTIF(F1:F8,">="&(S9-0.5))-COUNTIF(F1:F8,">="&S9)+COUNTIF(F1:F8,">"&S10)-COUNTIF(F1:F8,">"&(S10+0.5))
+A37 = J20 = inspection: cyl_matinMoistA
+A38 = G20 = specs: cyl_matinMoistMin
+A39 = I20 = specs: cyl_matinMoistMax
+A40 = K20 = inspection: cyl_matinMoistB
+old: (error because might add an empty cell + added check for empty specs)
+cyl_matinMoist: 	=if(A37="","",if(A37<A38,-0.2,if(A37>A39,-0.2,0)))
+						+if(A40="","",if(A40<A38,-0.2,if(A40>A39,-0.2,0)))
+new:
+cyl_matinMoist: 	=IF(OR(A38="",A39="",AND(A37="",A40="")),"", IF(OR(A37="",AND(A37>A38,A37<A39)),0,-0.2)+IF(OR(A40="",AND(A40>A38,A40<A39)),0,-0.2))
 
-Z4 = 批次得分(Batch Score):
-=100-A41*0.2-A42*0.5-A43*1-A44*0.5-A45*1-A46*1-(A49+A48)*0.5+IF(A47>0,-60,0)
+A41 = J21 = inspection: cyl_matoutMoistA
+A42 = G21 = specs: cyl_matoutMoistMin
+A43 = I21 = specs: cyl_matoutMoistMax
+A44 = K21 = inspection: cyl_matoutMoistB
+old: (error because might add an empty cell + added check for empty specs)
+cyl_matoutMoist: 	=if(A41="","",if(A41<A42,-0.3,if(A41>A43,-0.3,0)))
+						+if(A44="","",if(A44<A42,-0.3,if(A44>A43,-0.3,0)))
+new:
+cyl_matoutMoist: 	=IF(OR(A42="",A43="",AND(A41="",A40="")),"", IF(OR(A37="",AND(A41>A42,A41<A43)),0,-0.3)+IF(OR(A44="",AND(A44>A42,A44<A43)),0,-0.3))
 
-AA4 = 批次质量判定(Batch quality determination):
-=IF(OR(A52<85,A50<4,AND(A50=4,A51<3)),"不合格","合格")
+A45 = J22 = inspection: cyl_matoutTempA
+A46 = G22 = specs: cyl_matoutTempMin 
+A47 = I22 = specs: cyl_matoutTempMax
+A48 = K22 = inspection: cyl_matoutTempB
+old: (error because might add an empty cell + added check for empty specs)
+cyl_matoutTemp: 	=if(A45="","",if(A45<A46,-0.2,if(A45>A47,-0.2,0)))
+						+if(A48="","",if(A48<A46,-0.2,if(A48>A47,-0.2,0)))
+new:
+cyl_matoutTemp: 	=IF(OR(A46="",A47="",AND(A45="",A48="")),"", IF(OR(A45="",AND(A45>A46,A45<A47)),0,-0.2)+IF(OR(A48="",AND(A48>A46,A48<A47)),0,-0.2))	
 
-----------------------------------------------------------------------------------------------------------------------
-defects
+A49 = J23 = inspection: dry_matoutMoistA
+A50 = G23 = specs: dry_matoutMoistMin
+A51 = I23 = specs: dry_matoutMoistMax
+A52 = K23 = inspection: dry_matoutMoistB
+old: (error because might add an empty cell + added check for empty specs)
+dry_matoutMoist: 	=if(A49="","",if(A49<A50,-0.5,if(A49>A51,-0.5,0)))
+						+if(A52="","",if(A52<A50,-0.5,if(A52>A51,-0.5,0)))
+new:
+dry_matoutMoist: 	=IF(OR(A50="",A51="",AND(A49="",A52="")),"", IF(OR(A49="",AND(A49>A50,A49<A51)),0,-0.5)+IF(OR(A52="",AND(A52>A50,A52<A51)),0,-0.5))
 
+A53 = J24 = inspection: dry_matoutTempA
+A54 = G24 = specs: dry_matoutTempMin
+A55 = I24 = specs: dry_matoutTempMax
+A56 = K24 = inspection: dry_matoutTempB
+old: (error because might add an empty cell + added check for empty specs)
+dry_matoutTemp: 	=if(A53="","",if(A53<A54,-0.3,if(A53>A55,-0.3,0)))
+						+if(A56="","",if(A56<A54,-0.3,if(A56>A55,-0.3,0)))
+new:
+dry_matoutTemp: 	=IF(OR(A54="",A55="",AND(A53="",A56="")),"", IF(OR(A53="",AND(A53>A54,A53<A55)),0,-0.3)+IF(OR(A56="",AND(A56>A54,A56<A55)),0,-0.3))
 
+A57 = J25 = inspection: blendcutMatOK
+blendcutStemID: =if(A57="","",if(A57="不符合",-30,0))
 
+A58 = J26 = inspection: blendcutAccuracy
+old: (remove slash and optimize)
+blendcutAccuracy: =if(A58="","",if(A58="/",0,if(A58<1,0,if(A58>1.5,if(A58<=2,-3,-15),-1))))
+new:
+blendcutAccuracy:	=IF(A58="","", IF(A58<1, 0, IF(AND(A58>=1,A58<1.5), -1, IF(A58<=2, -3, -15))))
+
+A59 = J27 = inspection: blendexpMatOK
+blendexpOK: =if(A59="","",if(A59="不符合",-30,0))
+
+A60 = J28 = inspection: blendexpAccuracy
+old: (remove slash and optimize)
+blendexpAccuracy: =if(A60="","",if(A60="/",0,if(A60<1,0,if(A60>1.5,if(A60<=2,-3,-15),-1))))
+new:
+blendexpAccuracy: =IF(A60="","", IF(A60<1, 0, IF(AND(A60>=1,A60<1.5), -1, IF(A60<=2, -3, -15))))
+
+A61 = J30 = inspection: blendreOK
+blendreMatOK: =if(A61="","",if(A61="不符合",-30,0))
+
+A62 = J31 = inspection: flavorOK
+blendflavorMatOK: =if(A62="","",if(A62="不符合",-30,0))
+
+A63 = J32 = inspection: flavorAccuracy
+old: (remove / and optimize)
+blendflavorAccuracy: =if(A63="","",if(A63="/",0,if(A63<1,0,if(A63>1.5,if(A63<=2,-3,-15),-1))))
+new:
+blendflavorAccuracy: =IF(A63="","", IF(A63<1, 0, IF(AND(A63>=1,A63<1.5), -1, IF(A63<=2, -3, -15))))
+
+A64 = J33 = inspection: flavor_matout

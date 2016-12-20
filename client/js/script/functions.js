@@ -25,6 +25,37 @@ function getFields(obj) {
 	}
 }
 
+// spinner options
+var spin_opts = {	// options for the spinner symbol
+	lines: 12,					// The number of lines to draw
+	length: 12, 				// The length of each line
+	width: 7, 					// The line thickness
+	radius: 20, 				// The radius of the inner circle
+	corners: 1, 				// Corner roundness (0..1)
+	rotate: 10, 				// The rotation offset
+	color: '#000', 			// #rgb or #rrggbb
+	speed: 1, 					// Rounds per second
+	trail: 90, 					// Afterglow percentage
+	shadow: false, 			// Whether to render a shadow
+	hwaccel: false,			// Whether to use hardware acceleration
+	className: 'spinner', 	// The CSS class to assign to the spinner
+	zIndex: 2e9, 				// The z-index (defaults to 2000000000)
+	top: 'auto', 				// Top position relative to parent in px
+	left: 'auto' 				// Left position relative to parent in px
+};
+
+function spin() {
+  	$("<div'>&nbsp;</div>")							// create waiting div
+		.attr("id", "waiting")
+		.css("position", "fixed")
+		.css("left", "50%")
+		.css("top", "50%")
+		.css("z-index", "100000")
+		.appendTo('body');
+	var wait = $('#waiting').get(0);
+	var busy = new Spinner(spin_opts).spin(wait);	// show busy spinner
+}
+
 // change the :contains-selector to match on whole words
 jQuery.expr[":"].contains = $.expr.createPseudo(function(arg) {
   return function( elem ) {
@@ -903,8 +934,14 @@ function show_evaluation() {
 						$('#evaluate [name=result]').empty().append(data.result);
 						$('#evaluate [name=disposal]').empty().append(data.disposal);		
 
-						if ($.jStorage.get("pline_evaluationtab") == 1)						
-							createSheet();
+						if ($.jStorage.get("pline_evaluationtab") == 1) {			
+							spin();
+							window.setTimeout(function() {
+								createSheet();
+								$( "#waiting" ).remove();	// remove the spinner
+							}, 100);
+						}
+						
 					});
 			  }
 			});

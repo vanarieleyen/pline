@@ -1,6 +1,9 @@
 <?php
 
-require_once 'Classes/pdo.php';
+
+include 'Classes/pdo.php';
+include realpath(dirname(__FILE__))."/statistics.php";		// statistical functions
+
 
 extract($_POST);
 
@@ -19,78 +22,72 @@ function between($date, $start, $end) {
 
 $database = new Database();
 
-$machine_condition = ($machine > -1) ? sprintf(" AND t1.packing_m='%s' ", $machine ) : "";
-$station_condition = ($station > -1) ? sprintf(" AND t1.origin='%s' ", $station ) : "";
-$filter_condition = ($filter > 0) ? " AND t1.checked>0 " : " AND t1.checked=0 ";
-if ($table == 'penalties')
-	$query = sprintf("SELECT t2.score AS value, DATE(t1.date) AS date FROM gwc_slimline.cigaret t1 
-						JOIN gwc_slimline.%s t2 ON t2.master=t1.id 
-						WHERE (DATE(t1.date) BETWEEN '%s' AND '%s') AND t2.score>0 AND t1.product='%s' %s %s %s ORDER BY t1.date",
-							$table, $start, $end, $product, $machine_condition, $station_condition, $filter_condition);
-else 
-	$query = sprintf("SELECT t2.value AS value, DATE(t1.date) AS date FROM gwc_slimline.cigaret t1 
-						JOIN gwc_slimline.%s t2 ON t2.master=t1.YPBH 
-						WHERE (DATE(t1.date) BETWEEN '%s' AND '%s') AND t2.value>0 AND t1.product='%s' %s %s %s ORDER BY t1.date",
-							$table, $start, $end, $product, $machine_condition, $station_condition, $filter_condition);
-
+$query = sprintf("SELECT * FROM gwc_pline.%s WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
+							$table, $start, $end, $product);
 
 $database->query($query);
 $rows = $database->resultset();
 
 $data = array();	// the output data
-
 switch($type) {
 	case "raw":		
-		foreach ($rows as $idx => $row) {
-			array_push($data, array($idx, $row['value'], $row['date'] ));
+		$idx = 1;
+		foreach ($rows as $i=>$row) {
+			foreach ($field as $naam) {
+				if (trim($row[$naam]) != "") 
+					array_push($data, array($idx++, floatval($row[$naam]), $row['date'] ));
+			}
 		}
 		break;
 	case "average":
 		$tmp = array();
-		$q = 0;
-		$sample_size = $database->rowCount() / 50;
+		$q = 1;
+		$sample_size = round($database->rowCount() / 20);
 		foreach ($rows as $idx => $row) {
-			$val = $row['value'];
-			if (is_numeric($val)) {
-				array_push($tmp, $row);			
-				if ($idx % $sample_size == 0) {
-					array_push($data, array($q, mean(array_column($tmp, 'value')), $row['date'] ));	
-					$tmp = [];
-					$q++;			
+			foreach ($field as $naam) {
+				$val = $row[$naam];
+				if (is_numeric($val)) {
+					array_push($tmp, $row);			
+					if ($idx % $sample_size == 0) {
+						array_push($data, array($q++, mean(array_column($tmp, $naam)), $row['date'] ));	
+						$tmp = [];		
+					}
 				}
-			}
+			}	
 		}
 		break;
 	case "deviation":
 		$tmp = array();
-		$q = 0;
-		$sample_size = round($database->rowCount() / 200);
+		$q = 1;
+		$sample_size = round($database->rowCount() / 20);
 		foreach ($rows as $idx => $row) {
-			$val = $row['value'];
-			if (is_numeric($val)) {
-				array_push($tmp, $row);			
-				if (count($tmp) > $sample_size) {
-					array_push($data, array($q, stddev(array_column($tmp, 'value')), $row['date'] ));	
-					$tmp = [];
-					$q++;			
+			foreach ($field as $naam) {
+				$val = $row[$naam];
+				if (is_numeric($val)) {
+					array_push($tmp, $row);			
+					if ($idx % $sample_size == 0) {
+						array_push($data, array($q++, stddev(array_column($tmp, $naam)), $row['date'] ));	
+						$tmp = [];		
+					}
 				}
-			}
+			}	
 		}
 		break;
 	case "variance":
 		$tmp = array();
-		$q = 0;
-		$sample_size = round($database->rowCount() / 100);
+		$q = 1;
+		$sample_size = round($database->rowCount() / 20);
 		foreach ($rows as $idx => $row) {
-			$val = $row['value'];
-			if (is_numeric($val)) {
-				array_push($tmp, $row);			
-				if (count($tmp) > $sample_size) {
-					array_push($data, array($q, cof_var(array_column($tmp, 'value')), $row['date'] ));	
-					$tmp = [];
-					$q++;			
+			foreach ($field as $naam) {
+				$val = $row[$naam];
+				if (is_numeric($val)) {
+					array_push($tmp, $row);			
+					if ($idx % $sample_size == 0) {
+						array_push($data, array($q++, cof_var(array_column($tmp, $naam)), $row['date'] ));	
+						$tmp = [];		
+					}
 				}
-			}
+			}	
 		}
 		break;
 	case "cpk":
@@ -126,6 +123,9 @@ switch($type) {
 		echo "";	return;	// not available
 }
 
+
+//echo print_r($data); return;
+
 $datasize = count($data);
 
 if ($datasize < 5) {		// check if there is enough data
@@ -133,45 +133,46 @@ if ($datasize < 5) {		// check if there is enough data
 	return;
 }
 
-if (is_array($spec)) {	// the specs are given as fixed values in an array 
-	$specs = array();
-	array_push($specs, [0, count($data), $spec[0], $spec[1], 'norm', $spec[2], $spec[3]]);
-} elseif ($spec != "") {	// the specs are given as the specs-fieldname
-	// get the specifications of the product
-	$query = sprintf("SELECT %s_min AS min35, %s AS norm, %s_max AS max35, 
-						(%s + (%s_max-%s)/35*20) AS max20, (%s - (%s-%s_min)/35*20) AS min20,
-						DATE(start) as start, DATE(end) as end 
-						 FROM gwc_slimline.products_finished WHERE pid='%s' ",
-							$spec, $spec, $spec, $spec, $spec, $spec, $spec, $spec, $spec, $product);
-	$database->query($query);
-	$rows = $database->resultset();
-	$s = array();
-	foreach ($rows as $row) {
-		array_push($s, array($row['start'],$row['end'],$row['min35'],$row['min20'],$row['norm'],$row['max20'],$row['max35']));
-	}
-	$specs = array();	// array with the specs [from, to, min35, min20, norm, max20, max35]) to use for each point in the data
-	$oldate = "";
-	$from = 0;
-	$to = 0;
-	$spec = $s[0];
-	$oldate = $spec[1];
-	array_push($specs, array($from, $datasize, $spec[2], $spec[3], $spec[4], $spec[5], $spec[6]));
+// get the specifications of the product
+$query = sprintf("SELECT %s AS lsl, %s AS usl, start, end FROM gwc_pline.specs WHERE name='%s' ",
+						$spec['min'], $spec['max'], $product);
+						
+$database->query($query);
+$rows = $database->resultset();
 
-	foreach($data as $key => $val) {
-		$date = $val[2];	// val = [[x][value][date]]
-		foreach($s as $spec) {
-			if (between($date, $spec[0], $spec[1])) {
-				if ($spec[1] != $oldate) {
-					$oldate = $spec[1];
-					$to = $key;
-					$from = $to;
-					$specs[count($specs)-1][1] = $to;
-					array_push($specs, array($from, $datasize, $spec[2], $spec[3], $spec[4], $spec[5], $spec[6]));
-				}
-			}
-		}   
-	}
+$s = array();
+foreach ($rows as $row) {
+	$min35 = $row['lsl'];
+	$max35 = $row['usl'];
+	$norm = ($min35+$max35)/2;
+	$min20 = $norm-(($norm-$min35)/35*20);
+	$max20 = $norm+(($max35-$norm)/35*20);
+	array_push($s, array($row['start'], $row['end'], $min35, $min20, $norm, $max20, $max35));
 }
+//echo print_r($s);	return;
+$specs = array();	// array with the specs [from, to, min35, min20, norm, max20, max35]) to use for each point in the data
+$oldate = "";
+$from = 0;
+$to = 0;
+$spec = $s[0];
+$oldate = $spec[1];
+array_push($specs, array($from, $datasize, $spec[2], $spec[3], $spec[4], $spec[5], $spec[6]));
+
+foreach($data as $key => $val) {
+	$date = $val[2];	// val = [[x][value][date]]
+	foreach($s as $spec) {
+		if (between($date, $spec[0], $spec[1])) {
+			if ($spec[1] != $oldate) {
+				$oldate = $spec[1];
+				$to = $key;
+				$from = $to;
+				$specs[count($specs)-1][1] = $to;
+				array_push($specs, array($from, $datasize, $spec[2], $spec[3], $spec[4], $spec[5], $spec[6]));
+			}
+		}
+	}   
+}
+
 
 // make an array with the time labels on the x-axis (the data is provided as series of [[x][value][date], [][][], ... ]
 $split = round(count($data) / $ticks);
@@ -179,7 +180,7 @@ foreach($data as $idx => $value) {
 	if ($split != 0)
 		if (($idx % $split) == $split-2)
 			if (array_key_exists(2, $value))
-				$tijd[] = array($idx+1, $value[2]);
+				$tijd[] = array($idx+1, substr($value[2], 0, 10) );
 }
 
 // set the y-as opties
