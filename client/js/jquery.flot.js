@@ -1312,8 +1312,7 @@ Licensed under the MIT license.
                     return !$(this).hasClass("flot-overlay") && !$(this).hasClass('flot-base');
                 }).remove();
 
-						// 29/11/2016: removed because it sometimes causes wrong placement of chart
-            //if (placeholder.css("position") == 'static')
+            if (placeholder.css("position") == 'static')
                 placeholder.css("position", "relative"); // for positioning labels and overlay
 
             surface = new Canvas("flot-base", placeholder);

@@ -34,6 +34,8 @@ function draw_chart(arg) {
 								break;
 		case 'Variance':	variationChart('#charts #graph1', arg.what1, "matoutmoist", arg.start, arg.end, arg.product);
 								break;
+		case 'Cpk':	cpcpkChart('#charts #graph1', arg.what1, "matoutmoist", arg.start, arg.end, arg.product);
+								break;
 	}
 	switch (arg.type2) {
 		case 'Raw':			rawChart('#charts #graph2', arg.what2, "matoutmoist", arg.start, arg.end, arg.product);
@@ -43,6 +45,8 @@ function draw_chart(arg) {
 		case 'Deviation':	deviationChart('#charts #graph2', arg.what2, "matoutmoist", arg.start, arg.end, arg.product);
 								break;
 		case 'Variance':	variationChart('#charts #graph2', arg.what2, "matoutmoist", arg.start, arg.end, arg.product);
+								break;
+		case 'Cpk':	cpcpkChart('#charts #graph2', arg.what2, "matoutmoist", arg.start, arg.end, arg.product);
 								break;
 	}
 }
@@ -74,14 +78,56 @@ function plotChart(options) {
 			if (data != "") {
 				eval(data);								// plot the chart
 			} else {
+				none(options.element);
 				//notAvailable(options.element, 0);	// show not available
 			}
    	}
 	});		
 }
 
+
+// cp/cpk chart
+function cpcpkChart(chart, what, soort, start, end, product) {
+	var ytext;
+	var specs = db[what][soort].spec;
+	var fields = db[what][soort].field;
+
+	if (product == null)		return;	// without a product there are no charts
+
+	switch(soort) {
+		case 'matinmoist': 	ytext = LABELS[612][$.jStorage.get("lang")];
+									break;
+		case 'matoutmoist': ytext = LABELS[613][$.jStorage.get("lang")];
+									break;
+		case 'matouttemp': 	ytext = LABELS[614][$.jStorage.get("lang")];
+									break;
+		case 'moisture': 		ytext = LABELS[170][$.jStorage.get("lang")];
+									break;
+	}
+
+	plotChart({
+		element: chart,								// element for the chart
+		type: "cpk",									// raw, average, deviation, variance, cpk
+		field: fields,									// field list
+		table: "inspection",							// the data table
+		start: start,									// start of period
+		end: end,										// end of period
+		product: product,								// the product that we need the specs from			
+		label: ytext,									// label to use for the legend
+		color: "blue",								 	// color to use for the data
+		trend: true,									// show trendline
+		trans: '0.3',									// transparency for bars
+		ylabel: ytext,									// label on the y-axis
+		space: 40,										// add extra space for the tilted labels at the bottom
+		curved: true,									// use curved lines
+		spec: specs,									// spec list
+		ticks: 10,										// number of time-marks on xaxis
+		samples: 500									// maximum data size (to speed up plotting)
+	});
+}
+
 // variance chart
-function variationChart(chart, what, soort, start, end, product, machine, station, filter) {
+function variationChart(chart, what, soort, start, end, product) {
 	var ytext, field, eff = [];
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
@@ -121,7 +167,7 @@ function variationChart(chart, what, soort, start, end, product, machine, statio
 }
 
 // std. deviation chart
-function deviationChart(chart, what, soort, start, end, product, machine, station, filter) {
+function deviationChart(chart, what, soort, start, end, product) {
 	var ytext, field, eff = [];
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
@@ -161,7 +207,7 @@ function deviationChart(chart, what, soort, start, end, product, machine, statio
 }
 
 // average chart
-function averageChart(chart, what, soort, start, end, product, machine, station, filter) {
+function averageChart(chart, what, soort, start, end, product) {
 	var ytext, field, eff = [];
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
@@ -201,7 +247,7 @@ function averageChart(chart, what, soort, start, end, product, machine, station,
 }
 
 // make a chart of the raw data
-function rawChart(chart, what, soort, start, end, product, machine, station, filter) {
+function rawChart(chart, what, soort, start, end, product) {
 	var ytext, field, eff = [];
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
@@ -421,57 +467,6 @@ function penaltiesChart(chart, table, start, end, product, machine, station, fil
 // checks if the date is between start and end (only works with YYYY-MM-DD formatted strings)
 function between(date, start, end) {
 	return ( ( date >= start ) && ( date < end ) );
-}
-
-// cp/cpk chart
-function cpcpkChart(chart, table, start, end, product, machine, station, filter) {	
-	var ytext, field, cpk = [];
-
-	if (product == null)		return;	// without a product there are no charts
-	
-	switch(table) {
-		case 'weight': 		ytext = sprintf("%s (%s)", LABELS[42][$.jStorage.get("lang")], LABELS[40][$.jStorage.get("lang")]);
-									field = 'weight';
-									break;
-		case 'ventilation': 	ytext = sprintf("%s (%s)", LABELS[516][$.jStorage.get("lang")], LABELS[40][$.jStorage.get("lang")]);
-									field = 'vent';
-									break;
-		case 'pd': 				ytext = sprintf("%s (%s)", LABELS[146][$.jStorage.get("lang")], LABELS[40][$.jStorage.get("lang")]);
-									field = 'pd';
-									break;
-		case 'length': 		ytext = sprintf("%s (%s)", LABELS[102][$.jStorage.get("lang")], LABELS[40][$.jStorage.get("lang")]);
-									field = 'len';
-									break;
-		case 'hardness': 		ytext = sprintf("%s (%s)", LABELS[520][$.jStorage.get("lang")], LABELS[40][$.jStorage.get("lang")]);
-									field = 'hd';
-									break;
-		case 'circumference':ytext = sprintf("%s (%s)", LABELS[515][$.jStorage.get("lang")], LABELS[40][$.jStorage.get("lang")]);
-									field = 'circ';
-									break;
-	}
-
-	plotChart({
-		element: chart,								// element for the chart
-		type: "cpk",									// raw, average, deviation, variance, cpk
-		table: table,									// the data table
-		field: field,
-		start: start,									// start of period
-		end: end,										// end of period
-		machine: machine,								// machine
-		station: station,								// station
-		filter: filter,								// filter
-		product: product,								// the product that we need the specs from			
-		label: ytext,									// label to use for the legend
-		color: "blue",								 	// color to use for the data
-		trend: true,									// show trendline
-		trans: '0.3',									// transparency for bars
-		ylabel: ytext,									// label on the y-axis
-		space: 40,										// add extra space for the tilted labels at the bottom
-		curved: true,									// use curved lines
-		spec: [0.7, 1, 1000, 1000],				// which spec we need
-		ticks: 10,										// number of time-marks on xaxis
-		samples: 500									// maximum data size (to speed up plotting)
-	});
 }
 
 // distribution chart

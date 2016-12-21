@@ -3,7 +3,7 @@ var charts_content = {
 	contents: [
 		m("table", {style:"width:100%"}, [
 			m("tr", {style:"height:300px"}, [
-				m("td", {valign:"middle"},
+				m("td", {valign:"top"},
 					m("table", {style:"background-color:rgba(0,255,255,0.1)"}, [
 						m("tr", m("td", {colspan:"2"} )),
 						m("tr", [
@@ -16,10 +16,10 @@ var charts_content = {
 						])
 					])
 				),
-				m("td", {width:"100%"}, m("#graph1", {style:"width:800px; height:300px"}))
+				m("td", {width:"100%"}, m("#graph1", {style:"width:1000px; height:300px"}))
 			]),
 			m("tr", {style:"height:300px"}, [
-				m("td", {valign:"middle"},
+				m("td", {valign:"top"},
 					m("table", {style:"background-color:rgba(0,255,255,0.1)"}, [
 						m("tr", m("td", {colspan:"2"} )),
 						m("tr", [
@@ -32,7 +32,7 @@ var charts_content = {
 						])
 					])
 				),
-				m("td", {width:"100%"}, m("#graph2", {style:"width:800px; height:300px"}))
+				m("td", {width:"100%"}, m("#graph2", {style:"width:1000px; height:300px"}))
 			])
 		])
 	],

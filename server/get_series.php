@@ -31,7 +31,7 @@ $rows = $database->resultset();
 $data = array();	// the output data
 switch($type) {
 	case "raw":		
-		$idx = 1;
+		$idx = 0;
 		foreach ($rows as $i=>$row) {
 			foreach ($field as $naam) {
 				if (trim($row[$naam]) != "") 
@@ -41,15 +41,17 @@ switch($type) {
 		break;
 	case "average":
 		$tmp = array();
-		$q = 1;
-		$sample_size = round($database->rowCount() / 20);
+		$q = 0;
+		$sample_size = round( min([$database->rowCount(),$samples]) / 50);
 		foreach ($rows as $idx => $row) {
 			foreach ($field as $naam) {
 				$val = $row[$naam];
 				if (is_numeric($val)) {
-					array_push($tmp, $row);			
-					if ($idx % $sample_size == 0) {
-						array_push($data, array($q++, mean(array_column($tmp, $naam)), $row['date'] ));	
+					$len = array_push($tmp, $row);			
+					if ($len > $sample_size) {
+						$avg = mean(array_column($tmp, $naam));
+						if ($avg > 0)
+							array_push($data, array($q++, $avg, $row['date'] ));	
 						$tmp = [];		
 					}
 				}
@@ -58,15 +60,17 @@ switch($type) {
 		break;
 	case "deviation":
 		$tmp = array();
-		$q = 1;
-		$sample_size = round($database->rowCount() / 20);
+		$q = 0;
+		$sample_size = round( min([$database->rowCount(),$samples]) / 50);
 		foreach ($rows as $idx => $row) {
 			foreach ($field as $naam) {
 				$val = $row[$naam];
 				if (is_numeric($val)) {
-					array_push($tmp, $row);			
-					if ($idx % $sample_size == 0) {
-						array_push($data, array($q++, stddev(array_column($tmp, $naam)), $row['date'] ));	
+					$len = array_push($tmp, $row);			
+					if ($len > $sample_size) {
+						$std = stddev(array_column($tmp, $naam));
+						if ($std > 0)
+							array_push($data, array($q++, $std, $row['date'] ));	
 						$tmp = [];		
 					}
 				}
@@ -75,15 +79,17 @@ switch($type) {
 		break;
 	case "variance":
 		$tmp = array();
-		$q = 1;
-		$sample_size = round($database->rowCount() / 20);
+		$q = 0;
+		$sample_size = round( min([$database->rowCount(),$samples]) / 50);
 		foreach ($rows as $idx => $row) {
 			foreach ($field as $naam) {
 				$val = $row[$naam];
 				if (is_numeric($val)) {
-					array_push($tmp, $row);			
-					if ($idx % $sample_size == 0) {
-						array_push($data, array($q++, cof_var(array_column($tmp, $naam)), $row['date'] ));	
+					$len = array_push($tmp, $row);			
+					if ($len > $sample_size) {
+						$var = variance(array_column($tmp, $naam));
+						if ($var > 0)
+							array_push($data, array($q++, $var, $row['date'] ));	
 						$tmp = [];		
 					}
 				}
@@ -91,30 +97,26 @@ switch($type) {
 		}
 		break;
 	case "cpk":
-		// get the specifications of the product
-		$query = sprintf("SELECT %s_min AS min, %s_max AS max, DATE(start) as start, DATE(end) as end 
-					 			FROM gwc_slimline.products_finished WHERE pid='%s' ", $field, $field, $product);
-		$database->query($query);
-		$sp = $database->resultset();
-
 		$tmp = array();
 		$q = 0;
-		$sample_size = 50;
+		$sample_size = round( min([$database->rowCount(),$samples]) / 20);
 		foreach ($rows as $idx => $row) {
-			$val = $row['value'];
-			if (is_numeric($val)) {
-				array_push($tmp, $row);
-				if (count($tmp) > $sample_size) {
-					$datum = $row['date'];
-					foreach ($sp as $val) {
-						if (between($datum, $val['start'], $val['end'])) {
-							$low = $val['min'];
-							$high = $val['max'];
-							array_push($data, array($q, cpk(array_column($tmp, 'value'), $low, $high), $row['date'] ));
-							$tmp = [];
-							$q++;
-						}
-					}				
+			foreach ($field as $naam) {
+				$val = $row[$naam];
+				if (is_numeric($val)) {
+					$len = array_push($tmp, $row);
+					if ($len > $sample_size) {
+						$sql = sprintf("SELECT * FROM gwc_pline.specs WHERE DATE('%s') BETWEEN start AND end AND name='%s' ", $row['date'], $product);
+						$database->query($sql);
+						$sp = $database->single();					
+						
+						$low = $sp[$spec['min']];
+						$high = $sp[$spec['max']];
+						$cpk = cpk(array_column($tmp, $naam), $low, $high);
+						if ($cpk != '-')
+							array_push($data, array($q++, $cpk, $row['date'] ));
+						$tmp = [];
+					}
 				}
 			}
 		}
@@ -133,22 +135,28 @@ if ($datasize < 5) {		// check if there is enough data
 	return;
 }
 
-// get the specifications of the product
-$query = sprintf("SELECT %s AS lsl, %s AS usl, start, end FROM gwc_pline.specs WHERE name='%s' ",
-						$spec['min'], $spec['max'], $product);
-						
-$database->query($query);
-$rows = $database->resultset();
-
-$s = array();
-foreach ($rows as $row) {
-	$min35 = $row['lsl'];
-	$max35 = $row['usl'];
-	$norm = ($min35+$max35)/2;
-	$min20 = $norm-(($norm-$min35)/35*20);
-	$max20 = $norm+(($max35-$norm)/35*20);
-	array_push($s, array($row['start'], $row['end'], $min35, $min20, $norm, $max20, $max35));
+// make the specs array, used for the colored regions
+if ($type == "cpk") {
+	$s = array(array("2000-01-01 00:00:00", "3000-01-01 00:00:00", 0.5, 0.7, 1, 100, 100 ));
+} else {
+	// get the specifications of the product
+	$query = sprintf("SELECT %s AS lsl, %s AS usl, start, end FROM gwc_pline.specs WHERE name='%s' ",
+							$spec['min'], $spec['max'], $product);
+							
+	$database->query($query);
+	$rows = $database->resultset();
+	
+	$s = array();
+	foreach ($rows as $row) {
+		$min35 = $row['lsl'];
+		$max35 = $row['usl'];
+		$norm = ($min35+$max35)/2;
+		$min20 = $norm-(($norm-$min35)/35*20);
+		$max20 = $norm+(($max35-$norm)/35*20);
+		array_push($s, array($row['start'], $row['end'], $min35, $min20, $norm, $max20, $max35));
+	}
 }
+
 //echo print_r($s);	return;
 $specs = array();	// array with the specs [from, to, min35, min20, norm, max20, max35]) to use for each point in the data
 $oldate = "";
@@ -175,13 +183,14 @@ foreach($data as $key => $val) {
 
 
 // make an array with the time labels on the x-axis (the data is provided as series of [[x][value][date], [][][], ... ]
-$split = round(count($data) / $ticks);
+$split = ceil(count($data) / $ticks);
 foreach($data as $idx => $value) {
 	if ($split != 0)
-		if (($idx % $split) == $split-2)
+		if (($idx % $split) == 0)
 			if (array_key_exists(2, $value))
-				$tijd[] = array($idx+1, substr($value[2], 0, 10) );
+				$tijd[] = array($idx, substr($value[2], 0, 10) );
 }
+
 
 // set the y-as opties
 function yaxes() {
