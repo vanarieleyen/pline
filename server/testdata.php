@@ -35,18 +35,14 @@ function purebell($min,$max,$std_deviation,$step=1) {
   return $random_number;
 }
 
-/*
-for ($i = 0; $i < 100; $i++) {
-	echo purebell(0,100,3)." ";
-}
-return;
-*/
-
 // remove test product from specs and data
 $database->query("DELETE FROM gwc_pline.specs WHERE name='test' ");		
 $database->execute();
+
+// delete test
 $database->query("DELETE FROM gwc_pline.inspection WHERE product='test' ");
 $database->execute();
+
 
 // insert test specs of 3 time periods
 $sql = "INSERT INTO gwc_pline.specs (name, start, end, pid, 

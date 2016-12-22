@@ -1,9 +1,8 @@
 <?php
 
-// get the product names from the database and return it as options for a selectbox
-// call: get_products.php?start=2016-03-10&end=2016-03-19
+// get the group names for the charts
 
-require_once realpath($_SERVER['DOCUMENT_ROOT']).'/ajax/language.php';
+require_once 'language.php';
 
 extract($_GET);
 									
