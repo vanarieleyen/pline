@@ -1565,8 +1565,9 @@ Licensed under the MIT license.
                 }
             });
 
+						// changed plotOffset.right to 2 to remove the empty space on the right side
             plotOffset.left = Math.ceil(Math.max(margins.left, plotOffset.left));
-            plotOffset.right = Math.ceil(Math.max(margins.right, plotOffset.right));
+            plotOffset.right = 2; //Math.ceil(Math.max(margins.right, plotOffset.right));
             plotOffset.top = Math.ceil(Math.max(margins.top, plotOffset.top));
             plotOffset.bottom = Math.ceil(Math.max(margins.bottom, plotOffset.bottom));
         }

@@ -175,6 +175,38 @@ if ($orientation == "horizontal") {
 				xaxes: [%s]
 			}', $space, $samples, background($min35, $min20, $max20, $max35), $barwidth, yaxes(), xaxes() );	
 	
+} else {
+	
+	// set the dataset
+	$dataset = sprintf('
+		{
+			data: %s,
+			yaxis: 1,
+			color: "%s",
+			lines: {show:false},
+			bars: {show:true, lineWidth: 1}
+		},', json_encode($serie), $color);
+	$dataset = substr($dataset, 0, -1);		// remove last comma
+
+	// set the options
+	$options = sprintf('
+				{
+				space: %s,
+				canvas: true,
+				series: {
+					downsample: { threshold: %s }
+				},
+				bars: {
+					barWidth: %s
+				},
+				xaxis: {
+					show: false
+				},
+				yaxis: {
+					show: false
+				}
+			}', $space, $samples, $barwidth );	
+	
 }
 
 $canvas = "canvas".rand(0, 9999)."_".time();	// generate a unique name for the canvas

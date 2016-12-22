@@ -302,7 +302,7 @@ $canvas = "canvas".rand(0, 9999)."_".time();	// generate a unique name for the c
 $empty = sprintf("$('%s').empty(); ", $element);
 $plot = sprintf('var %s = $.plot($("%s"), [%s], %s); ', 
 						$canvas, $element, $dataset, $options);
-$toIMG = sprintf("$('%s').html('<img src=\"'+%s.getCanvas().toDataURL('image/png')+'\"/>');", $element, $canvas);
+$toIMG = sprintf("$('%s').html('<img src=\"'+%s.getCanvas().toDataURL('image/png')+'\" />');", $element, $canvas);
 
 echo $empty.$plot.$toIMG;
 

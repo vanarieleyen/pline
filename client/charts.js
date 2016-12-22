@@ -20,7 +20,12 @@ var charts_content = {
 						])
 					])
 				),
-				m("td", {width:"100%"}, m("#graph1", {style:"width:1000px; height:300px"}))
+				m("td", {width:"100%"}, 
+					m("span.flex-row", {style:"-webkit-justify-content:flex-start !important"}, [
+							m("#graph1", {style:"width:600px; height:300px"}),
+							m("#dist1", {style:"width:240px; height:200px"})
+					])
+				)
 			]),
 			m("tr", {style:"height:300px"}, [
 				m("td", {valign:"top"},
