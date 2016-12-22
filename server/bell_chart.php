@@ -28,8 +28,13 @@ $serie = array();
 $serie = json_decode(stripslashes($what[0]));		// put the data in serie-array
 
 $distribution = array();		// the individual bars
-$left = $min35-($min35/100*3);	// set the limits for values that are too much out of bounds
-$right = $max35+($max35/100*3);
+if ($orientation == "horizontal") {
+	$left = $min35-($min35/100*3);	// set the limits for values that are too much out of bounds
+	$right = $max35+($max35/100*3);
+} else {
+	$left = -0.1*$min35;
+	$right = 5*$max35;
+}
 
 foreach($serie as $key => $value) {
 	if (isset($value[1]))
