@@ -22,8 +22,8 @@ var charts_content = {
 				),
 				m("td", {width:"100%"}, 
 					m("span.flex-row", {style:"-webkit-justify-content:flex-start !important"}, [
-							m("#graph1", {style:"width:600px; height:300px"}),
-							m("#dist1", {style:"width:240px; height:200px"})
+							m("#graph1", {style:"width:870px; height:300px"}),
+							m("#dist1", {style:"width:230px; height:150px"})
 					])
 				)
 			]),

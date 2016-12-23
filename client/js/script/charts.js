@@ -1,88 +1,5 @@
-/**
- * Hermite resize - fast image resize/resample using Hermite filter. 1 cpu version!
- * 
- * @param {HtmlElement} canvas
- * @param {int} width
- * @param {int} height
- * @param {boolean} resize_canvas if true, canvas will be resized. Optional.
- */
-function resample_single(canvas, width, height, resize_canvas) {
-    var width_source = canvas.width;
-    var height_source = canvas.height;
-    width = Math.round(width);
-    height = Math.round(height);
 
-    var ratio_w = width_source / width;
-    var ratio_h = height_source / height;
-    var ratio_w_half = Math.ceil(ratio_w / 2);
-    var ratio_h_half = Math.ceil(ratio_h / 2);
-
-    var ctx = canvas.getContext("2d");
-    var img = ctx.getImageData(0, 0, width_source, height_source);
-    var img2 = ctx.createImageData(width, height);
-    var data = img.data;
-    var data2 = img2.data;
-
-    for (var j = 0; j < height; j++) {
-        for (var i = 0; i < width; i++) {
-            var x2 = (i + j * width) * 4;
-            var weight = 0;
-            var weights = 0;
-            var weights_alpha = 0;
-            var gx_r = 0;
-            var gx_g = 0;
-            var gx_b = 0;
-            var gx_a = 0;
-            var center_y = (j + 0.5) * ratio_h;
-            var yy_start = Math.floor(j * ratio_h);
-            var yy_stop = Math.ceil((j + 1) * ratio_h);
-            for (var yy = yy_start; yy < yy_stop; yy++) {
-                var dy = Math.abs(center_y - (yy + 0.5)) / ratio_h_half;
-                var center_x = (i + 0.5) * ratio_w;
-                var w0 = dy * dy; //pre-calc part of w
-                var xx_start = Math.floor(i * ratio_w);
-                var xx_stop = Math.ceil((i + 1) * ratio_w);
-                for (var xx = xx_start; xx < xx_stop; xx++) {
-                    var dx = Math.abs(center_x - (xx + 0.5)) / ratio_w_half;
-                    var w = Math.sqrt(w0 + dx * dx);
-                    if (w >= 1) {
-                        //pixel too far
-                        continue;
-                    }
-                    //hermite filter
-                    weight = 2 * w * w * w - 3 * w * w + 1;
-                    var pos_x = 4 * (xx + yy * width_source);
-                    //alpha
-                    gx_a += weight * data[pos_x + 3];
-                    weights_alpha += weight;
-                    //colors
-                    if (data[pos_x + 3] < 255)
-                        weight = weight * data[pos_x + 3] / 250;
-                    gx_r += weight * data[pos_x];
-                    gx_g += weight * data[pos_x + 1];
-                    gx_b += weight * data[pos_x + 2];
-                    weights += weight;
-                }
-            }
-            data2[x2] = gx_r / weights;
-            data2[x2 + 1] = gx_g / weights;
-            data2[x2 + 2] = gx_b / weights;
-            data2[x2 + 3] = gx_a / weights_alpha;
-        }
-    }
-    //clear and resize canvas
-    if (resize_canvas === true) {
-        canvas.width = width;
-        canvas.height = height;
-    } else {
-        ctx.clearRect(0, 0, width_source, height_source);
-    }
-
-    //draw
-    ctx.putImageData(img2, 0, 0);
-}
-
-var what, start, end, product, machine, station, ofwhat, filter;
+var what, start, end, product, machine, station, ofwhat, filter, rawdata;
 
 // used to fill in default arguments in draw_chart()
 function extend() {
@@ -111,7 +28,6 @@ function draw_chart(arg) {
 	if (arg.product == '---')	arg.product = null;
 	switch (arg.type1) {
 		case 'Raw':			rawChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
-										miniDistChart('#charts #dist1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
 								break;
 		case 'Average':	averageChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
 								break;
@@ -124,6 +40,8 @@ function draw_chart(arg) {
 		case 'Dist':	distributionChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
 								break;
 	}
+	miniDistChart('#charts #dist1', arg.group1, arg.choice1, arg.product, arg.end);
+
 	switch (arg.type2) {
 		case 'Raw':			rawChart('#charts #graph2', arg.group2, arg.choice2, arg.start, arg.end, arg.product);
 								break;
@@ -163,9 +81,11 @@ function plotChart(options) {
     	url: "server/get_series.php",
 	  	contentType: "application/x-www-form-urlencoded",
    	data: options,
+   	dataType: 'json',
 		success: function(data) {
 			if (data != "") {
-				eval(data);								// plot the chart
+				eval(data.chart);								// plot the chart
+				rawdata = data.raw;
 			} else {
 				none(options.element);
 				//notAvailable(options.element, 0);	// show not available
@@ -403,66 +323,27 @@ function drawBell(options) {
 }
 
 // mini distribution chart
-function miniDistChart(chart, what, soort, start, end, product) {
-	var ytext, field, eff = [];
+function miniDistChart(chart, what, soort, product, end) {
 	var specs = db[what][soort].spec;
-	var fields = db[what][soort].field;
-
-	switch(soort) {
-		case 'matinmoist': 	xLbl = LABELS[612][$.jStorage.get("lang")];
-									break;
-		case 'matoutmoist': 	xLbl = LABELS[613][$.jStorage.get("lang")];
-									break;
-		case 'matouttemp': 	xLbl = LABELS[614][$.jStorage.get("lang")];
-									break;
-		case 'moisture': 		xLbl = LABELS[170][$.jStorage.get("lang")];
-									break;
-	}
 
 	if (product == 0)		return;	// without a product there are no charts
-
-	yLbl = LABELS[94][$.jStorage.get("lang")];
 	
 	var spec = getSpec(product, end);		// get the specs for the last date
 	var low = spec[db[what][soort].spec.min];
 	var high = spec[db[what][soort].spec.max];
 	var norm = (parseFloat(low)+parseFloat(high))/2;
-	var _data = Array();
 
-	var sql = sprintf("SELECT * FROM gwc_pline.inspection WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
-							start, end, product);
-
-	$.getJSON('server/get_range.php', {	// get the data 
-		query: sql
-	},	function(data) {
-			
-		for (i = 0; i < data.count; i++) {
-			fields.map(function (naam) {
-				_data.push([i, parseFloat(data[i].row[naam])]);
-			})
-		}
-
-		var DATA = JSON.stringify(_data);
-		drawBell({
-			element: chart,								// element for the chart
-			orientation: "vertical",		// orientation of the chart									what: [DATA],									// which fields to use for the data
-			label: [xLbl],									// labels to use for the legend
-			color: "grey",									// color to use for the data
-			trans: '0.3',									// transparency for bars
-			ylabel: yLbl,									// label for each serie on the y-axis
-			space: 15,										// add extra space for the tilted labels at the bottom
-			resample: 1,									// used for dist charts (makes the bars wider)
-			specs: [low, norm, high],					// the field(s) or values to use as spec reference
-			period: [],										// time or record range
-			ticks: 5,										// number of time-marks on xaxis
-			grid: [1,1],									// which grid to show [x,y]	
-			show: [-2],										// what to show on xaxis (date=0, time=1, number=-1, raw=-2)
-			samples: 1000									// maximum data size (to speed up plotting)
-		});
-		//alert();
+	var DATA = JSON.stringify(rawdata);
+	drawBell({
+		element: chart,								// element for the chart
+		orientation: "vertical",			// orientation of the chart								what: [DATA],									// which fields to use for the data
+		color: "grey",								// color to use for the data
+		space: 0,											// add extra space for the tilted labels at the bottom
+		specs: [low, norm, high],			// the field(s) or values to use as spec reference
+		samples: 1000									// maximum data size (to speed up plotting)
 	});
-	$(chart).children().css("-webkit-transform-origin","41% 50%");
-	$(chart).children().css("-webkit-transform","rotate(90deg)");
+
+	$(chart).children().css("-webkit-transform","rotate(90deg) scaleX(-1) translate(-50px, 41px)");
 }
 
 // large distribution chart

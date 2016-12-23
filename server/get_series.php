@@ -304,6 +304,15 @@ $plot = sprintf('var %s = $.plot($("%s"), [%s], %s); ',
 						$canvas, $element, $dataset, $options);
 $toIMG = sprintf("$('%s').html('<img src=\"'+%s.getCanvas().toDataURL('image/png')+'\" />');", $element, $canvas);
 
-echo $empty.$plot.$toIMG;
+//echo $empty.$plot.$toIMG;
+
+$rawdata = array();
+foreach ($data AS $idx=>$val) {
+	$rawdata[] = array($idx, $val[1]);
+}
+$result = array();
+$result['chart'] = $empty.$plot.$toIMG; 
+$result['raw'] = $rawdata;
+echo json_encode($result);
 
 ?>

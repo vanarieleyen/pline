@@ -32,8 +32,8 @@ if ($orientation == "horizontal") {
 	$left = $min35-($min35/100*3);	// set the limits for values that are too much out of bounds
 	$right = $max35+($max35/100*3);
 } else {
-	$left = -0.1*$min35;
-	$right = 5*$max35;
+	$left = -100000; 		// minicharts don't have boundaries
+	$right = 100000; 
 }
 
 foreach($serie as $key => $value) {
@@ -41,7 +41,7 @@ foreach($serie as $key => $value) {
 		$val = is_numeric($value[1]) ? round($value[1]*$scale) : 0;
 	else
 		$val = 0;
-	$index = $val; 
+	$index = $val;
 	if (($index > $left) && ($index <  $right)) { 
 		if (isset($distribution[$index]))
 			$distribution[$index]++;
@@ -49,6 +49,7 @@ foreach($serie as $key => $value) {
 			$distribution[$index] = 0;
 	}
 }
+
 
 ksort($distribution);
 
@@ -186,7 +187,6 @@ if ($orientation == "horizontal") {
 	$dataset = sprintf('
 		{
 			data: %s,
-			yaxis: 1,
 			color: "%s",
 			lines: {show:false},
 			bars: {show:true, lineWidth: 1}
@@ -204,12 +204,7 @@ if ($orientation == "horizontal") {
 				bars: {
 					barWidth: %s
 				},
-				xaxis: {
-					show: false
-				},
-				yaxis: {
-					show: false
-				}
+				grid: false
 			}', $space, $samples, $barwidth );	
 	
 }
