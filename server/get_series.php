@@ -131,7 +131,10 @@ switch($type) {
 $datasize = count($data);
 
 if ($datasize < 5) {		// check if there is enough data
-	echo "";
+	$result = array();
+	$result['chart'] = ""; 
+	$result['raw'] = array();
+	echo json_encode($result);
 	return;
 }
 
@@ -304,12 +307,12 @@ $plot = sprintf('var %s = $.plot($("%s"), [%s], %s); ',
 						$canvas, $element, $dataset, $options);
 $toIMG = sprintf("$('%s').html('<img src=\"'+%s.getCanvas().toDataURL('image/png')+'\" />');", $element, $canvas);
 
-//echo $empty.$plot.$toIMG;
 
 $rawdata = array();
 foreach ($data AS $idx=>$val) {
-	$rawdata[] = array($idx, $val[1]);
+	$rawdata[] = $val[1];
 }
+
 $result = array();
 $result['chart'] = $empty.$plot.$toIMG; 
 $result['raw'] = $rawdata;

@@ -2,22 +2,8 @@
 
 // generate the bell chart from raw data
 
-
 extract($_POST);
 
-$sp = $specs[2]-$specs[0];	// ruimte binnen de specs
-$scale = $samples/$sp;		// hoeveel de waarden moeten worden aangepast om in de sample-ruimte te passen
-
-// set specification limits
-$min35 = round($specs[0]*$scale);
-$norm  = round($specs[1]*$scale);
-$max35 = round($specs[2]*$scale);
-
-$delta = max($norm-$min35, $max35-$norm);
-$min20 = round($norm - ($delta/35*20));
-$max20 = round($norm + ($delta/35*20));
-
-$serie = array();
 $tijd = array();
 
 $kleur = "rgb(56, 56, 56)";	// kleur voor labels en ticks
@@ -29,16 +15,31 @@ $serie = json_decode(stripslashes($what[0]));		// put the data in serie-array
 
 $distribution = array();		// the individual bars
 if ($orientation == "horizontal") {
+	$sp = $specs[2]-$specs[0];	// ruimte binnen de specs
+	$scale = $samples/$sp;		// hoeveel de waarden moeten worden aangepast om in de sample-ruimte te passen
+
+	$min35 = round($specs[0]*$scale);	// set specification limits
+	$norm  = round($specs[1]*$scale);
+	$max35 = round($specs[2]*$scale);
+	
+	$delta = max([$norm-$min35, $max35-$norm]);
+	$min20 = round($norm - ($delta/35*20));
+	$max20 = round($norm + ($delta/35*20));
+
 	$left = $min35-($min35/100*3);	// set the limits for values that are too much out of bounds
 	$right = $max35+($max35/100*3);
 } else {
+	$min = min($serie); 							// find the lowest and highest value
+	$max = max($serie);
+	$scale = $samples/($max-$min);		// determine the scaling factor
+	
 	$left = -100000; 		// minicharts don't have boundaries
 	$right = 100000; 
 }
 
-foreach($serie as $key => $value) {
-	if (isset($value[1]))
-		$val = is_numeric($value[1]) ? round($value[1]*$scale) : 0;
+foreach($serie as $key => $value) {				// generate the distribution array
+	if (isset($value))
+		$val = is_numeric($value) ? round($value*$scale) : 0;
 	else
 		$val = 0;
 	$index = $val;
@@ -50,7 +51,6 @@ foreach($serie as $key => $value) {
 	}
 }
 
-
 ksort($distribution);
 
 $barwidth = 1000000; // set at an imaginary large value
@@ -58,9 +58,7 @@ $old = 0;
 $result = array();
 foreach ($distribution as $key => $value) {
 	$result[] = array($key, $value);
-	if ($key-$old < $barwidth) {
-		$barwidth = $key-$old;
-	}
+	$barwidth = min([$barwidth, $key-$old]);
 	$old = $key;
 }
 $serie = $result;
@@ -196,7 +194,6 @@ if ($orientation == "horizontal") {
 	// set the options
 	$options = sprintf('
 				{
-				space: %s,
 				canvas: true,
 				series: {
 					downsample: { threshold: %s }
@@ -204,8 +201,11 @@ if ($orientation == "horizontal") {
 				bars: {
 					barWidth: %s
 				},
+				xaxis: {
+					autoscaleMargin: 0.09
+				},
 				grid: false
-			}', $space, $samples, $barwidth );	
+			}', $samples, $barwidth );	
 	
 }
 
@@ -215,8 +215,6 @@ $empty = sprintf("$('%s').empty(); ", $element);
 $plot = sprintf('var %s = $.plot($("%s"), [%s], %s); ', 
 						$canvas, $element, $dataset, $options);
 $toIMG = sprintf("$('%s').html('<img src=\"'+%s.getCanvas().toDataURL('image/png')+'\"/>');", $element, $canvas);
-
-//file_put_contents("debug.txt", $plot);
 
 echo $empty.$plot.$toIMG;
 

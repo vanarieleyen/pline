@@ -336,9 +336,8 @@ function miniDistChart(chart, what, soort, product, end) {
 	var DATA = JSON.stringify(rawdata);
 	drawBell({
 		element: chart,								// element for the chart
-		orientation: "vertical",			// orientation of the chart								what: [DATA],									// which fields to use for the data
+		orientation: "vertical",			// orientation of the chart								what: [DATA],									// the raw data
 		color: "grey",								// color to use for the data
-		space: 0,											// add extra space for the tilted labels at the bottom
 		specs: [low, norm, high],			// the field(s) or values to use as spec reference
 		samples: 1000									// maximum data size (to speed up plotting)
 	});
