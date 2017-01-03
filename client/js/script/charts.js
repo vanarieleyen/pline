@@ -1,59 +1,45 @@
 
-var what, start, end, product, machine, station, ofwhat, filter, rawdata;
-
-// used to fill in default arguments in draw_chart()
-function extend() {
-	for (var i = 1; i < arguments.length; i++)
-		for (var key in arguments[i])
-			if (arguments[i].hasOwnProperty(key))
-				arguments[0][key] = arguments[i][key];
-	return arguments[0];
-}
-    
-// draws the charts in chart.php
-function draw_chart(arg) {
-	var defaults = {	
-    start: 	$('#evaluate [name=start]').val(),	// begin tijdsperiode
-		end: 		$('#evaluate [name=end]').val(),
-		product: $('#evaluate [name=product] option:selected').val(),
-		group1: 	$('#charts #group1').val(),											// regain1, regain2 etc..
-		choice1:	$('#charts #choice1').val(),											// inputmoist, outputmoist etc...
-		type1: 	$('#charts #type1 input:checked').val(),					// raw, avg, cpk etc...
-		group2: 	$('#charts #group2').val(),		
-		choice2:	$('#charts #choice2').val(),					
-		type2: 	$('#charts #type2 input:checked').val(),		
-	};
-	var arg = extend(defaults, arg); // fill with defaults when no arguments are passed
-
-	if (arg.product == '---')	arg.product = null;
-	switch (arg.type1) {
-		case 'Raw':			rawChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
-								break;
-		case 'Average':	averageChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
-								break;
-		case 'Deviation':	deviationChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
-								break;
-		case 'Variance':	variationChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
-								break;
-		case 'Cpk':	cpcpkChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
-								break;
-		case 'Dist':	distributionChart('#charts #graph1', arg.group1, arg.choice1, arg.start, arg.end, arg.product);
-								break;
+// returns the label to display on the chart
+function label(soort) {
+	switch(soort) {
+		case 'matinmoist': 	return LABELS[612][$.jStorage.get("lang")];
+		case 'matoutmoist': return LABELS[613][$.jStorage.get("lang")];
+		case 'matouttemp': 	return LABELS[614][$.jStorage.get("lang")];
+		case 'moisture': 		return LABELS[170][$.jStorage.get("lang")];
 	}
-	miniDistChart('#charts #dist1', arg.group1, arg.choice1, arg.product, arg.end);
+}
 
-	switch (arg.type2) {
-		case 'Raw':			rawChart('#charts #graph2', arg.group2, arg.choice2, arg.start, arg.end, arg.product);
+   
+// draws the charts in chart.php
+function draw_chart(keus) {
+	var product = $('#evaluate [name=product] option:selected').val();
+	var group = 	$('#charts #group'+keus).val();									// regain1, regain2 etc..
+	var choice =	$('#charts #choice'+keus).val();								// inputmoist, outputmoist etc...
+	var type = 		$('#charts #type'+keus+' input:checked').val();		// raw, avg, cpk etc...
+	var data = 		$.jStorage.get("pline_rawdata");
+
+	$('#charts #graph'+keus).empty();
+	if (keus=="1") $('#charts #dist1').empty();	// empty mini distribution chart
+
+	if (data == null)	
+		return;
+
+	if (typeof product == 'undefined' || product==0)
+		return;
+		
+	switch (type) {
+		case 'Raw':				rawChart('#charts #graph'+keus, group, choice, product, data);
 								break;
-		case 'Average':	averageChart('#charts #graph2', arg.group2, arg.choice2, arg.start, arg.end, arg.product);
+		case 'Average':		averageChart('#charts #graph'+keus, group, choice, product, data);
 								break;
-		case 'Deviation':	deviationChart('#charts #graph2', arg.group2, arg.choice2, arg.start, arg.end, arg.product);
+		case 'Deviation':	deviationChart('#charts #graph'+keus, group, choice, product, data);
 								break;
-		case 'Variance':	variationChart('#charts #graph2', arg.group2, arg.choice2, arg.start, arg.end, arg.product);
+		case 'Variance':	variationChart('#charts #graph'+keus, group, choice, product, data);
 								break;
-		case 'Cpk':		cpcpkChart('#charts #graph2', arg.group2, arg.choice2, arg.start, arg.end, arg.product);
+		case 'Cpk':				cpkChart('#charts #graph'+keus, group, choice, product, data);
 								break;
-		case 'Dist':	distributionChart('#charts #graph2', arg.group2, arg.choice2, arg.start, arg.end, arg.product);
+		case 'Dist':			if (keus=="1") $('#charts #dist1').empty();	// empty mini distribution chart
+											distributionChart('#charts #graph'+keus, group, choice, product, data);
 								break;
 	}
 }
@@ -73,336 +59,583 @@ function none(chart) {
 	return true;
 }
 
-// basic call to draw a chart
-function plotChart(options) {
-	$.ajax({
-   	type: "POST",
-   	async: false,
-    	url: "server/get_series.php",
-	  	contentType: "application/x-www-form-urlencoded",
-   	data: options,
-   	dataType: 'json',
-		success: function(data) {
-			if (data != "") {
-				eval(data.chart);								// plot the chart
-				rawdata = data.raw;
-			} else {
-				none(options.element);
-				//notAvailable(options.element, 0);	// show not available
-			}
-			// set the image to the container size
-			var width = $(options.element).innerWidth();
-			var height = $(options.element).innerHeight();
-			$(options.element).children().css({"width":width+"px", "height":height+"px"}); 
-   	}
-	});		
+// tick array with time labels
+function setTickLabels(result, ticks) {
+	var labels = [];
+	var split = Math.ceil(result.length / ticks);
+	$.each(result, function(idx, value) {
+		if (split != 0)
+			if ((idx % split) == 0)
+				if (typeof value[2] !== 'undefined')
+					labels.push(Array(idx, value[2].substr(0, 10) ) );
+	});
+	return labels;
 }
 
+// background colors
+function background(result, what, soort, product) {
+	var bg = [];
+	var low, high, s, spec, oldcrc=0;
+	var len = result.length;
+	
+	$.each(result, function(idx, value) {
+		spec = getSpec(product, value[2]);		// get the specs of certain date
+		low = parseFloat(spec[db[what][soort].spec.min]);
+		high = parseFloat(spec[db[what][soort].spec.max]);
+		s = specLimits(low, high);
 
-// cp/cpk chart
-function cpcpkChart(chart, what, soort, start, end, product) {
-	var ytext;
+		if (crc(JSON.stringify(spec)) != oldcrc) {
+			oldcrc = crc(JSON.stringify(spec));
+			bg.push( { xaxis:{from:idx, to:len}, yaxis:{from:-100000, to:s.min35}, color:"#FFAD99" } );
+			bg.push( { xaxis:{from:idx, to:len}, yaxis:{from:s.min35, to:s.min20}, color:"#FFD2AA"} );
+			bg.push( { xaxis:{from:idx, to:len}, yaxis:{from:s.min20, to:s.max20}, color:"#AAFFAA"} );
+			bg.push( { xaxis:{from:idx, to:len}, yaxis:{from:s.max20, to:s.max35}, color:"#FFD2AA"} );
+			bg.push( { xaxis:{from:idx, to:len}, yaxis:{from:s.max35, to:100000 }, color:"#FFAD99"} );
+		}
+	});
+	return bg;
+}
+
+// cpk chart
+function cpkChart(chart, what, soort, product, data) {
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
+	var width = parseFloat($(chart).innerWidth());
+	var height = parseFloat($(chart).innerHeight());
+	var result = [], tijd = [], raw = [];
+	var length, ticks = 10; 
 
-	if (product == 0)		return;	// without a product there are no charts
-
-	switch(soort) {
-		case 'matinmoist': 	ytext = LABELS[612][$.jStorage.get("lang")];
-									break;
-		case 'matoutmoist': ytext = LABELS[613][$.jStorage.get("lang")];
-									break;
-		case 'matouttemp': 	ytext = LABELS[614][$.jStorage.get("lang")];
-									break;
-		case 'moisture': 		ytext = LABELS[170][$.jStorage.get("lang")];
-									break;
+	var tmp = [];
+	var sample_size = Math.round(Math.min(data.count, width) / 50);
+	var idx = 0;
+	for (var i = 0; i < data.count; i++) {
+		fields.map(function (naam) {
+			var value = data[i].row[naam];
+			if (!isEmpty(value)) {
+				if ($.isNumeric(value)) {
+					length = tmp.push(parseFloat(value));
+					if (length > sample_size) {
+						var spec = getSpec(product, data[i].row['date']);		// get the specs of current data
+						var low = parseFloat(spec[db[what][soort].spec.min]);
+						var high = parseFloat(spec[db[what][soort].spec.max]);
+						var val = cpk(low, high, tmp);
+						if (val != '--' && val > 0) {
+							result.push(Array(idx++, val, data[i].row['date'] ));
+							raw.push(val);
+							tmp = [];
+						}
+					}
+				}
+			}
+		})
 	}
 
-	plotChart({
-		element: chart,								// element for the chart
-		type: "cpk",									// raw, average, deviation, variance, cpk
-		field: fields,									// field list
-		table: "inspection",							// the data table
-		start: start,									// start of period
-		end: end,										// end of period
-		product: product,								// the product that we need the specs from			
-		label: ytext,									// label to use for the legend
-		color: "blue",								 	// color to use for the data
-		trend: true,									// show trendline
-		trans: '0.3',									// transparency for bars
-		ylabel: ytext,									// label on the y-axis
-		space: 40,										// add extra space for the tilted labels at the bottom
-		curved: true,									// use curved lines
-		spec: specs,									// spec list
-		ticks: 10,										// number of time-marks on xaxis
-		samples: 500									// maximum data size (to speed up plotting)
-	});
+	if (result.length > 5) {
+
+		tijd = setTickLabels(result, ticks);
+		
+		var dataset = { 
+			data: result, 
+			label: label(soort),
+			color: 'blue', 
+			lines: {show:true},
+		};
+		
+		var options = {
+			canvas: true,
+			space: 70,		// reserved space for the date labels on the bottom
+			series: {
+				downsample: { threshold: width }
+			},
+			trendline: { show: true },
+			grid: {	
+				markings: [
+					{ yaxis: {from:-100000,	to:0.5},		color:"#FFAD99" },
+					{ yaxis: {from:0.5,			to:0.7}, 		color:"#FFD2AA"},
+					{ yaxis: {from:0.7,			to:100000 },color:"#AAFFAA"}
+				]
+			},
+			xaxis: {
+				position: "bottom",
+				ticks: tijd
+			},
+			yaxis: {
+				position: "left",
+				autoscaleMargin: 0
+			}
+		};
+		
+		canvas = $.plot($(chart), [dataset], options);
+
+		$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
+		$(chart).children().css({"width":width+"px", "height":height+"px"});
+	} else {
+		none(chart);	// not enough data
+	}
+	if (chart == "#charts #graph1")		// the minichart is only drawn for the upper charts
+		miniDistChart('#charts #dist1', raw);
 }
 
 // variance chart
-function variationChart(chart, what, soort, start, end, product) {
-	var ytext, field, eff = [];
+function variationChart(chart, what, soort, product, data) {
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
+	var width = parseFloat($(chart).innerWidth());
+	var height = parseFloat($(chart).innerHeight());
+	var result = [], tijd = [], raw = [];
+	var length, ticks = 10; 
 
-	if (product == 0)		return;	// without a product there are no charts
-
-	switch(soort) {
-		case 'matinmoist': 	ytext = LABELS[612][$.jStorage.get("lang")];
-									break;
-		case 'matoutmoist': 	ytext = LABELS[613][$.jStorage.get("lang")];
-									break;
-		case 'matouttemp': 	ytext = LABELS[614][$.jStorage.get("lang")];
-									break;
-		case 'moisture': 		ytext = LABELS[170][$.jStorage.get("lang")];
-									break;
+	var tmp = [];
+	var sample_size = Math.round(Math.min(data.count, width) / 50);
+	var idx = 0;
+	for (var i = 0; i < data.count; i++) {
+		fields.map(function (naam) {
+			var value = data[i].row[naam];
+			if (!isEmpty(value)) {
+				if ($.isNumeric(value)) {
+					length = tmp.push(parseFloat(value));
+					if (length > sample_size) {
+						var val = jStat.coeffvar(tmp);
+						if (val > 0) {
+							result.push(Array(idx++, val, data[i].row['date'] ));
+							raw.push(val);
+							tmp = [];
+						}
+					}
+				}
+			}
+		})
 	}
+	
+	if (result.length > 5) {
+		
+		tijd = setTickLabels(result, ticks);
 
-	plotChart({
-		element: chart,								// element for the chart
-		type: "variance",								// raw, average, deviation, variance, cpk
-		field: fields,									// field list
-		table: "inspection",							// the data table
-		start: start,									// start of period
-		end: end,										// end of period
-		product: product,								// the product that we need the specs from			
-		label: ytext,									// label to use for the legend
-		color: "blue",								 	// color to use for the data
-		trend: true,									// show trendline
-		trans: '0.3',									// transparency for bars
-		ylabel: ytext,									// label on the y-axis
-		space: 40,										// add extra space for the tilted labels at the bottom
-		curved: true,									// use curved lines
-		spec: specs,									// spec list
-		ticks: 10,										// number of time-marks on xaxis
-		samples: 500									// maximum data size (to speed up plotting)
-	});
+		var dataset = { 
+			data: result, 
+			label: label(soort),
+			color: 'blue', 
+			lines: {show:true},
+		};
+		
+		var options = {
+			canvas: true,
+			space: 70,		// reserved space for the date labels on the bottom
+			series: {
+				downsample: { threshold: width },
+				curvedLines: {	
+					active: true, 
+					apply:true
+				}
+			},
+			trendline: { show: true },
+			grid: {	
+				markings: [
+					{ yaxis: {from:-100000,	to:0.02},		color:"#AAFFAA" },
+					{ yaxis: {from:0.02,		to:0.025}, 	color:"#FFD2AA"},
+					{ yaxis: {from:0.025,		to:100000 },color:"#FFAD99"}
+				]
+			},
+			xaxis: {
+				position: "bottom",
+				ticks: tijd
+			},
+			yaxis: {
+				position: "left",
+				autoscaleMargin: 0
+			}
+		};
+		
+		canvas = $.plot($(chart), [dataset], options);
+
+		$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
+		$(chart).children().css({"width":width+"px", "height":height+"px"});
+	} else {
+		none(chart);	// not enough data
+	}
+	if (chart == "#charts #graph1")		// the minichart is only drawn for the upper charts
+		miniDistChart('#charts #dist1', raw);
 }
 
 // std. deviation chart
-function deviationChart(chart, what, soort, start, end, product) {
-	var ytext, field, eff = [];
+function deviationChart(chart, what, soort, product, data) {
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
+	var width = parseFloat($(chart).innerWidth());
+	var height = parseFloat($(chart).innerHeight());
+	var result = [], tijd = [], raw = [];
+	var length, ticks = 10; 
 
-	if (product == 0)		return;	// without a product there are no charts
-
-	switch(soort) {
-		case 'matinmoist': 	ytext = LABELS[612][$.jStorage.get("lang")];
-									break;
-		case 'matoutmoist': 	ytext = LABELS[613][$.jStorage.get("lang")];
-									break;
-		case 'matouttemp': 	ytext = LABELS[614][$.jStorage.get("lang")];
-									break;
-		case 'moisture': 		ytext = LABELS[170][$.jStorage.get("lang")];
-									break;
+	var tmp = [];
+	var sample_size = Math.round(Math.min(data.count, width) / 50);
+	var idx = 0;
+	for (var i = 0; i < data.count; i++) {
+		fields.map(function (naam) {
+			var value = data[i].row[naam];
+			if (!isEmpty(value)) {
+				if ($.isNumeric(value)) {
+					length = tmp.push(parseFloat(value));
+					if (length > sample_size) {
+						var val = jStat.stdev(tmp);
+						if (val > 0) {
+							result.push(Array(idx++, val, data[i].row['date'] ));
+							raw.push(val);
+							tmp = [];
+						}
+					}
+				}
+			}
+		})
 	}
 	
-	plotChart({
-		element: chart,								// element for the chart
-		type: "deviation",									// raw, average, deviation, variance, cpk
-		field: fields,									// field list
-		table: "inspection",							// the data table
-		start: start,									// start of period
-		end: end,										// end of period
-		product: product,								// the product that we need the specs from			
-		label: ytext,									// label to use for the legend
-		color: "blue",								 	// color to use for the data
-		trend: true,									// show trendline
-		trans: '0.3',									// transparency for bars
-		ylabel: ytext,									// label on the y-axis
-		space: 40,										// add extra space for the tilted labels at the bottom
-		curved: true,									// use curved lines
-		spec: specs,									// spec list
-		ticks: 10,										// number of time-marks on xaxis
-		samples: 500									// maximum data size (to speed up plotting)
-	});
+	if (result.length > 5) {
+		
+		tijd = setTickLabels(result, ticks);
+		
+		var dataset = { 
+			data: result, 
+			label: label(soort),
+			color: 'blue', 
+			lines: {show:true},
+		};
+		
+		var options = {
+			canvas: true,
+			space: 70,		// reserved space for the date labels on the bottom
+			series: {
+				downsample: { threshold: width },
+				curvedLines: {	
+					active: true, 
+					apply:true
+				}
+			},
+			trendline: { show: true },
+			grid: {	
+				markings: [
+					{ yaxis: {from:-100000,	to:0.4},		color:"#AAFFAA" },
+					{ yaxis: {from:0.4,			to:0.5}, 		color:"#FFD2AA"},
+					{ yaxis: {from:0.5,			to:100000 },color:"#FFAD99"}
+				]
+			},
+			xaxis: {
+				position: "bottom",
+				ticks: tijd
+			},
+			yaxis: {
+				position: "left",
+				autoscaleMargin: 0
+			}
+		};
+		
+		canvas = $.plot($(chart), [dataset], options);
+
+		$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
+		$(chart).children().css({"width":width+"px", "height":height+"px"});
+	} else {
+		none(chart);	// not enough data
+	}
+	if (chart == "#charts #graph1")		// the minichart is only drawn for the upper charts
+		miniDistChart('#charts #dist1', raw);
 }
 
 // average chart
-function averageChart(chart, what, soort, start, end, product) {
-	var ytext, field, eff = [];
+function averageChart(chart, what, soort, product, data) {
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
+	var width = parseFloat($(chart).innerWidth());
+	var height = parseFloat($(chart).innerHeight());
+	var result = [], tijd = [], raw = [];
+	var length, ticks = 10; 
 
-	if (product == 0)		return;	// without a product there are no charts
-	
-	switch(soort) {
-		case 'matinmoist': 	ytext = LABELS[612][$.jStorage.get("lang")];
-									break;
-		case 'matoutmoist': 	ytext = LABELS[613][$.jStorage.get("lang")];
-									break;
-		case 'matouttemp': 	ytext = LABELS[614][$.jStorage.get("lang")];
-									break;
-		case 'moisture': 		ytext = LABELS[170][$.jStorage.get("lang")];
-									break;
+	var tmp = [];
+	var sample_size = Math.round(Math.min(data.count, width) / 50);
+	var idx = 0;
+	for (var i = 0; i < data.count; i++) {
+		fields.map(function (naam) {
+			var value = data[i].row[naam];
+			if (!isEmpty(value)) {
+				if ($.isNumeric(value)) {
+					length = tmp.push(parseFloat(value));
+					if (length > sample_size) {
+						var val = jStat.mean(tmp);
+						if (val > 0) {
+							result.push(Array(idx++, val, data[i].row['date'] ));
+							raw.push(val);
+							tmp = [];
+						}
+					}
+				}
+			}
+		})
 	}
+	
+	if (result.length > 5) {
+		
+		tijd = setTickLabels(result, ticks);
 
-	plotChart({
-		element: chart,								// element for the chart
-		type: "average",									// raw, average, deviation, variance, cpk
-		field: fields,									// field list
-		table: "inspection",							// the data table
-		start: start,									// start of period
-		end: end,										// end of period
-		product: product,								// the product that we need the specs from			
-		label: ytext,									// label to use for the legend
-		color: "blue",								 	// color to use for the data
-		trend: true,									// show trendline
-		trans: '0.3',									// transparency for bars
-		ylabel: ytext,									// label on the y-axis
-		space: 40,										// add extra space for the tilted labels at the bottom
-		curved: true,									// use curved lines
-		spec: specs,									// spec list
-		ticks: 10,										// number of time-marks on xaxis
-		samples: 500									// maximum data size (to speed up plotting)
-	});
+		var dataset = { 
+			data: result, 
+			label: label(soort),
+			color: 'blue', 
+			lines: {show:true},
+		};
+		
+		var options = {
+			canvas: true,
+			space: 70,		// reserved space for the date labels on the bottom
+			series: {
+				downsample: { threshold: width },
+				curvedLines: {	
+					active: true, 
+					apply:true
+				}
+			},
+			trendline: { show: true },
+			grid: {	markings: background(result, what, soort, product) },
+			xaxis: {
+				position: "bottom",
+				ticks: tijd
+			},
+			yaxis: {
+				position: "left",
+				autoscaleMargin: 0
+			}
+		};
+		
+		canvas = $.plot($(chart), [dataset], options);
+
+		$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
+		$(chart).children().css({"width":width+"px", "height":height+"px"});
+	} else {
+		none(chart);	// not enough data
+	}
+	if (chart == "#charts #graph1")		// the minichart is only drawn for the upper charts
+		miniDistChart('#charts #dist1', raw);
 }
 
 // make a chart of the raw data
-function rawChart(chart, what, soort, start, end, product) {
-	var ytext, field, eff = [];
+function rawChart(chart, what, soort, product, data) {
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
+	var width = parseFloat($(chart).innerWidth());
+	var height = parseFloat($(chart).innerHeight());
+	var result = [], tijd = [], ticks = 10;
+	var raw = [];
 
-	switch(soort) {
-		case 'matinmoist': 	ytext = LABELS[612][$.jStorage.get("lang")];
-									break;
-		case 'matoutmoist': 	ytext = LABELS[613][$.jStorage.get("lang")];
-									break;
-		case 'matouttemp': 	ytext = LABELS[614][$.jStorage.get("lang")];
-									break;
-		case 'moisture': 		ytext = LABELS[170][$.jStorage.get("lang")];
-									break;
-	}
-
-	if (product == 0)		return;	// without a product there are no charts
-
-	plotChart({
-		element: chart,								// element for the chart
-		type: "raw",									// raw, average, deviation, variance, cpk
-		field: fields,									// field list
-		table: "inspection",							// the data table
-		start: start,									// start of period
-		end: end,										// end of period
-		product: product,								// the product that we need the specs from			
-		label: ytext,									// label to use for the legend
-		color: "blue",								 	// color to use for the data
-		trend: false,									// show trendline
-		trans: '0.3',									// transparency for bars
-		ylabel: ytext,									// label on the y-axis
-		space: 40,										// add extra space for the tilted labels at the bottom
-		curved: true,									// use curved lines
-		spec: specs,									// spec list
-		ticks: 10,										// number of time-marks on xaxis
-		samples: 500									// maximum data size (to speed up plotting)
-	});
-}
-
-
-// call to draw a distribution chart
-function drawBell(options) {
-	$.ajax({
-   	type: "POST",
-   	async: false,
-    	url: "server/bell_chart.php",
-	  	contentType: "application/x-www-form-urlencoded",
-   	data: options,
-		success: function(data) {							// plot the chart
-			if (data != "") {
-				eval(data);								// plot the chart
-			} else {
-				none(options.element);
+	var idx = 0;
+	for (var i = 0; i < data.count; i++) {
+		fields.map(function (naam) {
+			var val = data[i].row[naam];
+			if (val.trim() != "") {
+				result.push(Array(idx++, parseFloat(val), data[i].row['date'] ));
+				raw.push(val);
 			}
-			// set the image to the container size
-			var width = $(options.element).innerWidth();
-			var height = $(options.element).innerHeight();
-			$(options.element).children().css({"width":width+"px", "height":height+"px"});
-   	}
-	});		
+		})
+	}
+	if (result.length > 5) {
+
+		tijd = setTickLabels(result, ticks);
+
+		var dataset = { 
+			data: result, 
+			label: label(soort),
+			color: 'blue', 
+			lines: {show:true},
+		};
+		
+		var options = {
+			canvas: true,
+			space: 70,		// reserved space for the date labels on the bottom
+			series: {
+				downsample: { threshold: width },
+				curvedLines: {	
+					active: true, 
+					apply:false
+				}
+			},
+			trendline: { show: true },
+			grid: {	markings: background(result, what, soort, product) },
+			xaxis: {
+				position: "bottom",
+				ticks: tijd
+			},
+			yaxis: {
+				position: "left",
+				autoscaleMargin: 0
+			}
+		};
+		
+		canvas = $.plot($(chart), [dataset], options);
+
+		$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
+		$(chart).children().css({"width":width+"px", "height":height+"px"});
+	} else {
+		none(chart);	// not enough data
+	}
+	if (chart == "#charts #graph1")		// the minichart is only drawn for the upper charts
+		miniDistChart('#charts #dist1', raw);
 }
 
-// mini distribution chart
-function miniDistChart(chart, what, soort, product, end) {
-	var specs = db[what][soort].spec;
-
-	if (product == 0)		return;	// without a product there are no charts
-	
-	var spec = getSpec(product, end);		// get the specs for the last date
-	var low = spec[db[what][soort].spec.min];
-	var high = spec[db[what][soort].spec.max];
-	var norm = (parseFloat(low)+parseFloat(high))/2;
-
-	var DATA = JSON.stringify(rawdata);
-	drawBell({
-		element: chart,								// element for the chart
-		orientation: "vertical",			// orientation of the chart								what: [DATA],									// the raw data
-		color: "grey",								// color to use for the data
-		specs: [low, norm, high],			// the field(s) or values to use as spec reference
-		samples: 1000									// maximum data size (to speed up plotting)
-	});
-
-	$(chart).children().css("-webkit-transform","rotate(90deg) scaleX(-1) translate(-50px, 41px)");
-}
 
 // large distribution chart
-function distributionChart(chart, what, soort, start, end, product) {
-	var ytext, field, eff = [];
+function distributionChart(chart, what, soort, product, data) {
 	var specs = db[what][soort].spec;
 	var fields = db[what][soort].field;
-
-	switch(soort) {
-		case 'matinmoist': 	xLbl = LABELS[612][$.jStorage.get("lang")];
-									break;
-		case 'matoutmoist': 	xLbl = LABELS[613][$.jStorage.get("lang")];
-									break;
-		case 'matouttemp': 	xLbl = LABELS[614][$.jStorage.get("lang")];
-									break;
-		case 'moisture': 		xLbl = LABELS[170][$.jStorage.get("lang")];
-									break;
-	}
-
-	if (product == 0)		return;	// without a product there are no charts
-
-	yLbl = LABELS[94][$.jStorage.get("lang")];
-	
+	var width = parseFloat($(chart).innerWidth());
+	var height = parseFloat($(chart).innerHeight());
+	var end = data[data.count-1].row['date'];
 	var spec = getSpec(product, end);		// get the specs for the last date
-	var low = spec[db[what][soort].spec.min];
-	var high = spec[db[what][soort].spec.max];
-	var norm = (parseFloat(low)+parseFloat(high))/2;
-	var _data = Array();
+	var low = parseFloat(spec[db[what][soort].spec.min]);
+	var high = parseFloat(spec[db[what][soort].spec.max]);
+	var scale = width/(high-low);		// hoeveel de waarden moeten worden aangepast om in de sample-ruimte te passen
+	var spec = specLimits(low, high);
+	var min35 = Math.round(spec.min35*scale);
+	var min20 = Math.round(spec.min20*scale);
+	var norm  = Math.round(spec.norm*scale);
+	var max20 = Math.round(spec.max20*scale);
+	var max35 = Math.round(spec.max35*scale);
+	var ll = low-(low/(100/2));		// the limits for values that are too much out of bounds
+	var ul = high+(high/(100/2));
+	var distribution = {};		// the individual bars
 
-	var sql = sprintf("SELECT * FROM gwc_pline.inspection WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
-							start, end, product);
-
-	$.getJSON('server/get_range.php', {	// get the data 
-		query: sql
-	},	function(data) {
-			
-		for (i = 0; i < data.count; i++) {
+	if (data.count > 3) {
+		// create the distribution
+		for (var i = 0; i < data.count; i++) {
 			fields.map(function (naam) {
-				_data.push([i, parseFloat(data[i].row[naam])]);
+				var value = parseFloat(data[i].row[naam]);
+				var index = (typeof value !== 'undefined') ? ($.isNumeric(value) ? Math.round(value*scale) : 0) : 0;
+				if (typeof distribution[index] !== 'undefined')
+					distribution[index]++;
+				else
+					distribution[index] = 0;
 			})
 		}
 
-		var DATA = JSON.stringify(_data);
-		drawBell({
-			element: chart,								// element for the chart
-			orientation: "horizontal",		// orientation of the chart									what: [DATA],									// which fields to use for the data
-			label: [xLbl],									// labels to use for the legend
-			color: "grey",									// color to use for the data
-			trans: '0.3',									// transparency for bars
-			ylabel: yLbl,									// label for each serie on the y-axis
-			space: 15,										// add extra space for the tilted labels at the bottom
-			resample: 1,									// used for dist charts (makes the bars wider)
-			specs: [low, norm, high],					// the field(s) or values to use as spec reference
-			period: [],										// time or record range
-			ticks: 5,										// number of time-marks on xaxis
-			grid: [1,1],									// which grid to show [x,y]	
-			show: [-2],										// what to show on xaxis (date=0, time=1, number=-1, raw=-2)
-			samples: 1000									// maximum data size (to speed up plotting)
+		// sort the distribution on key
+		Object.keys(distribution).sort().forEach(function(key) {	
+			var value = distribution[key];
+			delete distribution[key];
+			distribution[key] = value;
 		});
-		//alert();
+
+		// calculate the best bar width and populate the dataset  
+		var barwidth = 10000;
+		var old = 0;
+		var result = [];
+		$.each(distribution, function(key, value) {
+			result.push(Array(key, value));
+			barwidth = Math.min(barwidth, Math.max(0, key-old));
+			old = key;
+		});
+		
+		var dataset = { 
+			data: result, 
+			color: 'grey', 
+			bars: {show:true, lineWidth: 1} 
+		};
+	
+		var options = {
+			canvas: true,
+			space: 50,		// reserved space for the ticks on the bottom
+			series: {
+				downsample: { threshold: width }
+			},
+			grid: {
+				markings: [
+					{ xaxis: { from:-100000,to:min35 },	color: '#FFAD99' },
+					{ xaxis: { from:min35,	to:min20 },	color: '#FFD2AA' },
+					{ xaxis: { from:min20,	to:max20 },	color: '#AAFFAA' },
+					{ xaxis: { from:max20,	to:max35 },	color: '#FFD2AA' },
+					{ xaxis: { from:max35,	to:100000 },color: '#FFAD99' }
+				]
+			},
+			bars: {	barWidth: barwidth },
+			xaxis: {
+				position: "bottom",
+				axisLabelPadding: 10,
+				ticks: 10,
+				tickDecimals: 1,
+				tickFormatter: function (val, axis) {return (val/scale).toFixed(axis.tickDecimals)},
+				min: ll*scale,
+				max: ul*scale
+			},
+			yaxis: {
+				position: "left",
+				axisLabelPadding: 3
+			}
+		};
+	
+		canvas = $.plot($(chart), [dataset], options);
+
+		$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
+		$(chart).children().css({"width":width+"px", "height":height+"px"});
+	} else {
+		none(chart);	// not enough data
+	}		
+}
+
+
+// mini distribution chart
+// uses the raw data from other charts 
+function miniDistChart(chart, rawdata) {
+	var width = $(chart).innerWidth();
+	var height = $(chart).innerHeight();
+	var lower = Array.min(rawdata); 							// find the lowest and highest value
+	var upper = Array.max(rawdata); 
+	var scale = height/(upper-lower);
+	var canvas, index;
+
+	var distribution = {};		// the individual bars
+	$.each(rawdata, function (key, value) {
+		index = (typeof value !== 'undefined') ? ($.isNumeric(value) ? Math.round(value*scale) : 0) : 0;
+		if (typeof distribution[index] !== 'undefined')
+			distribution[index]++;
+		else
+			distribution[index] = 0;
 	});
 
+	Object.keys(distribution).sort().forEach(function(key) {	// sort the distribution (on keys)
+		var value = distribution[key];
+		delete distribution[key];
+		distribution[key] = value;
+	});
+
+	var barwidth = 10000.0; // set at an imaginary large value
+	var old = 0.0;
+	var result = [];
+	$.each(distribution, function(key, value) {
+		result.push(Array(value, key));
+		barwidth = Math.min(barwidth, Math.max(0, parseFloat(key)-old));
+		old = key;
+	});
+
+	var dataset = { 
+			data: result, 
+			color: 'grey', 
+			lines: {show:false}, 
+			bars: {show:true, lineWidth: 1, horizontal: true} 
+		};
+
+	var options = {
+				canvas: true,
+				series: {
+					downsample: { threshold: height }
+				},
+				bars: {	barWidth: barwidth },
+				xaxis: { show: false },
+				yaxis: {
+					autoscaleMargin: 0,
+					show: false
+				},
+				grid: false
+			};
+
+	canvas = $.plot($(chart), [dataset], options);
+	
+	$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
+	$(chart).children().css({"width":width+"px", 
+													"height":height+"px",
+													"-webkit-transform":"translate(0px, 6px)"
+													});
 }
+

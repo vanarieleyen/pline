@@ -1,29 +1,13 @@
-/*
-functies om de labels te setten
-functies om de inputvelden van data uit de database te voorzien
-*/
 
-$.ajaxSetup({ scriptCharset: "utf-8" , contentType: "Content-Type: text/html; charset=utf-8"});
-$.ajaxSetup({async:false});
+$(document).ajaxStop(function(){
+  $( "#spinner" ).remove();	// remove the spinner
+});
 
-
-var specmin, specmax;		// fieldnames of min and max
-
-// walk through the (dbs) field tree and fill the array (t) with the fieldnames
-function getFields(obj) {
-	var result = [];
-	zoek (obj, result);
-	return result;
-
-	function zoek(obj, t) {
-		$.each(obj, function (i, k) {
-			if (typeof obj[i] == "object" && obj[i] !== null)
-				zoek(k, t);
-			else
-				t.push(k);
-		})
-	}
-}
+$.ajaxSetup({
+	async:false, 
+	scriptCharset: "utf-8" , 
+	contentType: "Content-Type: text/html; charset=utf-8"
+});
 
 // spinner options
 var spin_opts = {	// options for the spinner symbol
@@ -45,15 +29,58 @@ var spin_opts = {	// options for the spinner symbol
 };
 
 function spin() {
-  	$("<div'>&nbsp;</div>")							// create waiting div
-		.attr("id", "waiting")
-		.css("position", "fixed")
-		.css("left", "50%")
-		.css("top", "50%")
-		.css("z-index", "100000")
-		.appendTo('body');
-	var wait = $('#waiting').get(0);
-	var busy = new Spinner(spin_opts).spin(wait);	// show busy spinner
+	if ($('#spinner').length == 0) {
+	  $("<div'>&nbsp;</div>")							// create waiting div
+			.attr("id", "spinner")
+			.css("position", "fixed")
+			.css("left", "50%")
+			.css("top", "50%")
+			.css("z-index", "100000")
+			.appendTo('body');
+		var spinner = $('#spinner').get(0);
+		var busy = new Spinner(spin_opts).spin(spinner);	// show busy spinner
+	}
+}
+
+// returns a simple checksum of a string
+function crc(str) {
+	var i, kar, hash = 0;
+	for (i = 0; i < str.length; i++) {
+		kar = str.charCodeAt(i);
+		hash = kar + (hash << 6) + (hash << 16) - hash;
+	}
+	return hash;
+}
+
+function isEmpty(str) {
+	return (!str || 0 === str.length);
+}
+
+// functions to return the min and max of an array
+Array.max = function( array ){
+	return Math.max.apply( Math, array );
+};
+
+Array.min = function( array ){
+	return Math.min.apply( Math, array );
+};
+
+var specmin, specmax;		// fieldnames of min and max
+
+// walk through the (dbs) field tree and fill the array (t) with the fieldnames
+function getFields(obj) {
+	var result = [];
+	zoek (obj, result);
+	return result;
+
+	function zoek(obj, t) {
+		$.each(obj, function (i, k) {
+			if (typeof obj[i] == "object" && obj[i] !== null)
+				zoek(k, t);
+			else
+				t.push(k);
+		})
+	}
 }
 
 // change the :contains-selector to match on whole words
@@ -938,15 +965,36 @@ function show_evaluation() {
 							spin();
 							window.setTimeout(function() {
 								createSheet();
-								$( "#waiting" ).remove();	// remove the spinner
+								$( "#spinner" ).remove();	// remove the spinner
 							}, 100);
-						}
+						} else {	// charts tab: get the selected data
+							var start = 	$('#evaluate [name=start]').val();
+							var end = 		$('#evaluate [name=end]').val();
+							var product = $('#evaluate [name=product] option:selected').val();
+							var sql = sprintf("SELECT * FROM gwc_pline.inspection \
+													WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
+													start, end, product);
 						
+							$.ajax({
+						   	type: "GET",
+						    url: "server/get_range.php",
+							  contentType: "application/x-www-form-urlencoded",
+							  async: true,
+						   	data: {query: sql},
+						   	dataType: 'json',
+						   	beforeSend: spin,	// start the spinner
+								success: function(data) {
+									$.jStorage.set("pline_rawdata", data);
+									draw_chart("1");
+									draw_chart("2");									
+								}
+							});
+						}	
 					});
 			  }
 			});
 		})
-	}, 100);
+	}, 1000);
 }
 
 

@@ -4,7 +4,7 @@ var charts_content = {
 		m("table", {style:"width:100%"}, [
 			m("tr", {style:"height:300px"}, [
 				m("td", {valign:"top"},
-					m("table", {style:"background-color:rgba(0,255,255,0.1)"}, [
+					m("table.chart1", {style:"background-color:rgba(0,255,255,0.1)"}, [
 						m("tr", m("td", {colspan:"2"} )),
 						m("tr", [
 							m("td.CHARTS"),
@@ -23,13 +23,13 @@ var charts_content = {
 				m("td", {width:"100%"}, 
 					m("span.flex-row", {style:"-webkit-justify-content:flex-start !important"}, [
 							m("#graph1", {style:"width:870px; height:300px"}),
-							m("#dist1", {style:"width:230px; height:150px"})
+							m("#dist1", {style:"width:140px; height:200px"})
 					])
 				)
 			]),
 			m("tr", {style:"height:300px"}, [
 				m("td", {valign:"top"},
-					m("table", {style:"background-color:rgba(0,255,255,0.1)"}, [
+					m("table.chart2", {style:"background-color:rgba(0,255,255,0.1)"}, [
 						m("tr", m("td", {colspan:"2"} )),
 						m("tr", [
 							m("td.CHARTS"),
@@ -66,15 +66,6 @@ var charts_content = {
 			function(data) {$('#charts #type1').append(data);	});
 		$.get('server/get_types.php?lang='+$.jStorage.get("lang")+'&name=type2', 
 			function(data) {$('#charts #type2').append(data);	});
-		$('#charts #type2 [Value=Raw]').prop('checked', 'checked');
-		
-		function generate_charts() {
-			spin();
-			window.setTimeout(function(){
-				draw_chart();
-				$( "#waiting" ).remove();	// remove the spinner
-			}, 100); 
-		}
 		
 		$('#charts #group1').on('change', function () {
 			$.get('server/get_choice.php?lang='+$.jStorage.get("lang")+"&group="+$(this).val(), 
@@ -87,18 +78,22 @@ var charts_content = {
 		});
 		
 		$('#charts #type1').on('change', function () {
-			generate_charts()
+			var chart = $(this).attr("id").slice(-1);
+			draw_chart(chart);
 		});
 		
 		$('#charts #type2').on('change', function () {
-			generate_charts()
+			var chart = $(this).attr("id").slice(-1);
+			draw_chart(chart);
 		});
 		
 		$('#charts select').on('change', function () {
-			generate_charts()
+			var chart = $(this).attr("id").slice(-1);
+			draw_chart(chart);
 		});		
 		
-		generate_charts();
+		draw_chart("1");
+		draw_chart("2");
 
 	},
 	view: function () {

@@ -156,8 +156,30 @@ var evaluate_content = {
 					spin();
 					window.setTimeout(function() {
 						createSheet();
-						$( "#waiting" ).remove();	// remove the spinner
+						$( "#spinner" ).remove();	// remove the spinner
 					}, 100);
+				} else {	// charts tab: get the selected data
+					var start = 	$('#evaluate [name=start]').val();
+					var end = 		$('#evaluate [name=end]').val();
+					var product = $('#evaluate [name=product] option:selected').val();
+					var sql = sprintf("SELECT * FROM gwc_pline.inspection \
+											WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
+											start, end, product);
+				
+					$.ajax({
+				   	type: "GET",
+				    url: "server/get_range.php",
+					  contentType: "application/x-www-form-urlencoded",
+					  async: true,
+				   	data: {query: sql},
+				   	dataType: 'json',
+				   	beforeSend: spin,	// start the spinner
+						success: function(data) {
+							$.jStorage.set("pline_rawdata", data);
+							draw_chart("1");
+							draw_chart("2");
+						}
+					});
 				}					
 
 			});
