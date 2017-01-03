@@ -519,16 +519,14 @@ function distributionChart(chart, what, soort, product, data) {
 		});
 
 		// calculate the best bar width and populate the dataset  
-		var barwidth = 10000.0;
-		var old = 0.0;
 		var result = [];
+		var size = 0;
 		$.each(distribution, function(key, value) {
-			key = parseFloat(key);
 			result.push(Array(key, value));
-			barwidth = Math.min(barwidth, Math.max(0, key-old));
-			old = key;
+			size++;
 		});
-		
+		barwidth = Math.ceil(parseFloat(width)/size);
+
 		var dataset = { 
 			data: result, 
 			color: 'grey', 
