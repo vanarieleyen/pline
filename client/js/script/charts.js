@@ -519,10 +519,11 @@ function distributionChart(chart, what, soort, product, data) {
 		});
 
 		// calculate the best bar width and populate the dataset  
-		var barwidth = 10000;
-		var old = 0;
+		var barwidth = 10000.0;
+		var old = 0.0;
 		var result = [];
 		$.each(distribution, function(key, value) {
+			key = parseFloat(key);
 			result.push(Array(key, value));
 			barwidth = Math.min(barwidth, Math.max(0, key-old));
 			old = key;
@@ -604,8 +605,9 @@ function miniDistChart(chart, rawdata) {
 	var old = 0.0;
 	var result = [];
 	$.each(distribution, function(key, value) {
+		key = parseFloat(key);
 		result.push(Array(value, key));
-		barwidth = Math.min(barwidth, Math.max(0, parseFloat(key)-old));
+		barwidth = Math.min(barwidth, Math.max(0, key-old));
 		old = key;
 	});
 
