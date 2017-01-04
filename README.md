@@ -1,5 +1,7 @@
 updates:
 
+import language.sql
+
 add fields to specs table:
 	1_accuracy
 	2_accuracy

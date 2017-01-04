@@ -59,6 +59,7 @@ var evaluate_content = {
 			m("ul", [
 				[
 					{label:"label.CHARTS", href:"#charts_tab"},
+					{label:"label.CONTROLCHARTS", href:"#control_tab"},
 					{label:"label.EXPORT", href:"#export_tab"}
 				].map(function (a) {
 					return m("li", 
@@ -70,6 +71,7 @@ var evaluate_content = {
 			]),
 			[			// the tabs used by ui-tabs
 				m("#charts_tab", m.component(charts_content)),
+				m("#control_tab", m.component(control_content)),
 				m("#export_tab", m.component(export_content))
 			]
 		])
