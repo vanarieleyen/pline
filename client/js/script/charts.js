@@ -518,14 +518,18 @@ function distributionChart(chart, what, soort, product, data) {
 			distribution[key] = value;
 		});
 
-		// calculate the best bar width and populate the dataset  
+		// calculate the optimal bar width and populate the dataset  
 		var result = [];
-		var size = 0;
+		var old = 0.0;
+		var smallest=1000000.0;		// smallest space between 2 bars
 		$.each(distribution, function(key, value) {
-			result.push(Array(key, value));
-			size++;
+			if (key > 0) {
+				result.push(Array(key, value));
+				smallest = Math.min(smallest, key-old);
+				old = key;
+			}
 		});
-		barwidth = Math.ceil(parseFloat(width)/size);
+		barwidth = 1/(1/smallest);
 
 		var dataset = { 
 			data: result, 
@@ -599,15 +603,17 @@ function miniDistChart(chart, rawdata) {
 		distribution[key] = value;
 	});
 
-	var barwidth = 10000.0; // set at an imaginary large value
+	var result = [];			// calculate the barwidth and set the data
 	var old = 0.0;
-	var result = [];
+	var smallest=1000000.0;
 	$.each(distribution, function(key, value) {
-		key = parseFloat(key);
-		result.push(Array(value, key));
-		barwidth = Math.min(barwidth, Math.max(0, key-old));
-		old = key;
+		if (key > 0) {
+			result.push(Array(value, key));
+			smallest = Math.min(smallest, key-old);
+			old = key;
+		}
 	});
+	barwidth = 1/(1/smallest);
 
 	var dataset = { 
 			data: result, 

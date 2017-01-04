@@ -153,11 +153,7 @@ var evaluate_content = {
 				$('#evaluate [name=disposal]').empty().append(data.disposal);		
 
 				if ($.jStorage.get("pline_evaluationtab") == 1) {			
-					spin();
-					window.setTimeout(function() {
-						createSheet();
-						$( "#spinner" ).remove();	// remove the spinner
-					}, 100);
+					createSheet();
 				} else {	// charts tab: get the selected data
 					var start = 	$('#evaluate [name=start]').val();
 					var end = 		$('#evaluate [name=end]').val();
