@@ -96,22 +96,22 @@ var control_constant = [
 ]
 
 // background colors
-function CC_background(type, CL, R) {
+function CC_background(type, CL, R, Use) {
 	var bg = [];
 	var LCL, UCL, s;
+
+	Use = Math.round(Math.max(Math.min(Use, 15),2));
 	
 	switch (type) {		// calculate control limits based on chart type
 		case "X":
-		case "I":		LCL = CL - (3* (R/control_constant[2].d2) );
-								UCL = CL + (3* (R/control_constant[2].d2) );
+		case "I":		LCL = CL - (3* (R/control_constant[Use].d2) );
+								UCL = CL + (3* (R/control_constant[Use].d2) );
 								break;
-		case "MR":	UCL = control_constant[2].D4 * R;
+		case "MR":	UCL = control_constant[Use].D4 * R;
 								LCL = -UCL;
 								break;
 	}
-	
 	s = specLimits(LCL, UCL);
-	console.log(s);
 
 	bg.push( { yaxis:{from:-100000, to:s.min35}, color:"#FFAD99" } );
 	bg.push( { yaxis:{from:s.min35, to:s.min20}, color:"#FFD2AA"} );
@@ -133,9 +133,8 @@ function xbarChart(what, soort, size, data) {
 	var tijd = [], ticks = 10; 
 	
 	var idx = 0;
-	var xTotal = 0, rTotal = 0;
 	var delta = 0;
-	var tmp = [];
+	var tmp = [], avgLen = [];
 	var len, last = 0, calc = false;;
 	for (var i = 0; i < data.count; i++) {
 		fields.map(function (naam) {
@@ -191,14 +190,13 @@ function xbarChart(what, soort, size, data) {
 						if (val > 0) {
 							xResult.push(Array(idx, val, data[i].row['date'] ));
 							xRaw.push(val);
-							xTotal += val;
 							if (rRaw.length == 0) 
 								delta = val;
 							delta = Math.abs(val-delta);
 							rResult.push(Array(idx++, delta, data[i].row['date'] ));
 							rRaw.push(delta);
 							delta = val;
-							rTotal += delta;
+							avgLen.push(len);
 						}
 						tmp = [];
 						calc = false;
@@ -209,6 +207,7 @@ function xbarChart(what, soort, size, data) {
 	}
 	var xMean = jStat.mean(xRaw);
 	var rMean = jStat.mean(rRaw);
+	var Use = jStat.mean(avgLen);		// the control limits to use
 	console.log(rMean);
 	
 	if (xResult.length > 2) {
@@ -234,7 +233,7 @@ function xbarChart(what, soort, size, data) {
 				}
 			},
 			trendline: { show: true },
-			grid: {	markings: CC_background("X", xMean, rMean) },
+			grid: {	markings: CC_background("X", xMean, rMean, Use) },
 			xaxis: {
 				position: "bottom",
 				ticks: tijd
@@ -269,7 +268,7 @@ function xbarChart(what, soort, size, data) {
 				}
 			},
 			trendline: { show: true },
-			grid: {	markings: CC_background("MR", rMean, rMean) },
+			grid: {	markings: CC_background("MR", rMean, rMean, Use) },
 			xaxis: {
 				position: "bottom",
 				ticks: tijd
@@ -306,7 +305,6 @@ function imrChart(what, soort, data) {
 	var tijd = [], ticks = 10; 
 
 	var idx = 0;
-	var iTotal = 0, rTotal = 0;
 	var delta = 0;
 	for (var i = 0; i < data.count; i++) {
 		fields.map(function (naam) {
@@ -322,8 +320,6 @@ function imrChart(what, soort, data) {
 					rResult.push(Array(idx++, delta, data[i].row['date'] ));
 					rRaw.push(delta);
 					delta = value;
-					iTotal += value;
-					rTotal += delta;
 				}
 			}
 		})
@@ -355,7 +351,7 @@ function imrChart(what, soort, data) {
 				}
 			},
 			trendline: { show: true },
-			grid: {	markings: CC_background("I", iMean, rMean) },
+			grid: {	markings: CC_background("I", iMean, rMean, 2) },
 			xaxis: {
 				position: "bottom",
 				ticks: tijd
@@ -390,7 +386,7 @@ function imrChart(what, soort, data) {
 				}
 			},
 			trendline: { show: true },
-			grid: {	markings: CC_background("MR", rMean, rMean) },
+			grid: {	markings: CC_background("MR", rMean, rMean, 2) },
 			xaxis: {
 				position: "bottom",
 				ticks: tijd
