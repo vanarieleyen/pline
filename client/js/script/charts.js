@@ -41,8 +41,6 @@ function draw_chart(keus) {
 		case 'Dist':			if (keus=="1") $('#charts #dist1').empty();	// empty mini distribution chart
 											distributionChart('#charts #graph'+keus, group, choice, product, data);
 								break;
-		case 'Control':		controlChart('#charts #graph'+keus, group, choice, product, data);
-								break;
 	}
 }
 
@@ -96,81 +94,6 @@ function background(result, what, soort, product) {
 		}
 	});
 	return bg;
-}
-
-// control chart
-function controlChart(chart, what, soort, product, data) {
-	var specs = db[what][soort].spec;
-	var fields = db[what][soort].field;
-	var width = parseFloat($(chart).innerWidth());
-	var height = parseFloat($(chart).innerHeight());
-	var result = [], tijd = [], raw = [];
-	var length, ticks = 10; 
-
-	var tmp = [];
-	var sample_size = Math.round(Math.min(data.count, width) / 50);
-	var idx = 0;
-	for (var i = 0; i < data.count; i++) {
-		fields.map(function (naam) {
-			var value = data[i].row[naam];
-			if (!isEmpty(value)) {
-				if ($.isNumeric(value)) {
-					length = tmp.push(parseFloat(value));
-					if (length > sample_size) {
-						var val = jStat.mean(tmp);
-						if (val > 0) {
-							result.push(Array(idx++, val, data[i].row['date'] ));
-							raw.push(val);
-							tmp = [];
-						}
-					}
-				}
-			}
-		})
-	}
-	
-	if (result.length > 5) {
-		
-		tijd = setTickLabels(result, ticks);
-
-		var dataset = { 
-			data: result, 
-			label: label(soort),
-			color: 'blue', 
-			lines: {show:true},
-		};
-		
-		var options = {
-			canvas: true,
-			space: 70,		// reserved space for the date labels on the bottom
-			series: {
-				downsample: { threshold: width },
-				curvedLines: {	
-					active: true, 
-					apply:true
-				}
-			},
-			trendline: { show: true },
-			grid: {	markings: background(result, what, soort, product) },
-			xaxis: {
-				position: "bottom",
-				ticks: tijd
-			},
-			yaxis: {
-				position: "left",
-				autoscaleMargin: 0
-			}
-		};
-		
-		canvas = $.plot($(chart), [dataset], options);
-
-		$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
-		$(chart).children().css({"width":width+"px", "height":height+"px"});
-	} else {
-		none(chart);	// not enough data
-	}
-	if (chart == "#charts #graph1")		// the minichart is only drawn for the upper charts
-		miniDistChart('#charts #dist1', raw);
 }
 
 

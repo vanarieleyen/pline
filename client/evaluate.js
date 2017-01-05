@@ -117,8 +117,11 @@ var evaluate_content = {
 					case "charts_tab":			
 						$.jStorage.set("pline_evaluationtab", 0);
 						break;
-					case "export_tab": 	
+					case "control_tab": 	
 						$.jStorage.set("pline_evaluationtab", 1);
+						break;
+					case "export_tab": 	
+						$.jStorage.set("pline_evaluationtab", 2);
 						break;
 				}
 			},
@@ -138,7 +141,7 @@ var evaluate_content = {
 			var prodStat = $("#evaluate [name=prodStat]").val();
 			var result = $("#evaluate [name=result]").val();
 			var disposal = $("#evaluate [name=disposal]").val();
-			
+
 			// fill the selectbox options
 			$.getJSON('server/get_evalselect.php', {
 				start: start_date,
@@ -154,7 +157,7 @@ var evaluate_content = {
 				$('#evaluate [name=result]').empty().append(data.result);
 				$('#evaluate [name=disposal]').empty().append(data.disposal);		
 
-				if ($.jStorage.get("pline_evaluationtab") == 1) {			
+				if ($.jStorage.get("pline_evaluationtab") == 2) {			// export tab		
 					createSheet();
 				} else {	// charts tab: get the selected data
 					var start = 	$('#evaluate [name=start]').val();
@@ -163,7 +166,7 @@ var evaluate_content = {
 					var sql = sprintf("SELECT * FROM gwc_pline.inspection \
 											WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
 											start, end, product);
-				
+				console.log(sql);
 					$.ajax({
 				   	type: "GET",
 				    url: "server/get_range.php",
@@ -174,8 +177,11 @@ var evaluate_content = {
 				   	beforeSend: spin,	// start the spinner
 						success: function(data) {
 							$.jStorage.set("pline_rawdata", data);
-							draw_chart("1");
-							draw_chart("2");
+							if (data.count > 0) {
+								draw_chart("1");
+								draw_chart("2");
+								draw_controlchart();
+							}
 						}
 					});
 				}					

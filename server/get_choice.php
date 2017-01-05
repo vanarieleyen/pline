@@ -6,7 +6,7 @@ require_once 'language.php';
 
 extract($_GET);
 
-echo $group;
+//echo $group;
 switch ($group) {
 	case "regain1":
 	case "regain2":
