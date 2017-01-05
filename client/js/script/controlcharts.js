@@ -152,14 +152,16 @@ function xbarChart(what, soort, size, data) {
 							}
 							break;
 						case "HOUR":		// each hour
-							if (last != data[i].row[date]) {	// todo: hour filteren
-								last = data[i].row[date];
+							var hour = data[i].row['date'].substr(11,2);
+							if (last != hour) {	
+								last = hour;
 								calc = true;
 							}
 							break;
 						case "DAY":		// each day
-							if (last != data[i].row[date]) {	// todo: day filteren
-								last = data[i].row[date];
+							var day = data[i].row['date'].substr(8,2);
+							if (last != day) {	
+								last = day;
 								calc = true;
 							}
 							break;
@@ -175,6 +177,11 @@ function xbarChart(what, soort, size, data) {
 							break;
 						case "10":		// every 10 measurements
 							if (len > 10) {	
+								calc = true;
+							}
+							break;
+						case "20":		// every 20 measurements
+							if (len > 20) {	
 								calc = true;
 							}
 							break;
