@@ -135,8 +135,8 @@ var evaluate_content = {
 		$('#evaluate [name=end]').val(nu.format("yyyy-MM-dd") );
 
 		$("#evaluate select").change(function () {
-			var start_date = $("#evaluate [name=start]").val();
-			var end_date = $("#evaluate [name=end]").val();
+			var start = 	$('#evaluate [name=start]').val();
+			var end = 		$('#evaluate [name=end]').val();
 			var product = $("#evaluate [name=product]").val();
 			var prodStat = $("#evaluate [name=prodStat]").val();
 			var result = $("#evaluate [name=result]").val();
@@ -144,8 +144,8 @@ var evaluate_content = {
 
 			// fill the selectbox options
 			$.getJSON('server/get_evalselect.php', {
-				start: start_date,
-				end: end_date,
+				start: start,
+				end: end,
 				product: product,
 				prodStat: prodStat,
 				result: result,
@@ -160,12 +160,12 @@ var evaluate_content = {
 				if ($.jStorage.get("pline_evaluationtab") == 2) {			// export tab		
 					createSheet();
 				} else {	// charts tab: get the selected data
-					var start = 	$('#evaluate [name=start]').val();
-					var end = 		$('#evaluate [name=end]').val();
-					var product = $('#evaluate [name=product] option:selected').val();
+					var pSelect = (prodStat > 0) ? " AND prodStat="+prodStat : "";
+					var rSelect = (result > 0) ? " AND result="+result : "";
+					var dSelect = (disposal > 0) ? " AND disposal="+disposal : "";
 					var sql = sprintf("SELECT * FROM gwc_pline.inspection \
-											WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
-											start, end, product);
+											WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' %s %s %s ORDER BY date",
+											start, end, product, pSelect, rSelect, dSelect);
 
 					$.ajax({
 				   	type: "GET",

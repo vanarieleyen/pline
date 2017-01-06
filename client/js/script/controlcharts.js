@@ -89,7 +89,6 @@ function draw_controlchart() {
 			{n:14, d2:3.407, D3:0.328, D4:1.672},
 			{n:15, d2:3.472, D3:0.347, D4:1.653}	
 		]
-	
 		limit = Math.round(Math.max(Math.min(limit, 15),2));
 
 		switch (type) {		// calculate control limits based on chart type
@@ -186,10 +185,12 @@ function draw_controlchart() {
 				var value = data[i].row[naam];
 				if (!isEmpty(value)) {
 					if ($.isNumeric(value)) {
-						len = tmp.push(null);
-						if (Enough(data, i, len)) {
-							avgLen.push(len);
-							tmp = [];
+						if (value > 0) {
+							len = tmp.push(null);
+							if (Enough(data, i, len)) {
+								avgLen.push(len);
+								tmp = [];
+							}
 						}
 					}
 				}
@@ -207,12 +208,12 @@ function draw_controlchart() {
 				if (!isEmpty(value)) {
 					if ($.isNumeric(value)) {
 						value = parseFloat(value);
-						len = tmp.push(value);
-						if (Enough(data, i, len)) {
-							var mean = jStat.mean(tmp);
-							var dev = jStat.stdev(tmp);
-							var val = (limit > 10) ? dev : mean;
-							if (val > 0) {
+						if (value > 0) {
+							len = tmp.push(value);
+							if (Enough(data, i, len)) {
+								var mean = jStat.mean(tmp);
+								var dev = jStat.stdev(tmp);
+								var val = (limit > 10) ? dev : mean;
 								xResult.push(Array(idx, mean, data[i].row['date'] ));
 								xRaw.push(mean);
 								if (rRaw.length == 0) delta = val;
@@ -220,8 +221,8 @@ function draw_controlchart() {
 								rResult.push(Array(idx++, delta, data[i].row['date'] ));
 								rRaw.push(delta);
 								delta = val;
+								tmp = [];
 							}
-							tmp = [];
 						}
 					}
 				}
@@ -331,14 +332,16 @@ function draw_controlchart() {
 				var value = data[i].row[naam];
 				if (!isEmpty(value)) {
 					if ($.isNumeric(value)) {
-						value = parseFloat(value);
-						iResult.push(Array(idx, value, data[i].row['date'] ));
-						iRaw.push(value);
-						if (rRaw.length == 0) delta = value;
-						delta = Math.abs(value-delta);
-						rResult.push(Array(idx++, delta, data[i].row['date'] ));
-						rRaw.push(delta);
-						delta = value;
+						if (value > 0) {
+							value = parseFloat(value);
+							iResult.push(Array(idx, value, data[i].row['date'] ));
+							iRaw.push(value);
+							if (rRaw.length == 0) delta = value;
+							delta = Math.abs(value-delta);
+							rResult.push(Array(idx++, delta, data[i].row['date'] ));
+							rRaw.push(delta);
+							delta = value;
+						}
 					}
 				}
 			})
