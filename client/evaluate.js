@@ -166,7 +166,7 @@ var evaluate_content = {
 					var sql = sprintf("SELECT * FROM gwc_pline.inspection \
 											WHERE (DATE(date) BETWEEN '%s' AND '%s') AND product='%s' ORDER BY date",
 											start, end, product);
-				console.log(sql);
+
 					$.ajax({
 				   	type: "GET",
 				    url: "server/get_range.php",

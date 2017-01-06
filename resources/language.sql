@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 04, 2017 at 03:17 PM
+-- Generation Time: Jan 06, 2017 at 10:36 AM
 -- Server version: 5.5.52-MariaDB-1ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.20
 
@@ -761,7 +761,8 @@ INSERT INTO `language` (`index`, `chinese`, `english`) VALUES
 (723, '水分合格次数', 'Amount moisture within limit'),
 (724, '水标±0.5%次数', 'Amount moisture ±0.5% specs'),
 (725, '分析与考核', 'Evaluation'),
-(726, '管制圖', 'Control Charts');
+(726, '管制圖', 'Control Charts'),
+(727, '样本大小', 'Samples');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

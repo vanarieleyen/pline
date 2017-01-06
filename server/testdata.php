@@ -79,10 +79,10 @@ function generate($specmin, $specmax, $date) {
 	$database->query($sql);
 	$spec = $database->single();
 	
-	$ll = 100*$spec[$specmin];
+	$ll = 100*$spec[$specmin];					// exact spec
 	$ul = 100*$spec[$specmax];
-	$ll = $ll-($ll/100*rand(1, 10));
-	$ul = $ul+($ul/100*rand(1, 10));
+	$ll = $ll-($ll/100*rand(1, 13));		// expand the spec to generate more realistic data
+	$ul = $ul+($ul/100*rand(1, 13));
 	
 	return purebell($ll, $ul, 3)/100;
 }
