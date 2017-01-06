@@ -116,17 +116,17 @@ function draw_controlchart() {
 	function getEnough() {
 		switch (size) {		
 			case "MEAS":
-				return function (naam, row, len) {
-					if (this.last != naam) {
-						this.last = naam;
+				return function (data, i, len) {
+					if (this.last != i) {
+						this.last = i;
 						return true;
 					}
 					return false;
 				}
 				break;
 			case "HOUR":
-				return function (naam, row, len) {
-					var hour = row['date'].substr(11,2);
+				return function (data, i, len) {
+					var hour = data[i].row['date'].substr(11,2);
 					if (this.last != hour) {
 						this.last = hour;
 						return true;
@@ -135,8 +135,8 @@ function draw_controlchart() {
 				}
 				break;
 			case "DAY":
-				return function (naam, row, len) {
-					var day = row['date'].substr(8,2);
+				return function (data, i, len) {
+					var day = data[i].row['date'].substr(8,2);
 					if (this.last != day) {
 						this.last = day;
 						return true;
@@ -145,22 +145,22 @@ function draw_controlchart() {
 				}
 				break;
 			case "2":
-				return function (naam, row, len) {
+				return function (data, i, len) {
 					return (len > 2);
 				}
 				break;
 			case "5":
-				return function (naam, row, len) {
+				return function (data, i, len) {
 					return (len > 5);
 				}
 				break;
 			case "10":
-				return function (naam, row, len) {
+				return function (data, i, len) {
 					return (len > 10);
 				}
 				break;
 			case "20":
-				return function (naam, row, len) {
+				return function (data, i, len) {
 					return (len > 20);
 				}
 				break;
@@ -187,7 +187,7 @@ function draw_controlchart() {
 				if (!isEmpty(value)) {
 					if ($.isNumeric(value)) {
 						len = tmp.push(null);
-						if (Enough(naam, data[i].row, len)) {
+						if (Enough(data, i, len)) {
 							avgLen.push(len);
 							tmp = [];
 						}
@@ -208,13 +208,15 @@ function draw_controlchart() {
 					if ($.isNumeric(value)) {
 						value = parseFloat(value);
 						len = tmp.push(value);
-						if (Enough(naam, data[i].row, len)) {
-							var val = (limit > 10) ? jStat.stdev(tmp) : jStat.mean(tmp);
+						if (Enough(data, i, len)) {
+							var mean = jStat.mean(tmp);
+							var dev = jStat.stdev(tmp);
+							var val = (limit > 10) ? dev : mean;
 							if (val > 0) {
-								xResult.push(Array(idx, val, data[i].row['date'] ));
-								xRaw.push(val);
+								xResult.push(Array(idx, mean, data[i].row['date'] ));
+								xRaw.push(mean);
 								if (rRaw.length == 0) delta = val;
-								delta = Math.abs(val-delta);
+								delta = (limit > 10) ? dev : Math.abs(val-delta);
 								rResult.push(Array(idx++, delta, data[i].row['date'] ));
 								rRaw.push(delta);
 								delta = val;
