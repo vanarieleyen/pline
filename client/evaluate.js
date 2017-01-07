@@ -111,7 +111,6 @@ var evaluate_content = {
 		$( "#evaltabs" ).tabs({
 			active: initialtab,
 			activate: function( event, ui ) {
-				show_evaluation();
 				keus = ui.newPanel[0].id;
 				switch (keus) {
 					case "charts_tab":			
