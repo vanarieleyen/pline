@@ -14,9 +14,13 @@ $database->execute();
 $database->query("SET lc_time_names = 'zh_CN'");
 $database->execute();
 
+
 switch ($table) {
 	case "gwc_pline.specs":
 		$query = sprintf("INSERT INTO %s (start) VALUES(NOW())", $table);
+		$database->query($query);	
+		$database->execute();
+		$id = $database->lastInsertId();
 		break;
 	case "gwc_pline.inspection":
 		$database->query("INSERT INTO gwc_pline.inspection (date) VALUES(NOW())");		// create new inspection record
@@ -32,15 +36,15 @@ switch ($table) {
 		$database->bind(":ID", $id);
 		$database->bind(":PENID", $penalties_id);
 		$database->execute();
+
 		break;
 	default:
 		$query = sprintf("INSERT INTO %s (date) VALUES(NOW())", $table);
+		$database->query($query);	
+		$database->execute();
+		$id = $database->lastInsertId();
 		break;
 }
-
-$database->query($query);	
-$database->execute();
-$id = $database->lastInsertId();
 
 $database->endTransaction();
 
