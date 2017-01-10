@@ -171,8 +171,8 @@ function draw_controlchart() {
 		var fields = db[what][soort].field;
 		var xChart = "#control #graph1";
 		var rChart = "#control #graph2";
-		var width = parseFloat($(xChart).innerWidth());
-		var height = parseFloat($(xChart).innerHeight());
+		var width = Math.round(parseFloat($(xChart).innerWidth()));
+		var height = Math.round(parseFloat($(xChart).innerHeight()));
 		var xResult = [], xRaw = [], rResult = [], rRaw = [];
 		var tijd = [], ticks = 10; 
 		var Enough = getEnough();	// get the function to check the samplesize
@@ -247,7 +247,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					//downsample: { threshold: width },
+					downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true
@@ -282,7 +282,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					// downsample: { threshold: width },
+					downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true
@@ -320,8 +320,8 @@ function draw_controlchart() {
 		var fields = db[what][soort].field;
 		var iChart = "#control #graph1";
 		var rChart = "#control #graph2";
-		var width = parseFloat($(iChart).innerWidth());
-		var height = parseFloat($(iChart).innerHeight());
+		var width = Math.round(parseFloat($(iChart).innerWidth()));
+		var height = Math.round(parseFloat($(iChart).innerHeight()));
 		var iResult = [], iRaw = [], rResult = [], rRaw = [];
 		var tijd = [], ticks = 10; 
 	
@@ -365,7 +365,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					// downsample: { threshold: width },
+					downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true
@@ -400,7 +400,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					// downsample: { threshold: width },
+					downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true

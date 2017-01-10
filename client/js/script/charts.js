@@ -102,8 +102,8 @@ function draw_chart(keus) {
 	function cpkChart(chart, what, soort, product, data) {
 		var specs = db[what][soort].spec;
 		var fields = db[what][soort].field;
-		var width = parseFloat($(chart).innerWidth());
-		var height = parseFloat($(chart).innerHeight());
+		var width = Math.round(parseFloat($(chart).innerWidth()));
+		var height = Math.round(parseFloat($(chart).innerHeight()));
 		var result = [], tijd = [], raw = [];
 		var length, ticks = 10; 
 	
@@ -182,8 +182,8 @@ function draw_chart(keus) {
 	function variationChart(chart, what, soort, product, data) {
 		var specs = db[what][soort].spec;
 		var fields = db[what][soort].field;
-		var width = parseFloat($(chart).innerWidth());
-		var height = parseFloat($(chart).innerHeight());
+		var width = Math.round(parseFloat($(chart).innerWidth()));
+		var height = Math.round(parseFloat($(chart).innerHeight()));
 		var result = [], tijd = [], raw = [];
 		var length, ticks = 10; 
 	
@@ -263,8 +263,8 @@ function draw_chart(keus) {
 	function deviationChart(chart, what, soort, product, data) {
 		var specs = db[what][soort].spec;
 		var fields = db[what][soort].field;
-		var width = parseFloat($(chart).innerWidth());
-		var height = parseFloat($(chart).innerHeight());
+		var width = Math.round(parseFloat($(chart).innerWidth()));
+		var height = Math.round(parseFloat($(chart).innerHeight()));
 		var result = [], tijd = [], raw = [];
 		var length, ticks = 10; 
 	
@@ -344,8 +344,8 @@ function draw_chart(keus) {
 	function averageChart(chart, what, soort, product, data) {
 		var specs = db[what][soort].spec;
 		var fields = db[what][soort].field;
-		var width = parseFloat($(chart).innerWidth());
-		var height = parseFloat($(chart).innerHeight());
+		var width = Math.round(parseFloat($(chart).innerWidth()));
+		var height = Math.round(parseFloat($(chart).innerHeight()));
 		var result = [], tijd = [], raw = [];
 		var length, ticks = 10; 
 	
@@ -419,8 +419,8 @@ function draw_chart(keus) {
 	function rawChart(chart, what, soort, product, data) {
 		var specs = db[what][soort].spec;
 		var fields = db[what][soort].field;
-		var width = parseFloat($(chart).innerWidth());
-		var height = parseFloat($(chart).innerHeight());
+		var width = Math.round(parseFloat($(chart).innerWidth()));
+		var height = Math.round(parseFloat($(chart).innerHeight()));
 		var result = [], tijd = [], ticks = 10;
 		var raw = [];
 	
@@ -434,7 +434,7 @@ function draw_chart(keus) {
 				}
 			})
 		}
-console.log(width);
+
 		if (result.length > 5) {
 	
 			tijd = setTickLabels(result, ticks);
@@ -450,13 +450,13 @@ console.log(width);
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					//downsample: { threshold: width },
+					downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:false
 					}
 				},
-				trendline: { show: false },
+				trendline: { show: true },
 				grid: {	markings: background(result, what, soort, product) },
 				xaxis: {
 					position: "bottom",
@@ -484,8 +484,8 @@ console.log(width);
 	function distributionChart(chart, what, soort, product, data) {
 		var specs = db[what][soort].spec;
 		var fields = db[what][soort].field;
-		var width = parseFloat($(chart).innerWidth());
-		var height = parseFloat($(chart).innerHeight());
+		var width = Math.round(parseFloat($(chart).innerWidth()));
+		var height = Math.round(parseFloat($(chart).innerHeight()));
 		var end = data[data.count-1].row['date'];
 		var spec = getSpec(product, end);		// get the specs for the last date
 		var low = parseFloat(spec[db[what][soort].spec.min]);
