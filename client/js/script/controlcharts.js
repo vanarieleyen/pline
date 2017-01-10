@@ -12,13 +12,13 @@ function draw_controlchart() {
 	$('#control #dist1').empty();	
 	$('#control #graph2').empty();
 	$('#control #dist2').empty();	
-	
+
 	if (data == null)	
 		return;
 
 	if (typeof product == 'undefined' || product==0)
 		return;
-
+//console.log(soort);
 	switch (soort) {
 		case 'IMR':		imrChart(group, choice, data);
 								break;
@@ -247,7 +247,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					downsample: { threshold: width },
+					//downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true
@@ -282,7 +282,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					downsample: { threshold: width },
+					// downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true
@@ -365,7 +365,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					downsample: { threshold: width },
+					// downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true
@@ -400,7 +400,7 @@ function draw_controlchart() {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					downsample: { threshold: width },
+					// downsample: { threshold: width },
 					curvedLines: {	
 						active: false, 
 						apply:true

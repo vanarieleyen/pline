@@ -78,6 +78,8 @@ var history_content = {
 			var options = $.jStorage.get("pline.historylist");
 			options.sort = $(this).attr("nr");
 			options.direction = (options.direction == "ASC") ? "DESC" : "ASC";
+			options.page = 0;
+			options.crc = "";
 
 			// remove sort indicator from all columns
 			$(this).parent().find("th").each(function () {

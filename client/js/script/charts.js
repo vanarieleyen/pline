@@ -434,10 +434,11 @@ function draw_chart(keus) {
 				}
 			})
 		}
+console.log(width);
 		if (result.length > 5) {
 	
 			tijd = setTickLabels(result, ticks);
-	
+
 			var dataset = { 
 				data: result, 
 				label: label(soort),
@@ -449,13 +450,13 @@ function draw_chart(keus) {
 				canvas: true,
 				space: 70,		// reserved space for the date labels on the bottom
 				series: {
-					downsample: { threshold: width },
+					//downsample: { threshold: width },
 					curvedLines: {	
-						active: true, 
+						active: false, 
 						apply:false
 					}
 				},
-				trendline: { show: true },
+				trendline: { show: false },
 				grid: {	markings: background(result, what, soort, product) },
 				xaxis: {
 					position: "bottom",
@@ -466,9 +467,9 @@ function draw_chart(keus) {
 					autoscaleMargin: 0
 				}
 			};
-			
+			//		console.log(dataset);
 			canvas = $.plot($(chart), [dataset], options);
-	
+
 			$(chart).html('<img src=\"'+canvas.getCanvas().toDataURL('image/png')+'\"/>');
 			$(chart).children().css({"width":width+"px", "height":height+"px"});
 		} else {
