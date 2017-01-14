@@ -143,6 +143,18 @@ function draw_controlchart() {
 					return false;
 				}
 				break;
+			case "WEEK":
+				return function (data, i, len) {
+					var parts = data[i].row['date'].substr(0,10).split('-');
+					var thedate = new Date(parts[2],parts[0]-1,parts[1]); 
+					var week = thedate.weekNR();
+					if (this.last != week) {
+						this.last = week;
+						return true;
+					}
+					return false;
+				}
+				break;
 			case "2":
 				return function (data, i, len) {
 					return (len > 2);
@@ -462,11 +474,9 @@ function draw_controlchart() {
 		var old = 0.0;
 		var smallest=1000000.0;
 		$.each(distribution, function(key, value) {
-			if (key > 0) {
-				result.push(Array(value, key));
-				smallest = Math.min(smallest, key-old);
-				old = key;
-			}
+			result.push(Array(value, key));
+			smallest = Math.min(smallest, key-old);
+			old = key;
 		});
 		barwidth = 1/(1/smallest);
 	

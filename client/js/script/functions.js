@@ -66,6 +66,12 @@ Array.min = function( array ){
 	return Math.min.apply( Math, array );
 };
 
+// gets week number
+Date.prototype.weekNR = function() {
+	var onejan = new Date(this.getFullYear(), 0, 1);
+	return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+
 var specmin, specmax;		// fieldnames of min and max
 
 // walk through the (dbs) field tree and fill the array (t) with the fieldnames
