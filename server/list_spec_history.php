@@ -22,6 +22,8 @@ $column = explode(", ", $fields);															// extract the column names from
 
 $query = sprintf("SELECT %s FROM gwc_pline.specs WHERE pid=(SELECT pid FROM gwc_pline.specs WHERE id=%s) ORDER BY end DESC",
 									$fields, $id);
+//echo $query;
+
 $database->query($query);
 $rows = $database->resultset();
 

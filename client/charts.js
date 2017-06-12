@@ -2,31 +2,7 @@
 var charts_content = {
 	contents: [
 		m("table", {style:"width:100%"}, [
-			m("tr", {style:"height:300px"}, [
-				m("td", {valign:"top"},
-					m("table.chart1", {style:"background-color:rgba(0,255,255,0.1)"}, [
-						m("tr", m("td", {colspan:"2"} )),
-						m("tr", [
-							m("td.CHARTS"),
-							m("td", m("select#group1", {style:"width:13em"} ))
-						]),
-						m("tr", [
-							m("td"),
-							m("td", m("select#choice1", {style:"width:13em"} ))
-						]),
-						m("tr", [
-							m("td.TYPE"),
-							m("td#type1")
-						])
-					])
-				),
-				m("td", {width:"100%"}, 
-					m("span.flex-row", {style:"-webkit-justify-content:flex-start !important"}, [
-							m("#graph1", {style:"width:870px; height:300px"}),
-							m("#dist1", {style:"width:140px; height:200px"})
-					])
-				)
-			]),
+
 			m("tr", {style:"height:300px"}, [
 				m("td", {valign:"top"},
 					m("table.chart2", {style:"background-color:rgba(0,255,255,0.1)"}, [
@@ -45,8 +21,47 @@ var charts_content = {
 						])
 					])
 				),
-				m("td", {width:"100%"}, m("#graph2", {style:"width:1000px; height:300px"}))
-			])
+				m("td", {width:"100%"}, m("#graph2", {style:"width:800px; height:300px"})),
+				m("td", {width:"100%", valign:"top"},
+					m("table", {style:"margin-left:20px"}, [
+						m("tr", {align:"center", style:"font-weight:bold; height:40px"}, m("td.SUMMARY", {colspan:"3"})),
+						m("tr", [m("td.MEASUREMENTS"), m("td", {style: "padding-left:10px"}), m("td#measurements")]),
+						m("tr", [m("td.MIN"), m("td"), m("td#min")]),
+						m("tr", [m("td.MAX"), m("td"), m("td#max")]),
+						m("tr", [m("td.OUTSPEC"), m("td"), m("td#outspec")]),
+						m("tr", [m("td.AVERAGE"), m("td"), m("td#average")]),
+						m("tr", [m("td.DEVIATION"), m("td"), m("td#deviation")]),
+						m("tr", [m("td.CP"), m("td"), m("td#cp")]),
+						m("tr", [m("td.CPK"), m("td"), m("td#cpk")])
+					])
+				)
+			]),	
+	
+			m("tr", {style:"height:300px"}, [
+				m("td", {valign:"top"},
+					m("table.chart1", {style:"background-color:rgba(0,255,255,0.1)"}, [
+						m("tr", m("td", {colspan:"2"} )),
+						m("tr", [
+							m("td.CHARTS"),
+							m("td", m("select#group1", {style:"width:13em"} ))
+						]),
+						m("tr", [
+							m("td"),
+							m("td", m("select#choice1", {style:"width:13em"} ))
+						]),
+						m("tr", [
+							m("td.TYPE"),
+							m("td#type1")
+						])
+					])
+				),
+				m("td", {width:"100%", colspan:"2"}, 
+					m("span.flex-row", {style:"-webkit-justify-content:flex-start !important"}, [
+							m("#graph1", {style:"width:870px; height:300px"}),
+							m("#dist1", {style:"width:140px; height:200px"})
+					])
+				)
+			])			
 		])
 	],
 	controller: function (element, isInitialized) {

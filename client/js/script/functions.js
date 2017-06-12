@@ -537,61 +537,55 @@ function get_current(table) {
 // go to the next record
 function next_rec(table) {
 	var name = table.split('.')[1];
+	var current = $.jStorage.get("pline.current."+name);
 	
-	this.current = $.jStorage.get("pline.current."+name);
-	$.getJSON('server/get_record.php', { 
-		query: 'SELECT * FROM '+table+' WHERE id = ' + this.current + ' LIMIT 1'
-	}, function(data) {
-		if (data.rowcount != 0) {
-			$.getJSON('server/get_record.php', { 
-				query: 'SELECT * FROM '+table+' WHERE id > "' + data.id + '" ORDER BY id ASC LIMIT 1'
-			}, function(data) {
-				if (data.rowcount != 0) {	// als er nog records worden gevonden...
-					$.jStorage.set("pline.current."+name, data.id);
-				}	
-			});
-		} else {
-			$.getJSON('server/get_record.php', { 
-				query: 'SELECT max(id) AS id FROM '+table
-			},	function(data) {
-				$.jStorage.set("pline.current."+name, data.id);	// NULL when none found
-			});
-		}		
-	});
+	if (isNaN(current)) {
+		$.getJSON('server/get_record.php', { 
+			query: 'SELECT max(id) AS id FROM '+table
+		},	function(data) {
+			$.jStorage.set("pline.current."+name, data.id);	// NULL when none found
+		});
+	}	else {
+		$.getJSON('server/get_record.php', { 
+			query: 'SELECT id FROM '+table+' WHERE date > '+
+						'(SELECT date FROM '+table+' WHERE id = '+ current +') ORDER BY date ASC LIMIT 1'
+		}, function(data) {
+			if (data.rowcount != 0) {	// als er nog records worden gevonden...
+				$.jStorage.set("pline.current."+name, data.id);
+			}	
+		});
+	}
 	show_data(name);
 }	
 
 // go to the previous record
 function prev_rec(table) {
 	var name = table.split('.')[1];
+	var current = $.jStorage.get("pline.current."+name);
 	
-	this.current = $.jStorage.get("pline.current."+name);
-	$.getJSON('server/get_record.php', { 
-		query: 'SELECT * FROM '+table+' WHERE id = ' + this.current + ' LIMIT 1'
-	}, function(data) {
-		if (data.rowcount != 0) {
-			$.getJSON('server/get_record.php', { 
-				query: 'SELECT * FROM '+table+' WHERE id < "' + data.id + '" ORDER BY id DESC LIMIT 1'
-			}, function(data) {
-				if (data.rowcount != 0) {	// als er nog records worden gevonden...
-					$.jStorage.set("pline.current."+name, data.id);
-				}	
-			});		
-		} else {
-			$.getJSON('server/get_record.php', { 
-				query: 'SELECT min(id) AS id FROM '+table
-			},	function(data) {
-				$.jStorage.set("pline.current."+name, data.id);	// NULL when none found
-			});
-		}		
-	});
+	if (isNaN(current)) {
+		$.getJSON('server/get_record.php', { 
+			query: 'SELECT min(id) AS id FROM '+table
+		},	function(data) {
+			$.jStorage.set("pline.current."+name, data.id);	// NULL when none found
+		});
+	}	else {
+		$.getJSON('server/get_record.php', { 
+			query: 'SELECT id FROM '+table+' WHERE date < '+
+						'(SELECT date FROM '+table+' WHERE id = '+ current +') ORDER BY date DESC LIMIT 1'
+		}, function(data) {
+			if (data.rowcount != 0) {	// als er nog records worden gevonden...
+				$.jStorage.set("pline.current."+name, data.id);
+			}	
+		});
+	}
 	show_data(name);
 }
 
 // make a new record
 function new_rec(table) {
 	var name = table.split('.')[1];
-	
+
 	$.getJSON('server/new.php', {	
 			table: table
 	}, function(data) {
@@ -683,122 +677,132 @@ function load_data(table) {
 
 // shows the data from a table
 function show_data(table) {
- 
-	get_current(table);	// get the current record pointer
-	
-	var id = $.jStorage.get("pline.current.inspection");
-	var sql = sprintf('SELECT * FROM gwc_pline.%s WHERE id=%s', table, id);
 
-	if (id != null)	{
-		$.getJSON('server/get_record.php', { 
-			query: sql
-		}, function(data) {
-			switch (table) {
-				case "inspection":
-					var lang = $.jStorage.get("lang");
+	var id = $.jStorage.get("pline.current."+table);
+	var sql = sprintf('SELECT * FROM gwc_pline.inspection WHERE id=%s', id);
 
-					// no records found - disable all input fields
-					if ($.jStorage.get("pline.current.inspection") == null) {
-						$("input").not("[type=button]").attr("disabled", "disabled");
-						$("textarea").attr("disabled", "disabled");
-					}
-					
-					// fill the selectbox options
-					$.get('server/get_inspector.php', function(data) {
-						$('#data [name=inspector]').empty().append(data);	
-						$('#data [name=inspectorDis]').empty().append(data);
-					});
-					$.get('server/get_productionstatus.php?lang='+lang, function(data) {$('#data [name=prodStat]').empty().append(data);	});
-					$.get('server/get_inspectionresult.php?lang='+lang, function(data) {$('#data [name=result]').empty().append(data);	});
-					$.get('server/get_disposal.php?lang='+lang, function(data) {$('#data [name=disposal]').empty().append(data);	});
-					$.get('server/get_specs.php?lang='+lang, function(data) {$('#data [name=number]').empty().append(data);	});
-					$.get('server/get_products.php?lang='+lang, function(data) {$('#data [name=product]').empty().append(data);	});	
-					$.get('server/get_status.php?lang='+lang, function(data) {
-						$('#physdata [name=1_moistOK]').empty().append(data);	
-						$('#physdata [name=2_moistOK]').empty().append(data);
-						$('#physdata [name=rawMatOK]').empty().append(data);
-						$('#physdata [name=storageMatOK]').empty().append(data);
-						$('#physdata [name=flavorOK]').empty().append(data);			
-						$('#physdata [name=blendcutMatOK]').empty().append(data);
-						$('#physdata [name=blendexpMatOK]').empty().append(data);
-						$('#physdata [name=blendreOK]').empty().append(data);
-						$('#physdata [name=blendstorMix]').empty().append(data);
-					});	
+	$.getJSON('server/get_record.php', { 
+		query: sql
+	}, function(data) {
+
+		if (data.rowcount == 0) {	// no data: get current id and reload
+			get_current(table);
+			//show_data(table);	
+			//return;
+		}
+		
+		switch (table) {
+			case "inspection":
+				var lang = $.jStorage.get("lang");
 				
-					// add option when it is not in the select
-					["inspector", "product", "inspectorDis", "number"].map(function (label) {
-						if (!$('#data [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
-							$("<option/>", {value: data[label], text:data[label]}).appendTo($('#data [name='+label+']'));
-						}
+				if (data.invalid == '1') {	// recalculate the score
+					$.getJSON('server/calc_penalties.php', {id: id}, function (result) {
+						data.score = result.score;
 					});
+				}
 
-					["date","batchNr","product","number","prodStat","inspector","result","pendingReason","disposal","matNotNR","inspectorDis"].map(function (label) {
-						$("#data [name="+label+"]").val(data[label]);
-					});
-					["score"].map(function (label) {	$("#data ."+label).html(data[label]);	});
+				// no records found - disable all input fields
+				if ($.jStorage.get("pline.current.inspection") == null) {
+					$("input").not("[type=button]").attr("disabled", "disabled");
+					$("textarea").attr("disabled", "disabled");
+				}
+				
+				// fill the selectbox options
+				$.get('server/get_inspector.php', function(data) {
+					$('#data [name=inspector]').empty().append(data);	
+					$('#data [name=inspectorDis]').empty().append(data);
+				});
+				$.get('server/get_productionstatus.php?lang='+lang, function(data) {$('#data [name=prodStat]').empty().append(data);	});
+				$.get('server/get_inspectionresult.php?lang='+lang, function(data) {$('#data [name=result]').empty().append(data);	});
+				$.get('server/get_disposal.php?lang='+lang, function(data) {$('#data [name=disposal]').empty().append(data);	});
+				$.get('server/get_specs.php?lang='+lang, function(data) {$('#data [name=number]').empty().append(data);	});
+				$.get('server/get_products.php?lang='+lang, function(data) {$('#data [name=product]').empty().append(data);	});	
+				$.get('server/get_status.php?lang='+lang, function(data) {
+					$('#physdata [name=1_moistOK]').empty().append(data);	
+					$('#physdata [name=2_moistOK]').empty().append(data);
+					$('#physdata [name=rawMatOK]').empty().append(data);
+					$('#physdata [name=storageMatOK]').empty().append(data);
+					$('#physdata [name=flavorOK]').empty().append(data);			
+					$('#physdata [name=blendcutMatOK]').empty().append(data);
+					$('#physdata [name=blendexpMatOK]').empty().append(data);
+					$('#physdata [name=blendreOK]').empty().append(data);
+					$('#physdata [name=blendstorMix]').empty().append(data);
+				});	
+			
+				// add option when it is not in the select
+				["inspector", "product", "inspectorDis", "number"].map(function (label) {
+					if (!$('#data [name='+label+']').find("option:contains('" + data[label]  + "')").length) {
+						$("<option/>", {value: data[label], text:data[label]}).appendTo($('#data [name='+label+']'));
+					}
+				});
 
-					["rawMatOK","1_matinMoistA","1_matinMoistB","1_moistOK","1_matoutMoistA","1_matoutMoistB","1_matoutTempA","1_matoutTempB","1_accuracy",
-					"2_matinMoistA","2_matinMoistB","2_moistOK","2_matoutMoistA","2_matoutMoistB","2_matoutTempA","2_matoutTempB","2_accuracy",
-					"storageTime","storageMatOK","cutWidth","cyl_matinMoistA","cyl_matinMoistB","cyl_matoutMoistA","cyl_matoutMoistB",
-					"cyl_matoutTempA","cyl_matoutTempB","dry_matoutMoistA","dry_matoutMoistB","dry_matoutTempA","dry_matoutTempB",
-					"flavorOK","flavorAccuracy","flavor_matoutMoistA","flavor_matoutMoistB","flavor_matoutMoistC","flavor_matoutMoistD",
-					"blendcutMatOK","blendcutAccuracy","blendexpMatOK","blendexpAccuracy","blendreID","blendreOK","blendstorMix",
-					"blendstorMoistA","blendstorMoistB","blendstorMoistC","blendstorMoistD",
-					"amountLongStems","amountShortStems","fillingPower"].map(function (label) {
-						$("#physdata [name="+label+"]").val(data[label]);
-					});
-					
-					var sql = sprintf("SELECT * FROM gwc_pline.penalties WHERE id=%s",  data.penalties);
-					$.getJSON('server/get_record.php', {
-						query: sql
-					},	function(pen) {
-						["FeedMatID","1_matinMoist","1_matMoistID","1_matoutMoist","1_matoutTemp","1_accuracy","2_matinMoist","2_matMoistID",
-						"2_matoutMoist","2_matoutTemp","2_accuracy","storTime","stormatOK","cutWidth","cyl_matinMoist","cyl_matoutMoist","cyl_matoutTemp",
-						"dry_matoutMoist","dry_matoutTemp","blendflavorMatOK","blendflavorAccuracy","blendflavorMoist","blendcutStemID","blendcutAccuracy",
-						"blendexpMatOK","blendexpAccuracy","blendreMatOK","blendstorMatOK","blendstorMoist","amountLongStems","amountShortStems",
-						"fillingPower"].map(function (label) {
-							$("#penalties ."+label).html(pen[label]);
-						})
-					});
-					
-					var spec = getSpec(data.product, data.date);
-					[ {group:"regain1",choice:"matinmoist"}, {group:"regain1",choice:"matoutmoist"},
-						{group:"regain1",choice:"matouttemp"}, {group:"regain1",choice:"accuracy"},
-						{group:"regain2",choice:"matinmoist"}, {group:"regain2",choice:"matoutmoist"},
-						{group:"regain2",choice:"matouttemp"}, {group:"regain2",choice:"accuracy"},
-						{group:"storage",choice:"time"}, {group:"cutting",choice:"breedte"},
-						{group:"drying",choice:"matoutmoist"}, {group:"drying",choice:"matouttemp"},
-						{group:"flavor",choice:"matoutmoist"}, {group:"flavor",choice:"accuracy"},
-						{group:"cylheat",choice:"matinmoist"}, {group:"cylheat",choice:"matoutmoist"}, {group:"cylheat",choice:"matouttemp"},
-						{group:"stems",choice:"long"}, {group:"stems",choice:"short"}, {group:"stems",choice:"filling"},
-						{group:"blend",choice:"moisture"}, {group:"blend",choice:"cutacc"}, {group:"blend",choice:"expacc"}
-					].map(function(a) {
-						colorSeries(a.group, a.choice, spec);								// color the inputs
-					});
-					break;
-				case "specs":
-					// no records found - disable all input fields
-					if ($.jStorage.get("pline.current.specs") == null) {
-						$("#specs input").not("[type=button]").attr("disabled", "disabled");
-						$("#specs textarea").attr("disabled", "disabled");
-					}
-					show_specs();
-					break;
-				case "users":
-					// no records found - disable all input fields
-					if ($.jStorage.get("pline.current.users") == null) {
-						$("#users input").not("[type=button]").attr("disabled", "disabled");
-						$("#users checkbox").attr("disabled", "disabled");
-						$("#users .save").attr("disabled", "disabled");
-					}
-					show_users();
-					break;
-				case "names":
-					show_names();
-					break;
-			}		
-		});
-	}
+				["date","batchNr","product","number","prodStat","inspector","result","pendingReason","disposal","matNotNR","inspectorDis"].map(function (label) {
+					$("#data [name="+label+"]").val(data[label]);
+				});
+				["score"].map(function (label) {	$("#data ."+label).html(data[label]);	});
+
+				["rawMatOK","1_matinMoistA","1_matinMoistB","1_moistOK","1_matoutMoistA","1_matoutMoistB","1_matoutTempA","1_matoutTempB","1_accuracy",
+				"2_matinMoistA","2_matinMoistB","2_moistOK","2_matoutMoistA","2_matoutMoistB","2_matoutTempA","2_matoutTempB","2_accuracy",
+				"storageTime","storageMatOK","cutWidth","cyl_matinMoistA","cyl_matinMoistB","cyl_matoutMoistA","cyl_matoutMoistB",
+				"cyl_matoutTempA","cyl_matoutTempB","dry_matoutMoistA","dry_matoutMoistB","dry_matoutTempA","dry_matoutTempB",
+				"flavorOK","flavorAccuracy","flavor_matoutMoistA","flavor_matoutMoistB","flavor_matoutMoistC","flavor_matoutMoistD",
+				"blendcutMatOK","blendcutAccuracy","blendexpMatOK","blendexpAccuracy","blendreID","blendreOK","blendstorMix",
+				"blendstorMoistA","blendstorMoistB","blendstorMoistC","blendstorMoistD",
+				"amountLongStems","amountShortStems","fillingPower"].map(function (label) {
+					$("#physdata [name="+label+"]").val(data[label]);
+				});
+				
+				var sql = sprintf("SELECT * FROM gwc_pline.penalties WHERE id=%s",  data.penalties);
+				$.getJSON('server/get_record.php', {
+					query: sql
+				},	function(pen) {
+					["FeedMatID","1_matinMoist","1_matMoistID","1_matoutMoist","1_matoutTemp","1_accuracy","2_matinMoist","2_matMoistID",
+					"2_matoutMoist","2_matoutTemp","2_accuracy","storTime","stormatOK","cutWidth","cyl_matinMoist","cyl_matoutMoist","cyl_matoutTemp",
+					"dry_matoutMoist","dry_matoutTemp","blendflavorMatOK","blendflavorAccuracy","blendflavorMoist","blendcutStemID","blendcutAccuracy",
+					"blendexpMatOK","blendexpAccuracy","blendreMatOK","blendstorMatOK","blendstorMoist","amountLongStems","amountShortStems",
+					"fillingPower"].map(function (label) {
+						$("#penalties ."+label).html(pen[label]);
+					})
+				});
+				
+				var spec = getSpec(data.product, data.date);
+				[ {group:"regain1",choice:"matinmoist"}, {group:"regain1",choice:"matoutmoist"},
+					{group:"regain1",choice:"matouttemp"}, {group:"regain1",choice:"accuracy"},
+					{group:"regain2",choice:"matinmoist"}, {group:"regain2",choice:"matoutmoist"},
+					{group:"regain2",choice:"matouttemp"}, {group:"regain2",choice:"accuracy"},
+					{group:"storage",choice:"time"}, {group:"cutting",choice:"breedte"},
+					{group:"drying",choice:"matoutmoist"}, {group:"drying",choice:"matouttemp"},
+					{group:"flavor",choice:"matoutmoist"}, {group:"flavor",choice:"accuracy"},
+					{group:"cylheat",choice:"matinmoist"}, {group:"cylheat",choice:"matoutmoist"}, {group:"cylheat",choice:"matouttemp"},
+					{group:"stems",choice:"long"}, {group:"stems",choice:"short"}, {group:"stems",choice:"filling"},
+					{group:"blend",choice:"moisture"}, {group:"blend",choice:"cutacc"}, {group:"blend",choice:"expacc"}
+				].map(function(a) {
+					colorSeries(a.group, a.choice, spec);								// color the inputs
+				});
+				break;
+			case "specs":
+				// no records found - disable all input fields
+				if ($.jStorage.get("pline.current.specs") == null) {
+					$("#specs input").not("[type=button]").attr("disabled", "disabled");
+					$("#specs textarea").attr("disabled", "disabled");
+				}
+				show_specs();
+				break;
+			case "users":
+				// no records found - disable all input fields
+				if ($.jStorage.get("pline.current.users") == null) {
+					$("#users input").not("[type=button]").attr("disabled", "disabled");
+					$("#users checkbox").attr("disabled", "disabled");
+					$("#users .save").attr("disabled", "disabled");
+				}
+				show_users();
+				break;
+			case "names":
+				show_names();
+				break;
+		}		
+	});
+
 }
 	
 function show_formulas() {	
@@ -917,7 +921,6 @@ function show_spec_details(id) {
 		});	
 	}
 }
-
 
 function show_names() {
 	$.getJSON('server/get_record.php', { 

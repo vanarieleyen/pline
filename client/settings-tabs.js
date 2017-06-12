@@ -38,9 +38,9 @@ var settings_content = {
 				switch (keus) {
 					case "formulas_sub_tab":	$.jStorage.set("pline_settingstab", 0);		show_formulas();
 												break;
-					case "specs_sub_tab": 		$.jStorage.set("pline_settingstab", 1);	load_data("specs");
+					case "specs_sub_tab": 		$.jStorage.set("pline_settingstab", 1);		load_data("specs");
 												break;
-					case "users_sub_tab":		 	$.jStorage.set("pline_settingstab", 2);		load_data("users");
+					case "users_sub_tab":		$.jStorage.set("pline_settingstab", 2);		load_data("users");
 												break;
 					case "names_sub_tab": 		$.jStorage.set("pline_settingstab", 3);		load_data("names");
 												break;

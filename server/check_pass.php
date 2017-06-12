@@ -28,6 +28,7 @@ if (trim($pass) == '') {
 	$database->execute();
 	$database->query("SET lc_time_names = 'zh_CN'");
 	$database->execute();
+	$database->endTransaction();
 
 	// get the user
 	$query = "SELECT * FROM gwc_handmade.users WHERE BINARY login = :LOGIN ";	// use case sensitive search for login (BINARY keyword)
@@ -37,8 +38,6 @@ if (trim($pass) == '') {
 	$count = $database->rowCount();
 	$ok = ($count == 1);
 	extract($rec);
-
-	$database->endTransaction();
 
 	$guest = 0;
 }

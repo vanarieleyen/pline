@@ -234,7 +234,7 @@ function update($db, $id) {
 	$db->bind(':ID', $rec['penalties']);
 	$db->execute();
 	
-	$query = "UPDATE gwc_pline.inspection SET score=:score WHERE id=:id";
+	$query = "UPDATE gwc_pline.inspection SET invalid=0, score=:score WHERE id=:id";
 	$db->query($query);
 	$db->bind(":score", $penalties);
 	$db->bind(":id", $id);
@@ -276,9 +276,13 @@ function update($db, $id) {
 }
 
 $result = array();
+
 $database = new Database();
+$database->beginTransaction();
 
 update($database, $id);
+
+$database->endTransaction();
 
 echo json_encode($result);
 

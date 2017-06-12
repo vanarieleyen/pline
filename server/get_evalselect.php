@@ -42,9 +42,9 @@ $disposalCond = ($disposal != "0") ? sprintf(" AND disposal='%s' ", $disposal) :
 
 $query = sprintf("SELECT * FROM gwc_pline.inspection WHERE DATE(date) BETWEEN DATE('%s') AND DATE('%s') %s%s%s%s ", 
 										$start, $end, $productCond, $prodStatCond, $resultCond, $disposalCond);
-
 $database->query($query);
 $rows = $database->resultset();
+
 if ($database->rowCount() > 0) {
 	foreach ($rows AS $idx=>$row) {
 		$val = trim($row["product"]);

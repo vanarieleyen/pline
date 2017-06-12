@@ -12,7 +12,6 @@ $database->query("SET NAMES 'utf8'");
 $database->execute();
 $database->query("SET lc_time_names = 'zh_CN'");
 $database->execute();
-$database->endTransaction();
 
 // set the conditions of the query
 $condition = sprintf("DATE(date) BETWEEN '%s' AND '%s' ", $start, $end);
@@ -58,6 +57,8 @@ $query = sprintf("SELECT %s, %s, %s
 						WHERE %s ORDER BY t1.date", $inspectionFields, $specFields, $penaltyFields, $condition);
 $database->query($query);
 $rows = $database->resultset();
+
+$database->endTransaction();
 
 echo json_encode($rows);
 	

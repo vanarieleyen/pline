@@ -30,7 +30,7 @@ $order = sprintf(" ORDER BY %s %s ", $column[$sort+1], $direction);
 // list the fields and make them sortable
 $selection = "id, date, batchNr*1 AS batchNr, product, score*1.0 AS score, (result%3+result) AS result";
 
-$query = sprintf("SELECT %s	FROM gwc_pline.inspection WHERE 1 %s %s", $selection, $order, $limit);
+$query = sprintf("SELECT %s FROM gwc_pline.inspection WHERE 1 %s %s", $selection, $order, $limit);
 $database->query($query);
 $rows = $database->resultset();
 

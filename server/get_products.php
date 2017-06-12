@@ -19,6 +19,8 @@ $query = "SELECT name FROM gwc_pline.specs WHERE DATE(end)='3000-01-01' ORDER BY
 $database->query($query);
 $rows = $database->resultset();
 
+$database->endTransaction();
+
 // generate the option list
 echo sprintf("<option value='/'>%s</option selected>", "---");
 foreach ($rows AS $val) {

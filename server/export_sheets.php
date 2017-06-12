@@ -18,7 +18,6 @@ $database->query("SET NAMES 'utf8'");
 $database->execute();
 $database->query("SET lc_time_names = 'zh_CN'");
 $database->execute();
-$database->endTransaction();
 
 // set the conditions of the query
 $condition = sprintf("DATE(date) BETWEEN '%s' AND '%s' ", $start, $end);
@@ -1048,6 +1047,8 @@ foreach ($record AS $row) {		// walk through all the sheets
 	writeLine($r, 'inspectorDis');
 					
 }
+
+$database->endTransaction();
 
 //$objPHPExcel->removeSheetByIndex(0);	// remove the default (not used) first sheet
 

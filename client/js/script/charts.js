@@ -1,4 +1,64 @@
-   
+
+// calculates and displays the summary of the selected data   
+function display_summary() {
+	var product = $('#evaluate [name=product] option:selected').val();
+	var group = 	$('#charts #group2').val();									// regain1, regain2 etc..
+	var choice =	$('#charts #choice2').val();								// inputmoist, outputmoist etc...
+	var data = 		$.jStorage.get("pline_rawdata");
+	var fields = db[group][choice].field;
+	
+	
+	
+	var waarden = [];
+	var cp_k = {};
+	var spec = {};
+	var checksum;
+	var out = 0;
+	var count = 0;
+	for (var i = 0; i < data.count; i++) {
+		fields.map(function (naam) {
+			var value = data[i].row[naam];
+			if (!isEmpty(value)) {
+				if ($.isNumeric(value)) {
+					value = parseFloat(value);
+					waarden.push(value);
+					spec = getSpec(product, data[i].row.date);
+					low = parseFloat(spec[db[group][choice].spec.min]);
+					high = parseFloat(spec[db[group][choice].spec.max]);
+					checksum = crc(JSON.stringify(spec));
+					if (typeof cp_k[checksum] == 'undefined') {
+						cp_k[checksum] = {};
+						cp_k[checksum].vals = [];
+						cp_k[checksum].low = low;
+						cp_k[checksum].high = high;
+					}
+					cp_k[checksum].vals.push(value);
+					if (value < low || value > high) out++;
+					count++;
+				}
+			}
+		});
+	}	
+	var avg_cpk = 0;
+	var avg_cp = 0;
+	var avg_out;
+	var cnt = 0;
+	for (var prop in cp_k) {
+		avg_cpk += parseFloat(cpk(cp_k[prop].low, cp_k[prop].high, cp_k[prop].vals));
+		avg_cp += parseFloat(cp(cp_k[prop].low, cp_k[prop].high, cp_k[prop].vals));
+		cnt++;
+	}
+	pct = Math.round(out/(count/100)*10)/10;
+	$("#charts #measurements").text(count);
+	$("#charts #deviation").text( Math.round( jStat.stdev(waarden, true) *100)/100 );
+	$("#charts #average").text( Math.round( jStat.mean(waarden) *100)/100 );
+	$("#charts #outspec").text( out+' ('+pct+'%)' );
+	$("#charts #cp").text( Math.round(avg_cp/cnt*100)/100 );
+	$("#charts #cpk").text( Math.round(avg_cpk/cnt*100)/100 );
+	$("#charts #min").text(Math.min(...waarden));
+	$("#charts #max").text(Math.max(...waarden));
+}
+
 // draws the charts in chart.php
 function draw_chart(keus) {
 	var product = $('#evaluate [name=product] option:selected').val();
@@ -15,6 +75,8 @@ function draw_chart(keus) {
 
 	if (typeof product == 'undefined' || product==0)
 		return;
+		
+	if (keus=="2") display_summary();
 		
 	switch (type) {
 		case 'Raw':				rawChart('#charts #graph'+keus, group, choice, product, data);

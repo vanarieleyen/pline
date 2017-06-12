@@ -25,7 +25,6 @@ if (!isset($query)) {
 }
 
 $database->query($query);
-//echo $database->getQuery($query);	return;
 try {
 	$result = $database->resultset();
 } catch(PDOException $exception) {

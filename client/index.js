@@ -109,10 +109,33 @@ var pline = {
 }
 
 $(document).ready(function() {
+
+	// returns the callers arguments as objects
+	function Getparams() {
+		var scripts = document.getElementsByTagName('script');
+		var myScript = scripts[scripts.length - 1];
+		var query = myScript.src.replace(/^[^\?]+\??/, '');
+		var Params = new Object();
+
+		if (query) {
+			var Pairs = query.split(/[;&]/);
+			for (var i = 0; i < Pairs.length; i++) {
+				var KeyVal = Pairs[i].split('=');
+				if (!KeyVal || KeyVal.length != 2) continue;
+				var key = unescape(KeyVal[0]);
+				var val = unescape(KeyVal[1]);
+				val = val.replace(/\+/g, ' ');
+				Params[key] = val;
+			}
+		}
+		return Params;
+	}
+	console.log(Getparams());	
+	
 	m.mount(document.body, pline );
 
 	$.getJSON('server/get_server.php', function (data) {
-		if (data != "127.0.0.1")	// dont show login on development server
+		//if (data != "127.0.0.1")	// dont show login on development server
 			$("#loginpop").popup();
 	});
 	

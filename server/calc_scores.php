@@ -134,6 +134,8 @@ $sql = sprintf("UPDATE gwc_handmade.%s SET score='%s', quality='%s' WHERE id=%s"
 $database->query($sql);
 $database->execute();
 
+$database->endTransaction();
+
 echo json_encode($result);
 
 ?>

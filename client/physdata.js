@@ -247,8 +247,6 @@ var physdata_content = {
 			});
 		});
 		
-
-		
 	},
 	view: function () {
 		return m("#physdata", {style: "background-color:rgba(0,255,255,0)"},  this.contents);

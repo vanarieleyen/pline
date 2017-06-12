@@ -26,17 +26,6 @@ switch ($table) {
 		$database->query("INSERT INTO gwc_pline.inspection (date) VALUES(NOW())");		// create new inspection record
 		$database->execute();
 		$id = $database->lastInsertId();
-		
-		$database->query("INSERT INTO gwc_pline.penalties (master) VALUES(:ID)");		// create new penalties record
-		$database->bind(":ID", $id);
-		$database->execute();
-		$penalties_id = $database->lastInsertId();
-		
-		$database->query("UPDATE gwc_pline.inspection SET penalties=:PENID WHERE id=:ID");	// link inspection to penalties
-		$database->bind(":ID", $id);
-		$database->bind(":PENID", $penalties_id);
-		$database->execute();
-
 		break;
 	default:
 		$query = sprintf("INSERT INTO %s (date) VALUES(NOW())", $table);
